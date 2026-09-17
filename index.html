@@ -54,6 +54,8 @@ body.is-detail .list-view,body.is-detail .gallery{display:none}
 .btn:disabled{opacity:.45}
 .audio-row{margin-top:16px}
 .audio-row audio{width:100%;height:32px}
+.audio-credit{font-size:11px;color:var(--muted);margin:0 0 8px}
+.audio-status{font-size:11px;color:var(--muted);margin:8px 0 0}
 .reader-root{display:none;position:fixed;inset:0;z-index:9;background:var(--page)}
 .reader-root.open{display:flex;flex-direction:column}
 .reader-chrome{min-height:42px;display:flex;align-items:center;justify-content:space-between;padding:0 12px;border-bottom:1px solid var(--line)}
@@ -114,7 +116,7 @@ const BOOKS = [
     blurb:'A long-haul driver, an autonomous unit named Charley, and the slow erasure of human authority on the northern plains.',
     chapters:[{label:'One. Wamsutter', text:'The skirt bracket only made noise between sixty-two and sixty-eight.\n\nHe found the crack in April, a hairline through the mount where the fairing tied into the frame rail.'}]},
   {id:'qf-first-water', title:'Quantum Frontier: First Water', subtitle:'Sera Holt · water circuit', series:'Quantum Frontier', era:'Prequels · Ark Survey', year:2026, type:'Fiction', status:'Manuscript',
-    audio:['/audio/first-water.mp3','/audio/ark-survey-ch01-v2-leo.mp3'],
+    reader:'Leo',audio:['/audio/first-water.mp3','/audio/ark-survey-ch01-v2-leo.mp3','/audio/ark-survey-ch01-v2-leo-p01.mp3','/audio/ark-survey-ch01-v2-leo-p02.mp3','/audio/ark-survey-ch01-v2-leo-p03.mp3','/audio/ark-survey-ch01-v2-leo-p04.mp3','/audio/ark-survey-ch01-v2-leo-p05.mp3','/audio/ark-survey-ch01-v2-leo-p06.mp3'],
     blurb:'Sera Holt on the water circuit. First prequel of the Ark Survey era.',
     chapters:[leaf('Quantum Frontier: First Water','Sera Holt','Listen is wired to First Water.')]},
   {id:'qf-perimeter-sample', title:'Quantum Frontier: Perimeter Sample', subtitle:'Kael Orth', series:'Quantum Frontier', era:'Prequels · Ark Survey', year:2026, type:'Fiction', status:'Manuscript', blurb:'Kael Orth. Second prequel.', chapters:[leaf('Quantum Frontier: Perimeter Sample','Kael Orth')]},
@@ -182,16 +184,20 @@ function renderDetail(){
   if(b.audio) actions += `<button class="btn ghost" type="button" id="d-listen">Listen</button>`;
   const prices = p ? `<div class="price-table"><div class="price-row"><span>Borrow · ${p.borrow.days} days</span><span>${p.borrow.label}</span></div><div class="price-row"><span>Buy · permanent</span><span>${p.buy.label}</span></div></div>` :
     (isSoon(b)?`<div class="price-table"><div class="price-row"><span>Status</span><span>Coming soon</span></div></div>`:'');
-  const audio = b.audio ? `<div class="audio-row" id="audio-row" hidden><audio id="qf-audio" controls preload="none"></audio></div>` : '';
-  $('detail').innerHTML = `<h1>${b.title}</h1><div class="sub">${b.series?b.series+' · '+(b.era||'')+'<br>':''}${b.subtitle}<br>${b.year} · ${b.type} · ${b.status}</div><div class="blurb">${b.blurb||''}</div>${prices}<div class="actions">${actions}</div>${audio}`;
+  const audio = b.audio ? `<div class="audio-row" id="audio-row"><div class="audio-credit">Read by ${b.reader||'Leo'}</div><audio id="qf-audio" controls preload="metadata"></audio><div class="audio-status" id="audio-status">Leo · hired reader</div></div>` : '';
+  $('detail').innerHTML = `<h1>${b.title}</h1><div class="sub">${b.series?b.series+' · '+(b.era||'')+'<br>':''}${b.subtitle}<br>${b.year} · ${b.type} · ${b.status}${b.reader?' · Read by '+b.reader:''}</div><div class="blurb">${b.blurb||''}</div>${prices}<div class="actions">${actions}</div>${audio}`;
   const r=$('d-read'); if(r) r.onclick=()=>openReader(b);
   const lis=$('d-listen');
   if(lis) lis.onclick=()=>{
-    const row=$('audio-row'), a=$('qf-audio'); if(!row||!a) return;
+    const row=$('audio-row'), a=$('qf-audio'), st=$('audio-status'); if(!row||!a) return;
     row.hidden=false;
+    if(a.src && !a.paused) return;
     const srcs=b.audio.slice(); let i=0;
-    const next=()=>{ if(i>=srcs.length) return; a.src=srcs[i++]; a.play().catch(next); };
-    a.onerror=next; next();
+    const label=()=>{ if(st) st.textContent = i<=1 ? 'Leo · hired reader · First Water' : 'Leo · hired reader · part '+String(i).padStart(2,'0'); };
+    const next=()=>{ if(i>=srcs.length){ if(st) st.textContent='Audio file is not on this host yet.'; return; } a.src=srcs[i++]; label(); a.play().catch(next); };
+    a.onerror=next;
+    a.onended=()=>{ if(i<srcs.length) next(); else if(st) st.textContent='Leo · hired reader · end'; };
+    next();
   };
 }
 function openReader(b){
