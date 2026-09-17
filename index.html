@@ -52,14 +52,15 @@ body.is-detail .list-view,body.is-detail .gallery{display:none}
 .btn.primary{background:var(--text);color:var(--bg)}
 .btn.ghost{border-color:var(--line-strong)}
 .btn:disabled{opacity:.45}
-.audio-row{margin-top:16px}
-.audio-row audio{width:100%;height:32px}
+.audio-row{margin-top:16px;padding-top:14px;border-top:1px solid var(--line)}
+.audio-row audio,.reader-player audio{width:100%;height:36px}
 .audio-credit{font-size:11px;color:var(--muted);margin:0 0 8px}
 .audio-status{font-size:11px;color:var(--muted);margin:8px 0 0}
-.reader-root{display:none;position:fixed;inset:0;z-index:9;background:var(--page)}
+.reader-root{display:none;position:fixed;inset:0;z-index:40;background:var(--page)}
 .reader-root.open{display:flex;flex-direction:column}
-.reader-chrome{min-height:42px;display:flex;align-items:center;justify-content:space-between;padding:0 12px;border-bottom:1px solid var(--line)}
+.reader-chrome{min-height:42px;display:flex;align-items:center;justify-content:space-between;padding:0 12px;border-bottom:1px solid var(--line);background:var(--page)}
 .reader-chrome button{border:0;background:transparent;color:var(--muted);font-size:11px;height:28px;padding:0 8px}
+.reader-player{padding:10px 12px 12px;border-bottom:1px solid var(--line)}
 .scroll-inner{max-width:36rem;margin:0 auto;padding:2.5rem 1.75rem 4.5rem;font-family:Literata,Georgia,serif}
 .scroll-inner h1{font-size:1.7rem;font-weight:600;margin-bottom:.35rem}
 .scroll-inner .sub{font-size:11px;color:var(--muted);margin-bottom:2rem;font-family:'JetBrains Mono',monospace}
@@ -118,7 +119,7 @@ const BOOKS = [
   {id:'qf-first-water', title:'Quantum Frontier: First Water', subtitle:'Sera Holt · water circuit', series:'Quantum Frontier', era:'Prequels · Ark Survey', year:2026, type:'Fiction', status:'Manuscript',
     reader:'Leo',audio:['/audio/first-water.mp3','/audio/ark-survey-ch01-v2-leo.mp3','/audio/ark-survey-ch01-v2-leo-p01.mp3','/audio/ark-survey-ch01-v2-leo-p02.mp3','/audio/ark-survey-ch01-v2-leo-p03.mp3','/audio/ark-survey-ch01-v2-leo-p04.mp3','/audio/ark-survey-ch01-v2-leo-p05.mp3','/audio/ark-survey-ch01-v2-leo-p06.mp3'],
     blurb:'Sera Holt on the water circuit. First prequel of the Ark Survey era.',
-    chapters:[leaf('Quantum Frontier: First Water','Sera Holt','Listen is wired to First Water.')]},
+    chapters:[leaf('Quantum Frontier: First Water','Sera Holt','Read by Leo.')]},
   {id:'qf-perimeter-sample', title:'Quantum Frontier: Perimeter Sample', subtitle:'Kael Orth', series:'Quantum Frontier', era:'Prequels · Ark Survey', year:2026, type:'Fiction', status:'Manuscript', blurb:'Kael Orth. Second prequel.', chapters:[leaf('Quantum Frontier: Perimeter Sample','Kael Orth')]},
   {id:'qf-structure-grid', title:'Quantum Frontier: Structure Grid', subtitle:'Lin Sato', series:'Quantum Frontier', era:'Prequels · Ark Survey', year:2026, type:'Fiction', status:'Manuscript', blurb:'Lin Sato. Third prequel.', chapters:[leaf('Quantum Frontier: Structure Grid','Lin Sato')]},
   {id:'qf-work-tag', title:'Quantum Frontier: Work Tag', subtitle:'Mira Kade', series:'Quantum Frontier', era:'Prequels · Ark Survey', year:2026, type:'Fiction', status:'Manuscript', blurb:'Mira Kade. Fourth prequel.', chapters:[leaf('Quantum Frontier: Work Tag','Mira Kade')]},
@@ -166,13 +167,13 @@ function render(){
   const books=BOOKS;
   $('list-view').innerHTML = withSections(books, b=>`<div class="list-row ${isSoon(b)?'soon':''}" data-id="${b.id}"><div><div class="t">${listTitle(b)}</div><div class="m">${b.year} · ${b.type}${b.series?' · '+b.subtitle:''}</div></div><div class="price">${listPrice(b)}</div></div>`, sec=>`<div class="list-section">${sec}</div>`);
   $('list-view').querySelectorAll('.list-row').forEach(el=>{
-    el.onclick=()=>{ selected=el.dataset.id; const b=BOOKS.find(x=>x.id===selected); if(window.innerWidth<=900 && !isSoon(b)) openReader(b); else { document.body.classList.add('is-detail'); renderDetail(); } };
+    el.onclick=()=>{ selected=el.dataset.id; document.body.classList.add('is-detail'); renderDetail(); };
   });
   $('list-rail').innerHTML = withSections(books, b=>`<div class="row ${b.id===selected?'on':''}" data-id="${b.id}"><div class="t">${listTitle(b)}</div><div class="m">${b.year} · ${listPrice(b)}</div></div>`, sec=>`<div class="section">${sec}</div>`);
   $('list-rail').querySelectorAll('.row').forEach(el=> el.onclick=()=>{ selected=el.dataset.id; renderDetail(); render(); });
   $('gallery').innerHTML = books.map(b=>`<div class="g-card" data-id="${b.id}"><div class="g-cover">${listTitle(b)}</div><div class="g-meta"><div class="t">${listTitle(b)}</div><div class="m">${b.year} · ${b.type} · ${listPrice(b)}</div></div></div>`).join('');
   $('gallery').querySelectorAll('.g-card').forEach(el=>{
-    el.onclick=()=>{ selected=el.dataset.id; const b=BOOKS.find(x=>x.id===selected); if(isSoon(b)){ document.body.classList.add('is-detail'); renderDetail(); } else openReader(b); };
+    el.onclick=()=>{ selected=el.dataset.id; const b=BOOKS.find(x=>x.id===selected); if(isSoon(b)||b.audio){ document.body.classList.add('is-detail'); renderDetail(); } else openReader(b); };
   });
   renderDetail();
 }
@@ -188,24 +189,30 @@ function renderDetail(){
   $('detail').innerHTML = `<h1>${b.title}</h1><div class="sub">${b.series?b.series+' · '+(b.era||'')+'<br>':''}${b.subtitle}<br>${b.year} · ${b.type} · ${b.status}${b.reader?' · Read by '+b.reader:''}</div><div class="blurb">${b.blurb||''}</div>${prices}<div class="actions">${actions}</div>${audio}`;
   const r=$('d-read'); if(r) r.onclick=()=>openReader(b);
   const lis=$('d-listen');
+  if(b.audio) bindAudio($('qf-audio'), $('audio-status'), b.audio.slice(), false);
   if(lis) lis.onclick=()=>{
-    const row=$('audio-row'), a=$('qf-audio'), st=$('audio-status'); if(!row||!a) return;
-    row.hidden=false;
-    if(a.src && !a.paused) return;
-    const srcs=b.audio.slice(); let i=0;
-    const label=()=>{ if(st) st.textContent = i<=1 ? 'Leo · hired reader · First Water' : 'Leo · hired reader · part '+String(i).padStart(2,'0'); };
-    const next=()=>{ if(i>=srcs.length){ if(st) st.textContent='Audio file is not on this host yet.'; return; } a.src=srcs[i++]; label(); a.play().catch(next); };
-    a.onerror=next;
-    a.onended=()=>{ if(i<srcs.length) next(); else if(st) st.textContent='Leo · hired reader · end'; };
-    next();
+    const a=$('qf-audio'); if(!a) return;
+    if(a.paused) a.play().catch(()=>bindAudio(a, $('audio-status'), b.audio.slice(), true));
   };
+}
+function bindAudio(a, st, srcs, autoplay){
+  if(!a || !srcs || !srcs.length) return;
+  let i=0;
+  const label=()=>{ if(st) st.textContent = i<=1 ? 'Leo · hired reader' : 'Leo · hired reader · part '+String(i).padStart(2,'0'); };
+  const next=()=>{ if(i>=srcs.length){ if(st) st.textContent='Audio file is not on this host yet.'; return; } a.src=srcs[i++]; label(); if(autoplay) a.play().catch(next); };
+  a.onerror=next;
+  a.onended=()=>{ if(i<srcs.length){ autoplay=true; next(); } else if(st) st.textContent='Leo · hired reader · end'; };
+  a.removeAttribute('src');
+  next();
 }
 function openReader(b){
   if(isSoon(b)){ selected=b.id; document.body.classList.add('is-detail'); renderDetail(); return; }
   $('reader-title').textContent=b.title;
-  $('scroll-inner').innerHTML = `<h1>${b.title}</h1><div class="sub">${b.subtitle}<br>${b.year} · ${b.type}</div>` +
+  const player = b.audio ? `<div class="reader-player"><div class="audio-credit">Read by ${b.reader||'Leo'}</div><audio id="reader-qf-audio" controls preload="metadata"></audio><div class="audio-status" id="reader-audio-status">Leo · hired reader</div></div>` : '';
+  $('scroll-inner').innerHTML = player + `<h1>${b.title}</h1><div class="sub">${b.subtitle}<br>${b.year} · ${b.type}${b.reader?' · Read by '+b.reader:''}</div>` +
     (b.chapters||[]).map(ch=>`<p><strong>${ch.label}</strong></p>`+ch.text.split(/\n\n+/).map(p=>`<p>${p.replace(/\n/g,'<br>')}</p>`).join('')).join('');
   $('reader').classList.add('open');
+  if(b.audio) bindAudio($('reader-qf-audio'), $('reader-audio-status'), b.audio.slice(), false);
 }
 $('btn-back').onclick=()=>$('reader').classList.remove('open');
 $('btn-list').onclick=()=>setView('list');
