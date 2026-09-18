@@ -37,6 +37,12 @@ const sectionLabel = b => {
   if(b.era==='Neo-Damascus') return 'Quantum Frontier · Neo-Damascus';
   return b.series;
 };
+const sectionHead = sec => {
+  const i=sec.indexOf(' · ');
+  const t=i<0?sec:sec.slice(0,i);
+  const m=i<0?'':sec.slice(i+3);
+  return '<span class="sec-copy"><span class="t">'+t+'</span>'+(m?'<span class="m">'+m+'</span>':'')+'</span>';
+};
 function withSections(items, rowFn, headerFn){
   let last='__none__', out='', open=false;
   const close=()=>{ if(open){ out += '</div>'; open=false; } };
@@ -99,10 +105,10 @@ function closeBook(){
 }
 function render(){
   const books=BOOKS;
-  $('list-view').innerHTML = withSections(books, b=>`<div class="list-row ${isSoon(b)?'soon':''}" data-id="${b.id}"><div><div class="t">${listTitle(b)}</div><div class="m">${b.subtitle|| (b.year+' · '+b.type)}</div></div></div>`, (sec,collapsed)=>`<button type="button" class="list-section ${collapsed?'is-collapsed':''}" data-sec="${sec}">${sec}</button>`);
+  $('list-view').innerHTML = withSections(books, b=>`<div class="list-row ${isSoon(b)?'soon':''}" data-id="${b.id}"><div><div class="t">${listTitle(b)}</div><div class="m">${b.subtitle|| (b.year+' · '+b.type)}</div></div></div>`, (sec,collapsed)=>`<button type="button" class="list-section ${collapsed?'is-collapsed':''}" data-sec="${sec}">${sectionHead(sec)}</button>`);
   $('list-view').querySelectorAll('.list-row').forEach(el=>{ el.onclick=()=>showBook(el.dataset.id); });
   bindCollapse($('list-view'));
-  $('list-rail').innerHTML = withSections(books, b=>`<div class="row ${b.id===selected?'on':''}" data-id="${b.id}"><div class="t">${listTitle(b)}</div><div class="m">${b.subtitle||b.type}</div></div>`, (sec,collapsed)=>`<button type="button" class="section ${collapsed?'is-collapsed':''}" data-sec="${sec}">${sec}</button>`);
+  $('list-rail').innerHTML = withSections(books, b=>`<div class="row ${b.id===selected?'on':''}" data-id="${b.id}"><div class="t">${listTitle(b)}</div><div class="m">${b.subtitle||b.type}</div></div>`, (sec,collapsed)=>`<button type="button" class="section ${collapsed?'is-collapsed':''}" data-sec="${sec}">${sectionHead(sec)}</button>`);
   $('list-rail').querySelectorAll('.row').forEach(el=> el.onclick=()=>showBook(el.dataset.id));
   bindCollapse($('list-rail'));
   $('gallery').innerHTML = books.map(b=>`<div class="g-card" data-id="${b.id}"><div class="g-cover">${listTitle(b)}</div><div class="g-meta"><div class="t">${listTitle(b)}</div><div class="m">${b.subtitle|| (b.year+' · '+b.type)}</div></div></div>`).join('');
@@ -131,8 +137,7 @@ function bindAudio(a, st, srcs, autoplay){
     const play=()=>{ if(autoplay) a.play().catch(next); };
     if(src.indexOf('/api/audio')===0){
       fetch(src,{cache:'no-store'}).then(r=>{
-        if(r.status===401){ location.href='/enter?next=/listen'; throw new Error('member');
-        }
+        if(r.status===401){ location.href='/enter?next=/listen'; throw new Error('member'); }
         return r.json();
       }).then(d=>{ if(!d||!d.url) throw new Error('no url'); a.src=d.url; play(); }).catch(err=>{ if(String(err.message)==='member') return; next(); });
       return;
