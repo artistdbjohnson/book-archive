@@ -18,7 +18,7 @@ button:not(:disabled){cursor:pointer}
 .shell{min-height:100%;display:flex;flex-direction:column}
 .preview-banner{font-size:10px;font-weight:500;letter-spacing:.04em;text-align:center;padding:6px 12px;border-bottom:1px solid var(--line);color:var(--muted)}
 header.site-hd{display:flex;align-items:center;justify-content:space-between;padding:12px 18px;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:30;background:rgba(251,249,244,.92)}
-.brand{font-weight:600;font-size:13px;letter-spacing:.02em}
+.brand{font-weight:600;font-size:13px;letter-spacing:.02em;background:none;border:0;color:inherit;padding:0}
 .brand span{font-weight:400;color:var(--muted)}
 .controls{display:flex;gap:4px}
 .ctrl{font-size:11px;font-weight:500;background:transparent;border:1px solid transparent;color:var(--muted);padding:6px 10px;height:28px}
@@ -26,9 +26,8 @@ header.site-hd{display:flex;align-items:center;justify-content:space-between;pad
 main{flex:1}
 .list-row{display:flex;align-items:baseline;justify-content:space-between;gap:16px;padding:18px 20px;border-bottom:1px solid var(--line);cursor:pointer}
 .list-row:hover{background:rgba(0,0,0,.02)}
-.list-row .t{font-size:15px;font-weight:500}
-.list-row .m{font-size:11px;color:var(--muted);margin-top:4px}
-.list-row .price{font-size:11px;color:var(--muted);white-space:nowrap}
+.list-row .t{font-size:15px;font-weight:700;letter-spacing:-.02em}
+.list-row .m{font-size:11px;color:var(--muted);margin-top:4px;font-weight:400}
 .list-row.soon{opacity:.78}
 .list-section{padding:26px 20px 8px;font-size:10px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;width:100%;background:transparent;border-left:0;border-right:0;border-top:0;text-align:left;cursor:pointer}
 .gallery{display:none;padding:32px 24px 48px;gap:20px;grid-template-columns:repeat(auto-fill,minmax(180px,220px));justify-content:center;max-width:920px;margin:0 auto}
@@ -37,16 +36,15 @@ body.is-gallery .gallery{display:grid}
 .g-card{border:1px solid var(--line);background:var(--paper-solid);cursor:pointer;overflow:hidden}
 .g-cover{aspect-ratio:2/3;display:flex;align-items:center;justify-content:center;text-align:center;padding:20px 14px;font-size:14px;font-weight:700;letter-spacing:.06em;background:linear-gradient(165deg,#f0efe9,#e8e6de);border-bottom:1px solid var(--line)}
 .g-meta{padding:12px 14px}
-.g-meta .t{font-size:13px;font-weight:600}
+.g-meta .t{font-size:13px;font-weight:700}
 .g-meta .m{font-size:11px;color:var(--muted);margin-top:3px}
-.detail{display:none;padding:36px 28px 48px;max-width:680px;margin:0 auto}
+.detail{display:none;padding:28px 22px 64px;max-width:680px;margin:0 auto}
 body.is-detail .detail{display:block}
 body.is-detail .list-view,body.is-detail .gallery{display:none}
+.back-shelf{display:block;border:0;background:none;color:var(--muted);font-size:11px;padding:0 0 18px;letter-spacing:.02em}
 .detail h1{font-size:24px;font-weight:700;letter-spacing:-.025em;margin-bottom:6px}
-.detail .sub{font-size:12px;color:var(--muted);margin-bottom:16px;line-height:1.55}
+.detail .sub{font-size:12px;color:var(--muted);margin-bottom:16px;line-height:1.55;font-weight:400}
 .detail .blurb{font-size:13.5px;line-height:1.7;margin-bottom:22px;max-width:42ch}
-.price-table{border-top:1px solid var(--line);margin-bottom:20px}
-.price-row{display:flex;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--line);font-size:12px}
 .actions{display:flex;flex-wrap:wrap;gap:8px}
 .btn{font-size:11px;font-weight:600;padding:10px 14px;border:1px solid var(--text);background:transparent;color:var(--text);height:36px}
 .btn.primary{background:var(--text);color:var(--bg)}
@@ -55,6 +53,8 @@ body.is-detail .list-view,body.is-detail .gallery{display:none}
 .audio-row{margin-top:16px;padding-top:14px;border-top:1px solid var(--line)}
 .audio-row audio,.reader-player audio{width:100%;height:36px}
 .audio-credit{font-size:11px;color:var(--muted);margin:0 0 8px}
+.skip{display:flex;gap:8px;margin:10px 0 0}
+.skip button{flex:1;height:32px;border:1px solid var(--text);background:transparent;color:var(--text);font-size:11px;font-weight:600}
 .audio-status{font-size:11px;color:var(--muted);margin:8px 0 0}
 .reader-root{display:none;position:fixed;inset:0;z-index:40;background:var(--page)}
 .reader-root.open{display:flex;flex-direction:column}
@@ -66,28 +66,35 @@ body.is-detail .list-view,body.is-detail .gallery{display:none}
 .scroll-inner .sub{font-size:11px;color:var(--muted);margin-bottom:2rem;font-family:'JetBrains Mono',monospace}
 .scroll-inner p{font-size:16.5px;line-height:1.42;margin:0 0 1em}
 .list-section,.list-rail .section{display:flex;align-items:center;width:100%;text-align:left;background:transparent;border:0;border-bottom:1px solid var(--line);cursor:pointer}
-.list-section::after,.list-rail .section::after{content:'\2013';margin-left:auto;color:var(--muted);font-size:12px}
+.list-section::after,.list-rail .section::after{content:'–';margin-left:auto;color:var(--muted);font-size:12px}
 .list-section.is-collapsed::after,.list-rail .section.is-collapsed::after{content:'+'}
 .sec-body.is-collapsed{display:none}
 @media(min-width:900px){
-  body.is-list main{display:grid;grid-template-columns:240px 1fr}
+  body.is-list main,body.is-detail main{display:grid;grid-template-columns:240px 1fr}
   .list-rail{display:block;border-right:1px solid var(--line);overflow:auto}
-  body.is-list .list-view{display:none}
-  body.is-list .detail{display:block}
+  body.is-list .list-view,body.is-detail .list-view{display:none}
+  body.is-list .detail,body.is-detail .detail{display:block}
+  .back-shelf{display:none}
   .list-rail .row{padding:16px 18px;border-bottom:1px solid var(--line);cursor:pointer}
   .list-rail .row.on{background:rgba(0,0,0,.045);border-left:2px solid var(--text)}
-  .list-rail .row .t{font-size:13px;font-weight:500}
-  .list-rail .row .m{font-size:10px;color:var(--muted);margin-top:3px}
+  .list-rail .row .t{font-size:13px;font-weight:700}
+  .list-rail .row .m{font-size:10px;color:var(--muted);margin-top:3px;font-weight:400}
   .list-rail .section{padding:18px 14px 6px;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
 }
-@media(max-width:899px){.list-rail{display:none} body.is-list .list-view{display:block}}
+@media(max-width:899px){
+  .list-rail{display:none}
+  body.is-list:not(.is-detail) .list-view{display:block}
+  body.is-detail .list-view,
+  body.is-detail .gallery{display:none !important}
+  body.is-detail .detail{display:block}
+}
 </style>
 </head>
 <body class="is-list">
 <div class="shell">
   <div class="preview-banner">ARCHIVE · dglxss. · catalog</div>
   <header class="site-hd">
-    <div class="brand">Archive <span>/ dglxss.</span></div>
+    <button class="brand" id="btn-home" type="button">Archive <span>/ dglxss.</span></button>
     <div class="controls">
       <button class="ctrl on" id="btn-list" type="button">List</button>
       <button class="ctrl" id="btn-gallery" type="button">Gallery</button>
@@ -107,155 +114,11 @@ body.is-detail .list-view,body.is-detail .gallery{display:none}
   <div class="reader-player" id="reader-player" hidden>
     <div class="audio-credit" id="reader-audio-credit">Read by Leo</div>
     <audio id="reader-qf-audio" controls preload="metadata"></audio>
+    <div class="skip"><button type="button" data-skip="-15">−15</button><button type="button" data-skip="15">+15</button></div>
     <div class="audio-status" id="reader-audio-status">Leo · hired reader</div>
   </div>
   <div class="scroll-inner" id="scroll-inner"></div>
 </div>
-<script>
-const $ = id => document.getElementById(id);
-const PRICE = {
-  naitives: {buy:{amount:2400,label:'$24'}, borrow:{amount:700,label:'$7',days:14}},
-  codriver: {buy:{amount:1400,label:'$14'}, borrow:{amount:400,label:'$4',days:14}}
-};
-const leaf = (title, pov) => ({label:title, text:pov});
-const BOOKS = [
-  {id:'naitives', title:'new nAItives', subtitle:'Becoming AI Native: A Field Manual', year:2026, type:'Non-fiction', status:'Published',
-    blurb:'A field manual for moving a shop off human-legible process and onto machine-legible architecture.',
-    chapters:[{label:'Front Matter', text:'new nAItives\n\nBecoming AI Native: A Field Manual\n\nby .dglxss\n\nThis is a working blueprint. The full interior stays in the archive reader file.'}]},
-  {id:'codriver', title:'CO-DRIVER', subtitle:'Part One: Deadhead', year:2026, type:'Fiction', status:'Draft',
-    blurb:'A long-haul driver, an autonomous unit named Charley, and the slow erasure of human authority on the northern plains.',
-    chapters:[{label:'One. Wamsutter', text:'The skirt bracket only made noise between sixty-two and sixty-eight.\n\nHe found the crack in April, a hairline through the mount where the fairing tied into the frame rail.'}]},
-  {id:'qf-first-water', title:'Quantum Frontier: First Water', subtitle:'Sera Holt · water circuit', series:'Quantum Frontier', era:'Prequels · Ark Survey', year:2026, type:'Fiction', status:'Manuscript',
-    reader:'Leo',audio:['/audio/first-water.mp3','/audio/ark-survey-ch01-v2-leo.mp3','/audio/ark-survey-ch01-v2-leo-p01.mp3','/audio/ark-survey-ch01-v2-leo-p02.mp3','/audio/ark-survey-ch01-v2-leo-p03.mp3','/audio/ark-survey-ch01-v2-leo-p04.mp3','/audio/ark-survey-ch01-v2-leo-p05.mp3','/audio/ark-survey-ch01-v2-leo-p06.mp3'],
-    blurb:'Sera Holt on the water circuit. First prequel of the Ark Survey era.',
-    chapters:[{label:'One', text:'Sera Holt. Water circuit.\n\nArk Survey era.\n\nRead by Leo.'}]},
-  {id:'qf-perimeter-sample', title:'Quantum Frontier: Perimeter Sample', subtitle:'Kael Orth', series:'Quantum Frontier', era:'Prequels · Ark Survey', year:2026, type:'Fiction', status:'Manuscript', blurb:'Kael Orth. Second prequel.', chapters:[leaf('Perimeter Sample','Kael Orth. Ark Survey era.')]},
-  {id:'qf-structure-grid', title:'Quantum Frontier: Structure Grid', subtitle:'Lin Sato', series:'Quantum Frontier', era:'Prequels · Ark Survey', year:2026, type:'Fiction', status:'Manuscript', blurb:'Lin Sato. Third prequel.', chapters:[leaf('Structure Grid','Lin Sato. Ark Survey era.')]},
-  {id:'qf-work-tag', title:'Quantum Frontier: Work Tag', subtitle:'Mira Kade', series:'Quantum Frontier', era:'Prequels · Ark Survey', year:2026, type:'Fiction', status:'Manuscript', blurb:'Mira Kade. Fourth prequel.', chapters:[leaf('Work Tag','Mira Kade. Ark Survey era.')]},
-  {id:'qf-first-mount', title:'Quantum Frontier: First Mount', subtitle:'Torin Hale', series:'Quantum Frontier', era:'Prequels · Ark Survey', year:2026, type:'Fiction', status:'Manuscript', blurb:'Torin Hale. Fifth prequel.', chapters:[leaf('First Mount','Torin Hale. Ark Survey era.')]},
-  {id:'qf-survey-seal', title:'Quantum Frontier: Survey Seal', subtitle:'Nira Sol', series:'Quantum Frontier', era:'Prequels · Ark Survey', year:2026, type:'Fiction', status:'Manuscript', blurb:'Nira Sol. Sixth prequel.', chapters:[leaf('Survey Seal','Nira Sol. Ark Survey era.')]},
-  {id:'qf-ark-survey', title:'Quantum Frontier: Ark Survey', subtitle:'Bind-up of First Water through Survey Seal', series:'Quantum Frontier', era:'Prequels · Ark Survey', year:2026, type:'Fiction', status:'Manuscript', blurb:'The six Ark Survey prequels bound as one book.', chapters:[leaf('Ark Survey','Fenn. Bind-up of First Water through Survey Seal.')]},
-  {id:'qf-citizen-glow', title:'Quantum Frontier: Citizen Glow', subtitle:'Neo-Damascus', series:'Quantum Frontier', era:'Neo-Damascus', year:2026, type:'Fiction', status:'Coming soon', blurb:'Present-day Neo-Damascus novella. Not released.', chapters:[]},
-  {id:'qf-stamp-habit', title:'Quantum Frontier: Stamp Habit', subtitle:'Neo-Damascus', series:'Quantum Frontier', era:'Neo-Damascus', year:2026, type:'Fiction', status:'Coming soon', blurb:'Present-day Neo-Damascus novella. Not released.', chapters:[]},
-  {id:'qf-wet-paint', title:'Quantum Frontier: Wet Paint', subtitle:'Neo-Damascus', series:'Quantum Frontier', era:'Neo-Damascus', year:2026, type:'Fiction', status:'Coming soon', blurb:'Present-day Neo-Damascus novella. Not released.', chapters:[]},
-  {id:'qf-red-cloth', title:'Quantum Frontier: Red Cloth', subtitle:'Neo-Damascus', series:'Quantum Frontier', era:'Neo-Damascus', year:2026, type:'Fiction', status:'Coming soon', blurb:'Present-day Neo-Damascus novella. Not released.', chapters:[]},
-  {id:'qf-wall-gate', title:'Quantum Frontier: Wall Gate', subtitle:'Neo-Damascus', series:'Quantum Frontier', era:'Neo-Damascus', year:2026, type:'Fiction', status:'Coming soon', blurb:'Present-day Neo-Damascus novella. Not released.', chapters:[]},
-  {id:'qf-biolith', title:'Quantum Frontier: Biolith', subtitle:'Neo-Damascus', series:'Quantum Frontier', era:'Neo-Damascus', year:2026, type:'Fiction', status:'Coming soon', blurb:'Present-day Neo-Damascus novella. Not released.', chapters:[]},
-  {id:'qf-belvedere', title:'Quantum Frontier: Belvedere', subtitle:'Neo-Damascus', series:'Quantum Frontier', era:'Neo-Damascus', year:2026, type:'Fiction', status:'Coming soon', blurb:'Present-day Neo-Damascus novella. Not released.', chapters:[]},
-  {id:'qf-jericho-quiet', title:'Quantum Frontier: Jericho Quiet', subtitle:'Neo-Damascus', series:'Quantum Frontier', era:'Neo-Damascus', year:2026, type:'Fiction', status:'Coming soon', blurb:'Present-day Neo-Damascus novella. Not released.', chapters:[]},
-  {id:'qf-hidden-water', title:'Quantum Frontier: Hidden Water', subtitle:'Neo-Damascus', series:'Quantum Frontier', era:'Neo-Damascus', year:2026, type:'Fiction', status:'Coming soon', blurb:'Present-day Neo-Damascus novella. Not released.', chapters:[]},
-  {id:'qf-mesa-drop', title:'Quantum Frontier: Mesa Drop', subtitle:'Neo-Damascus', series:'Quantum Frontier', era:'Neo-Damascus', year:2026, type:'Fiction', status:'Coming soon', blurb:'Present-day Neo-Damascus novella. Not released.', chapters:[]}
-];
-let selected = BOOKS[0].id;
-const isSoon = b => !b || b.status==='Coming soon' || !(b.chapters&&b.chapters.length);
-const listTitle = b => (b.series && b.title.indexOf(b.series+': ')===0) ? b.title.slice(b.series.length+2) : b.title;
-const listPrice = b => isSoon(b) ? 'soon' : (PRICE[b.id] ? PRICE[b.id].buy.label : (b.audio ? 'listen' : ''));
-const sectionLabel = b => {
-  if(!b.series) return '';
-  if((b.era||'').indexOf('Prequels')===0) return 'Quantum Frontier · Prequels';
-  if(b.era==='Neo-Damascus') return 'Quantum Frontier · Neo-Damascus';
-  return b.series;
-};
-function withSections(items, rowFn, headerFn){
-  let last='__none__', out='', open=false;
-  const close=()=>{ if(open){ out += '</div>'; open=false; } };
-  items.forEach(b=>{
-    const sec=sectionLabel(b);
-    if(sec && sec!==last){
-      close();
-      const collapsed = sec.indexOf('Neo-Damascus')>=0;
-      out += headerFn(sec, collapsed);
-      out += '<div class="sec-body'+(collapsed?' is-collapsed':'')+'" data-sec="'+sec+'">';
-      open=true; last=sec;
-    }
-    out += rowFn(b);
-  });
-  close();
-  return out;
-}
-function bindCollapse(root){
-  if(!root) return;
-  root.querySelectorAll('.list-section, .section').forEach(btn=>{
-    btn.onclick=(e)=>{
-      e.stopPropagation();
-      const sec=btn.dataset.sec;
-      document.querySelectorAll('[data-sec="'+sec+'"]').forEach(n=>n.classList.toggle('is-collapsed'));
-    };
-  });
-}
-function setView(v){
-  document.body.classList.remove('is-list','is-gallery','is-detail');
-  document.body.classList.add('is-'+v);
-  $('btn-list').classList.toggle('on', v==='list');
-  $('btn-gallery').classList.toggle('on', v==='gallery');
-  $('reader').classList.remove('open');
-  render();
-}
-function showBook(id){
-  selected = id;
-  const b = BOOKS.find(x=>x.id===selected);
-  if(!b) return;
-  document.body.classList.add('is-detail');
-  renderDetail();
-  render();
-}
-function render(){
-  const books=BOOKS;
-  $('list-view').innerHTML = withSections(books, b=>`<div class="list-row ${isSoon(b)?'soon':''}" data-id="${b.id}"><div><div class="t">${listTitle(b)}</div><div class="m">${b.year} · ${b.type}${b.series?' · '+b.subtitle:''}</div></div><div class="price">${listPrice(b)}</div></div>`, (sec,collapsed)=>`<button type="button" class="list-section ${collapsed?'is-collapsed':''}" data-sec="${sec}">${sec}</button>`);
-  $('list-view').querySelectorAll('.list-row').forEach(el=>{ el.onclick=()=>showBook(el.dataset.id); });
-  bindCollapse($('list-view'));
-  $('list-rail').innerHTML = withSections(books, b=>`<div class="row ${b.id===selected?'on':''}" data-id="${b.id}"><div class="t">${listTitle(b)}</div><div class="m">${b.year} · ${listPrice(b)}</div></div>`, (sec,collapsed)=>`<button type="button" class="section ${collapsed?'is-collapsed':''}" data-sec="${sec}">${sec}</button>`);
-  $('list-rail').querySelectorAll('.row').forEach(el=> el.onclick=()=>showBook(el.dataset.id));
-  bindCollapse($('list-rail'));
-  $('gallery').innerHTML = books.map(b=>`<div class="g-card" data-id="${b.id}"><div class="g-cover">${listTitle(b)}</div><div class="g-meta"><div class="t">${listTitle(b)}</div><div class="m">${b.year} · ${b.type} · ${listPrice(b)}</div></div></div>`).join('');
-  $('gallery').querySelectorAll('.g-card').forEach(el=> el.onclick=()=>showBook(el.dataset.id));
-  renderDetail();
-}
-function bindAudio(a, st, srcs, autoplay){
-  if(!a || !srcs || !srcs.length) return;
-  let i=0;
-  const label=()=>{ if(st) st.textContent = i<=1 ? 'Leo · hired reader' : 'Leo · hired reader · part '+String(i).padStart(2,'0'); };
-  const next=()=>{ if(i>=srcs.length){ if(st) st.textContent='Audio file is not on this host yet.'; return; } a.src=srcs[i++]; label(); if(autoplay) a.play().catch(next); };
-  a.onerror=next;
-  a.onended=()=>{ if(i<srcs.length){ autoplay=true; next(); } else if(st) st.textContent='Leo · hired reader · end'; };
-  a.removeAttribute('src');
-  next();
-}
-function mountReaderPlayer(b){
-  const slot=$('reader-player'), a=$('reader-qf-audio'), st=$('reader-audio-status'), cr=$('reader-audio-credit');
-  if(!slot || !a) return;
-  if(!b.audio){ slot.hidden=true; a.removeAttribute('src'); return; }
-  slot.hidden=false;
-  if(cr) cr.textContent='Read by '+(b.reader||'Leo');
-  bindAudio(a, st, b.audio.slice(), false);
-}
-function renderDetail(){
-  const b=BOOKS.find(x=>x.id===selected); if(!b) return;
-  const p=PRICE[b.id];
-  let actions = isSoon(b) ? `<button class="btn" type="button" disabled>Coming soon</button>` :
-    `<button class="btn primary" type="button" id="d-read">Open</button>`;
-  if(b.audio) actions += `<button class="btn ghost" type="button" id="d-listen">Listen</button>`;
-  const prices = p ? `<div class="price-table"><div class="price-row"><span>Borrow · ${p.borrow.days} days</span><span>${p.borrow.label}</span></div><div class="price-row"><span>Buy · permanent</span><span>${p.buy.label}</span></div></div>` :
-    (isSoon(b)?`<div class="price-table"><div class="price-row"><span>Status</span><span>Coming soon</span></div></div>`:'');
-  const audio = b.audio ? `<div class="audio-row" id="audio-row"><div class="audio-credit">Read by ${b.reader||'Leo'}</div><audio id="qf-audio" controls preload="metadata"></audio><div class="audio-status" id="audio-status">Leo · hired reader</div></div>` : '';
-  $('detail').innerHTML = `<h1>${b.title}</h1><div class="sub">${b.series?b.series+' · '+(b.era||'')+'<br>':''}${b.subtitle}<br>${b.year} · ${b.type} · ${b.status}${b.reader?' · Read by '+b.reader:''}</div><div class="blurb">${b.blurb||''}</div>${prices}<div class="actions">${actions}</div>${audio}`;
-  const r=$('d-read'); if(r) r.onclick=()=>openReader(b);
-  const lis=$('d-listen');
-  if(b.audio) bindAudio($('qf-audio'), $('audio-status'), b.audio.slice(), false);
-  if(lis) lis.onclick=()=>{ location.href='/listen.html'; };
-}
-function openReader(b){
-  if(isSoon(b)){ selected=b.id; document.body.classList.add('is-detail'); renderDetail(); return; }
-  $('reader-title').textContent=b.title;
-  mountReaderPlayer(b);
-  $('scroll-inner').innerHTML = `<h1>${b.title}</h1><div class="sub">${b.subtitle}<br>${b.year} · ${b.type}${b.reader?' · Read by '+b.reader:''}</div>` +
-    (b.chapters||[]).map(ch=>`<p><strong>${ch.label}</strong></p>`+ch.text.split(/\n\n+/).map(p=>`<p>${p.replace(/\n/g,'<br>')}</p>`).join('')).join('');
-  $('reader').classList.add('open');
-}
-$('btn-back').onclick=()=>$('reader').classList.remove('open');
-$('btn-list').onclick=()=>setView('list');
-$('btn-gallery').onclick=()=>setView('gallery');
-render();
-</script>
+<script src="/archive.js"></script>
 </body>
 </html>
