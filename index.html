@@ -70,7 +70,8 @@ body.is-detail .list-view,body.is-detail .gallery{display:none}
 .reader-root[data-margin="regular"]{--reader-pad-x:1.75rem}
 .reader-root[data-margin="wide"]{--reader-pad-x:2.6rem}
 .reader-root.open{display:flex;flex-direction:column}
-.reader-chrome{min-height:42px;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 14px;border-bottom:1px solid var(--line);background:var(--page);flex-shrink:0;position:relative}
+.reader-chrome{min-height:42px;display:flex;align-items:center;justify-content:center;padding:0 14px;border-bottom:1px solid var(--line);background:var(--page);flex-shrink:0;position:relative}
+.reader-chrome-inner{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;max-width:36rem;min-width:0;position:relative}
 .reader-chrome-left,.reader-chrome-actions{display:flex;align-items:center;gap:14px;min-width:0}
 .reader-chrome-left{flex:1}
 .reader-chrome button,.reader-link{border:0;background:transparent;color:var(--muted);font-size:11px;height:28px;padding:0;letter-spacing:.02em}
@@ -96,15 +97,15 @@ body.is-detail .list-view,body.is-detail .gallery{display:none}
 .pageview{position:relative;flex:1;min-height:0;display:none;flex-direction:column}
 .reader-root.mode-pages .scroll-inner{display:none}
 .reader-root.mode-pages .pageview{display:flex}
-.page-body{flex:1;min-height:0;overflow:hidden;padding:2.25rem var(--reader-pad-x) 1.5rem;font-size:1em;line-height:var(--reader-lh);scrollbar-width:none}
+.page-body{flex:1;min-height:0;overflow:hidden;padding:2.25rem var(--reader-pad-x) 1.5rem;font-size:1em;line-height:var(--reader-lh);scrollbar-width:none;max-width:36rem;width:100%;margin:0 auto}
 .page-body .pg-label{font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:0 0 1.15em}
 .page-body p{margin:0 0 1em}
 .page-measure{position:absolute;left:-9999px;top:0;height:auto!important;min-height:0!important;max-height:none!important;overflow:visible!important;flex:none!important;visibility:hidden;pointer-events:none}
-.page-foot{flex-shrink:0;display:flex;justify-content:space-between;padding:12px 1.5rem 14px;font-size:10px;letter-spacing:.04em;color:var(--muted)}
+.page-foot{flex-shrink:0;display:flex;justify-content:space-between;padding:12px 1.5rem 14px;font-size:10px;letter-spacing:.04em;color:var(--muted);max-width:36rem;width:100%;margin:0 auto}
 .reader-edge{position:absolute;top:0;bottom:36px;width:18%;max-width:88px;z-index:5;border:0;background:transparent;padding:0}
 .reader-edge.left{left:0;cursor:w-resize}
 .reader-edge.right{right:0;cursor:e-resize}
-.reader-menu{display:none;position:absolute;left:14px;top:calc(100% + 4px);z-index:60;min-width:248px;max-width:min(320px,calc(100vw - 28px));max-height:50vh;overflow:auto;background:var(--paper);border:1px solid var(--text)}
+.reader-menu{display:none;position:absolute;left:0;top:calc(100% + 4px);z-index:60;min-width:248px;max-width:min(320px,calc(100vw - 28px));max-height:50vh;overflow:auto;background:var(--paper);border:1px solid var(--text)}
 .reader-menu.open{display:block}
 .reader-menu-head{font-size:10px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);padding:11px 12px 9px}
 .reader-menu button,.reader-menu .menu-note{display:block;width:100%;text-align:left;font-size:12px;line-height:1.35;padding:10px 12px;border:0;border-top:1px solid var(--line);background:transparent;color:var(--text);height:auto;letter-spacing:0}
@@ -112,7 +113,7 @@ body.is-detail .list-view,body.is-detail .gallery{display:none}
 .reader-menu .menu-note{color:var(--muted)}
 .reader-menu-rule{border-top:1px solid var(--line-strong);margin:0}
 .reader-menu-rule + button{border-top:0}
-.reader-type-panel{display:none;position:absolute;right:14px;top:calc(100% + 4px);z-index:60;min-width:248px;background:var(--paper);border:1px solid var(--text);padding:10px 12px 12px}
+.reader-type-panel{display:none;position:absolute;right:0;top:calc(100% + 4px);z-index:60;min-width:248px;background:var(--paper);border:1px solid var(--text);padding:10px 12px 12px}
 .reader-type-panel.open{display:block}
 .type-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 0}
 .type-row + .type-row{border-top:1px solid var(--line)}
@@ -176,6 +177,7 @@ body.is-detail .list-view,body.is-detail .gallery{display:none}
 </div>
 <div class="reader-root mode-pages" id="reader" data-size="m" data-line="regular" data-margin="regular">
   <div class="reader-chrome">
+    <div class="reader-chrome-inner">
     <div class="reader-chrome-left">
       <button type="button" id="btn-back" class="reader-back">\u2190 Archive</button>
       <button type="button" id="btn-contents">Contents</button>
@@ -214,6 +216,7 @@ body.is-detail .list-view,body.is-detail .gallery{display:none}
           <button type="button" data-margin="wide">Wide</button>
         </div>
       </div>
+    </div>
     </div>
   </div>
   <div class="reader-resume" id="reader-resume" hidden></div>
