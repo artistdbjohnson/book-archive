@@ -1,7 +1,7 @@
 /* sooty reader 2026-09-18 */
 const $ = id => document.getElementById(id);
 const STORE = 'dglxss-archive-pwa-v1';
-const PRICE = {
+const PRICE = (typeof SpineOwnership!=='undefined' && SpineOwnership.PRICE) || {
   naitives: { buy:{amount:24,label:'$24'}, borrow:{days:14,label:'14 days'} },
   codriver: { buy:{amount:14,label:'$14'}, borrow:{days:14,label:'14 days'} }
 };
@@ -10,7 +10,28 @@ function saveStore(s){ localStorage.setItem(STORE, JSON.stringify(s)); }
 function getProgress(id){ return (loadStore().progress||{})[id] || null; }
 function saveProgress(id, p){ const s=loadStore(); s.progress=s.progress||{}; s.progress[id]=Object.assign({}, s.progress[id]||{}, p); saveStore(s); }
 function getAccess(id){ return (loadStore().access||{})[id] || {ok:false,kind:'none'}; }
-function unlockBook(id, kind){ const s=loadStore(); s.access=s.access||{}; s.access[id]={ok:true,kind}; saveStore(s); }
+function unlockBook(id, kind){
+  const s=loadStore();
+  s.access=s.access||{};
+  const rec={ok:true,kind,at:Date.now()};
+  if(kind==='borrowed') rec.until=Date.now()+(SpineOwnership.BORROW_DAYS||14)*86400000;
+  s.access[id]=rec;
+  saveStore(s);
+}
+function isArchiveMember(){ return !!(loadStore().member); }
+function setArchiveMember(on){ const s=loadStore(); s.member=!!on; saveStore(s); }
+function refreshMember(){
+  fetch('/api/me',{cache:'no-store'}).then(r=>r.json()).then(d=>{
+    if(d && d.member){ setArchiveMember(true); render(); }
+  }).catch(()=>{});
+}
+function ownershipInput(b){
+  return { book:b, member:isArchiveMember(), access:getAccess(b.id), progress:getProgress(b.id) };
+}
+function hasFullInterior(b){
+  if(SpineOwnership.liveAccess(getAccess(b.id)).ok) return true;
+  return isArchiveMember() && SpineOwnership.isMemberIncluded(b);
+}
 const TYPE_SIZE_PX = { s:'13px', m:'15px', l:'18px' };
 const TYPE_OK = {
   size:{s:1,m:1,l:1},
@@ -126,7 +147,33 @@ let readerBook = null;
 let readMode = 'pages';
 let pageIndex = 0;
 let pages = [];
-const isSoon = b => !b || b.status==='Coming soon' || (!(b.chapters&&b.chapters.length) && !(b.audio&&b.audio.length));
+const isSoon = b => SpineOwnership.isSoon(b);
+function stateChipHtml(b){
+  const chip=SpineOwnership.resolveChip(ownershipInput(b));
+  if(!chip || !chip.label) return '';
+  return '<span class="state-chip '+chip.state+'">'+escapeHtml(chip.label)+'</span>';
+}
+function ownLineClass(text){
+  if(/^Owned/.test(text) || /^Archive member/.test(text) || /^Borrowed/.test(text)) return '';
+  return ' muted';
+}
+function buySheetHtml(b){
+  const model=SpineOwnership.buySheetModel(ownershipInput(b));
+  if(model.variant==='none') return '<div class="buy-copy">No store listing for this title yet.</div>';
+  if(model.variant==='entitled-owned') return '<div class="buy-copy"><strong>Owned.</strong> Full interior unlocked.</div>';
+  if(model.variant==='entitled-member') return '<div class="buy-copy">Archive member · included.</div>';
+  if(model.variant==='member-included'){
+    return '<div class="buy-copy">Included with Archive membership.</div><div class="buy-actions"><a class="btn primary" href="/join">Join the Archive</a></div>';
+  }
+  return '<div class="buy-title">'+escapeHtml(model.title)+'</div><div class="buy-meta">'+escapeHtml(model.buyLabel)+' · '+escapeHtml(model.borrowLabel)+'</div><div class="buy-actions"><button class="btn primary" type="button" data-buy="confirm">Confirm buy</button><button class="btn ghost" type="button" data-buy="borrow">Borrow</button></div><div class="join-under"><a href="/join">Or join the Archive</a></div>';
+}
+function bindBuySheet(root, b, after){
+  if(!root) return;
+  const confirm=root.querySelector('[data-buy="confirm"]');
+  const borrow=root.querySelector('[data-buy="borrow"]');
+  if(confirm) confirm.onclick=()=>{ unlockBook(b.id,'owned'); after(b); };
+  if(borrow) borrow.onclick=()=>{ unlockBook(b.id,'borrowed'); after(b); };
+}
 const listTitle = b => (b.series && b.title.indexOf(b.series+': ')===0) ? b.title.slice(b.series.length+2) : b.title;
 const sectionLabel = b => {
   if(!b.series) return '';
@@ -163,10 +210,13 @@ function bindCollapse(root){
   });
 }
 function closeReader(){
-  const r=$('reader'); if(r) r.classList.remove('open');
+  const r=$('reader');
+  const wasOpen=r && r.classList.contains('open');
+  if(r) r.classList.remove('open');
   closeChromeSheets();
   readerBook=null;
   updateBackLabel(null);
+  if(wasOpen) render();
 }
 function setView(v){
   document.body.classList.remove('is-list','is-gallery','is-detail');
@@ -197,13 +247,13 @@ function closeBook(){
 }
 function render(){
   const books=BOOKS;
-  $('list-view').innerHTML = withSections(books, b=>`<div class="list-row ${isSoon(b)?'soon':''}" data-id="${b.id}"><div><div class="t">${listTitle(b)}</div><div class="m">${b.subtitle|| (b.year+' \u00b7 '+b.type)}</div></div></div>`, (sec,collapsed)=>`<button type="button" class="list-section ${collapsed?'is-collapsed':''}" data-sec="${sec}">${sectionHead(sec)}</button>`);
+  $('list-view').innerHTML = withSections(books, b=>`<div class="list-row ${isSoon(b)?'soon':''}" data-id="${b.id}"><div><div class="t">${listTitle(b)}</div><div class="m">${b.subtitle|| (b.year+' \u00b7 '+b.type)}</div></div>${stateChipHtml(b)}</div>`, (sec,collapsed)=>`<button type="button" class="list-section ${collapsed?'is-collapsed':''}" data-sec="${sec}">${sectionHead(sec)}</button>`);
   $('list-view').querySelectorAll('.list-row').forEach(el=>{ el.onclick=()=>showBook(el.dataset.id); });
   bindCollapse($('list-view'));
-  $('list-rail').innerHTML = withSections(books, b=>`<div class="row ${b.id===selected?'on':''}" data-id="${b.id}"><div class="t">${listTitle(b)}</div><div class="m">${b.subtitle||b.type}</div></div>`, (sec,collapsed)=>`<button type="button" class="section ${collapsed?'is-collapsed':''}" data-sec="${sec}">${sectionHead(sec)}</button>`);
+  $('list-rail').innerHTML = withSections(books, b=>`<div class="row ${b.id===selected?'on':''} ${isSoon(b)?'soon':''}" data-id="${b.id}"><div><div class="t">${listTitle(b)}</div><div class="m">${b.subtitle||b.type}</div></div>${stateChipHtml(b)}</div>`, (sec,collapsed)=>`<button type="button" class="section ${collapsed?'is-collapsed':''}" data-sec="${sec}">${sectionHead(sec)}</button>`);
   $('list-rail').querySelectorAll('.row').forEach(el=> el.onclick=()=>showBook(el.dataset.id));
   bindCollapse($('list-rail'));
-  $('gallery').innerHTML = books.map(b=>`<div class="g-card" data-id="${b.id}"><div class="g-cover">${listTitle(b)}</div><div class="g-meta"><div class="t">${listTitle(b)}</div><div class="m">${b.subtitle|| (b.year+' \u00b7 '+b.type)}</div></div></div>`).join('');
+  $('gallery').innerHTML = books.map(b=>`<div class="g-card ${isSoon(b)?'soon':''}" data-id="${b.id}"><div class="g-cover">${listTitle(b)}</div><div class="g-meta"><div class="t">${listTitle(b)}</div><div class="m">${b.subtitle|| (b.year+' \u00b7 '+b.type)}</div>${stateChipHtml(b)}</div></div>`).join('');
   $('gallery').querySelectorAll('.g-card').forEach(el=> el.onclick=()=>showBook(el.dataset.id));
   renderDetail();
 }
@@ -242,18 +292,27 @@ function mountReaderPlayer(b){
 }
 function renderDetail(){
   const b=BOOKS.find(x=>x.id===selected); if(!b) return;
-  let actions = isSoon(b) ? `<button class="btn" type="button" disabled>Coming soon</button>` : `<button class="btn primary" type="button" id="d-read">Open</button>`;
-  if(b.audio) actions += `<button class="btn ghost" type="button" id="d-listen">Listen</button>`;
-  const audio = b.audio ? `<div class="audio-row" id="audio-row"><div class="audio-credit">Read by ${b.reader||'Leo'}</div><audio id="qf-audio" controls preload="metadata"></audio><div class="skip"><button type="button" data-skip="-15">-15</button><button type="button" data-skip="15">+15</button></div><div class="audio-status" id="audio-status">Leo \u00b7 hired reader</div></div>` : '';
-  $('detail').innerHTML = `<button class="back-shelf" type="button" id="d-back">\u2190 Shelf</button><h1>${b.title}</h1><div class="sub">${b.series?b.series+' \u00b7 '+(b.era||'')+'<br>':''}${b.subtitle}<br>${b.year} \u00b7 ${b.type} \u00b7 ${b.status}${b.reader?' \u00b7 Read by '+b.reader:''}</div><div class="blurb">${b.blurb||''}</div><div class="actions">${actions}</div>${audio}`;
+  const flags=SpineOwnership.actionFlags(ownershipInput(b));
+  const line=SpineOwnership.ownershipLine(ownershipInput(b));
+  let actions='';
+  if(flags.soon) actions='<button class="btn" type="button" disabled>Coming soon</button>';
+  else {
+    if(flags.open) actions+='<button class="btn primary" type="button" id="d-read">Open</button>';
+    if(flags.listen) actions+='<button class="btn ghost" type="button" id="d-listen">Listen</button>';
+    if(flags.buy) actions+='<button class="btn ghost" type="button" id="d-buy">Buy</button>';
+    if(flags.join) actions+='<a class="btn ghost" id="d-join" href="/join">Join</a>';
+  }
+  const joinUnder=flags.joinLink?'<div class="join-under"><a href="/join">Or join the Archive</a></div>':'';
+  const sheet='<div class="buy-sheet" id="detail-buy" hidden>'+buySheetHtml(b)+'</div>';
+  $('detail').innerHTML = `<button class="back-shelf" type="button" id="d-back">\u2190 Shelf</button><h1>${b.title}</h1><div class="sub">${b.series?b.series+' \u00b7 '+(b.era||'')+'<br>':''}${b.subtitle}<br>${b.year} \u00b7 ${b.type} \u00b7 ${b.status}${b.reader?' \u00b7 Read by '+b.reader:''}</div><div class="blurb">${b.blurb||''}</div><div class="own-line${ownLineClass(line)}">${escapeHtml(line)}</div><div class="actions">${actions}</div>${joinUnder}${sheet}`;
   const back=$('d-back'); if(back) back.onclick=closeBook;
   const r=$('d-read'); if(r) r.onclick=()=>openReader(b);
-  if(b.audio){ bindAudio($('qf-audio'), $('audio-status'), b.audio.slice(), false); bindSkip($('audio-row'), $('qf-audio')); }
   const lis=$('d-listen'); if(lis) lis.onclick=()=>{ location.href='/listen'; };
+  const buy=$('d-buy'); if(buy) buy.onclick=()=>{ const sh=$('detail-buy'); if(sh) sh.hidden=!sh.hidden; };
+  bindBuySheet($('detail-buy'), b, ()=>{ render(); openReader(b); });
 }
 function readableChapters(b){
-  const access = getAccess(b.id);
-  return (b.chapters||[]).filter((ch,i)=> access.ok || i < (b.freeChapterCount||1));
+  return (b.chapters||[]).filter((ch,i)=> hasFullInterior(b) || i < (b.freeChapterCount||1));
 }
 function pageHtml(label, buf, first){
   return (first ? '<div class="pg-label">'+escapeHtml(label)+'</div>' : '') + String(buf||'').split(/\n\n+/).filter(Boolean).map(x=>'<p>'+escapeHtml(x)+'</p>').join('');
@@ -346,7 +405,7 @@ function renderPages(){
   if($('page-body')) $('page-body').innerHTML = pg ? pg.html : '<p>—</p>';
   if($('page-left')) $('page-left').textContent = pg ? pg.label : '';
   if($('page-right')) $('page-right').textContent = pages.length ? (pageIndex+1)+' / '+pages.length : '0 / 0';
-  if(readerBook) saveProgress(readerBook.id, {mode:'pages', page:pageIndex});
+  if(readerBook) saveProgress(readerBook.id, {mode:'pages', page:pageIndex, pages:pages.length});
 }
 function setReadMode(mode){
   readMode = mode;
@@ -358,7 +417,6 @@ function setReadMode(mode){
 }
 function renderContents(b, view){
   const menu = $('contents-menu'); if(!menu) return;
-  const access = getAccess(b.id);
   if(view==='highlights'){
     const items=getSavedMarks(b.id);
     let html='<div class="reader-menu-head">Saved highlights</div>';
@@ -381,7 +439,7 @@ function renderContents(b, view){
   }
   let html='<div class="reader-menu-head">CHAPTERS</div>';
   (b.chapters||[]).forEach((ch,i)=>{
-    const allowed = access.ok || i < (b.freeChapterCount||1);
+    const allowed = hasFullInterior(b) || i < (b.freeChapterCount||1);
     html += '<button type="button" data-ch="'+i+'" '+(allowed?'':'disabled')+'>'+escapeHtml(ch.label)+(allowed?'':' \u00b7 locked')+'</button>';
   });
   html += '<div class="reader-menu-rule"></div>';
@@ -403,12 +461,8 @@ function renderContents(b, view){
 }
 function renderBuy(b){
   const panel = $('buy-panel'); if(!panel) return;
-  const p = PRICE[b.id]; const access = getAccess(b.id);
-  if(!p){ panel.innerHTML = '<span>No store listing for this title yet.</span>'; return; }
-  if(access.ok){ panel.innerHTML = '<strong>Owned.</strong> Full interior unlocked on this device.'; return; }
-  panel.innerHTML = '<strong>'+escapeHtml(b.title)+'</strong> \u00b7 Buy '+p.buy.label+' \u00b7 Borrow '+p.borrow.label+'<br><button type="button" id="buy-confirm">Confirm buy</button> <button type="button" id="borrow-confirm">Borrow</button>';
-  const buy=$('buy-confirm'); if(buy) buy.onclick=()=>{ unlockBook(b.id,'owned'); openReader(b); };
-  const bor=$('borrow-confirm'); if(bor) bor.onclick=()=>{ unlockBook(b.id,'borrowed'); openReader(b); };
+  panel.innerHTML = buySheetHtml(b);
+  bindBuySheet(panel, b, openReader);
 }
 function showResume(b){
   const row = $('reader-resume'); if(!row) return;
@@ -498,5 +552,6 @@ window.addEventListener('keydown', e=>{
 window.addEventListener('resize', ()=>{ if(readerBook && readMode==='pages') afterLayout(relayoutPages); });
 window.addEventListener('popstate', ()=>{ const id=(location.hash||'').replace(/^#\//,''); if(id && BOOKS.some(b=>b.id===id)) showBook(id, false); else closeBook(); });
 applyTypePrefs();
+refreshMember();
 const boot=(location.hash||'').replace(/^#\//,'');
 if(boot && BOOKS.some(b=>b.id===boot)) showBook(boot, false); else render();

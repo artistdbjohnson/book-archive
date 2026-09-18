@@ -2,6 +2,9 @@
   "name": "book-archive",
   "private": true,
   "type": "module",
+  "scripts": {
+    "test": "node ownership.test.mjs"
+  },
   "dependencies": {
     "@vercel/blob": "^2.3.0"
   }

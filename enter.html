@@ -35,8 +35,27 @@ button{margin-top:12px;width:100%;height:40px;border:1px solid var(--text);backg
     <button type="submit">Enter</button>
   </form>
   <div class="status" id="status"></div>
+  <p class="status">or <a href="/join">Join the Archive</a></p>
 </main>
 <script>
+function safeNext(raw){
+  if(!raw) return '/';
+  var next=String(raw);
+  if(next.charAt(0)!=='/' || next.indexOf('//')===0 || next.indexOf('\\')>=0) return '/';
+  return next;
+}
+function rememberMember(){
+  try{
+    var s=JSON.parse(localStorage.getItem('dglxss-archive-pwa-v1')||'{}');
+    s.member=true;
+    localStorage.setItem('dglxss-archive-pwa-v1', JSON.stringify(s));
+  }catch(e){}
+}
+(function(){
+  var next=safeNext(new URLSearchParams(location.search).get('next'));
+  var join=document.querySelector('a[href="/join"]');
+  if(join && next!=='/') join.href='/join?next='+encodeURIComponent(next);
+})();
 document.getElementById('form').onsubmit=function(e){
   e.preventDefault();
   var st=document.getElementById('status');
@@ -47,7 +66,8 @@ document.getElementById('form').onsubmit=function(e){
     body:JSON.stringify({code:document.getElementById('code').value})
   }).then(function(r){ return r.json().then(function(d){ return {ok:r.ok,d:d}; }); }).then(function(x){
     if(!x.ok){ st.textContent=x.d.error||'Wrong code.'; return; }
-    location.href=new URLSearchParams(location.search).get('next')||'/listen';
+    rememberMember();
+    location.href=safeNext(new URLSearchParams(location.search).get('next'));
   }).catch(function(){ st.textContent='Could not reach the archive.'; });
 };
 </script>

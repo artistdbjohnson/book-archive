@@ -31,7 +31,15 @@ h1{font-size:26px;font-weight:700;letter-spacing:-.03em;margin:0 0 8px}
   <h1>Archive membership</h1>
   <div class="note">One access price for the digital shelf. Amount not set. Payments stay off until Stripe is connected. Testers use an access code.</div>
   <a class="btn off" href="#" aria-disabled="true">Pay with Stripe — next</a>
-  <a class="btn ghost" href="/enter">I have an access code</a>
+  <a class="btn ghost" id="enter-link" href="/enter">I have an access code</a>
 </main>
+<script>
+(function(){
+  var raw=new URLSearchParams(location.search).get('next');
+  var next=(!raw || raw.charAt(0)!=='/' || raw.indexOf('//')===0 || raw.indexOf('\\')>=0) ? '' : raw;
+  var a=document.getElementById('enter-link');
+  if(a && next) a.href='/enter?next='+encodeURIComponent(next);
+})();
+</script>
 </body>
 </html>
