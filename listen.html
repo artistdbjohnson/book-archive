@@ -44,12 +44,20 @@ audio{width:100%;height:36px}
 <script>
 (function(){
   var a=document.getElementById('player'), st=document.getElementById('status');
-  var srcs=['/ark-survey-ch01-v2-leo.mp3','/audio/ark-survey-ch01-v2-leo.mp3','/audio/first-water.mp3'];
+  var srcs=['/api/audio?book=first-water'];
   var i=0;
   function next(){
     if(i>=srcs.length){ st.textContent='Audio file is not on this host yet.'; return; }
-    a.src=srcs[i++];
-    st.textContent = i<=1 ? 'Leo · hired reader' : 'Leo · hired reader · part '+String(i).padStart(2,'0');
+    var src=srcs[i++];
+    st.textContent='Leo · hired reader';
+    if(src.indexOf('/api/audio')===0){
+      fetch(src,{cache:'no-store'}).then(function(r){ return r.json(); }).then(function(d){
+        if(!d||!d.url) throw new Error('no url');
+        a.src=d.url;
+      }).catch(next);
+      return;
+    }
+    a.src=src;
   }
   function jump(sec){
     if(!isFinite(a.currentTime)) return;
