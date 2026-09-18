@@ -355,7 +355,7 @@ function renderContents(b, view){
       };
     });
     const back=menu.querySelector('[data-toc]');
-    if(back) back.onclick=()=>renderContents(b);
+    if(back) back.onclick=(e)=>{ e.stopPropagation(); renderContents(b); menu.classList.add('open'); };
     return;
   }
   let html='<div class="reader-menu-head">CHAPTERS</div>';
@@ -378,7 +378,7 @@ function renderContents(b, view){
   const mark = menu.querySelector('[data-mark]');
   if(mark) mark.onclick=()=>{ menu.classList.remove('open'); const s=loadStore(); s.bookmarks=s.bookmarks||{}; s.bookmarks[b.id]=s.bookmarks[b.id]||[]; s.bookmarks[b.id].push({label: pages[pageIndex]?pages[pageIndex].label:b.title, page:pageIndex, t:Date.now()}); saveStore(s); };
   const hl=menu.querySelector('[data-hl-open]');
-  if(hl) hl.onclick=()=>renderContents(b,'highlights');
+  if(hl) hl.onclick=(e)=>{ e.stopPropagation(); renderContents(b,'highlights'); menu.classList.add('open'); };
 }
 function renderBuy(b){
   const panel = $('buy-panel'); if(!panel) return;
@@ -461,7 +461,9 @@ if($('edge-left')) $('edge-left').onclick=()=>{ closeChromeSheets(); if(pageInde
 if($('edge-right')) $('edge-right').onclick=()=>{ closeChromeSheets(); if(pageIndex<pages.length-1){ pageIndex++; renderPages(); } };
 if($('scroll-inner')) $('scroll-inner').addEventListener('scroll', ()=>{ if(readerBook && readMode==='scroll') saveProgress(readerBook.id, {mode:'scroll', scroll:$('scroll-inner').scrollTop}); });
 if($('reader')) $('reader').addEventListener('click', e=>{
-  if(e.target.closest('.reader-chrome')) return;
+  const path=typeof e.composedPath==='function' ? e.composedPath() : [];
+  if(path.some(n=>n && n.classList && n.classList.contains('reader-chrome'))) return;
+  if(e.target && e.target.closest && e.target.closest('.reader-chrome')) return;
   closeChromeSheets();
 });
 window.addEventListener('keydown', e=>{
