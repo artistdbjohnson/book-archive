@@ -1,4 +1,5 @@
 import { issueSignedToken, presignUrl } from '@vercel/blob';
+import { isMember } from './_lib.js';
 
 const FILES = {
   'first-water': 'ark-survey-ch01-v2-leo.mp3'
@@ -8,6 +9,10 @@ export default async function handler(req, res) {
   res.setHeader('Cache-Control', 'no-store');
   if (req.method !== 'GET') {
     res.status(405).json({ error: 'method' });
+    return;
+  }
+  if (!isMember(req)) {
+    res.status(401).json({ error: 'member' });
     return;
   }
   const url = new URL(req.url, 'http://localhost');
