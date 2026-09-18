@@ -11,13 +11,71 @@ function getProgress(id){ return (loadStore().progress||{})[id] || null; }
 function saveProgress(id, p){ const s=loadStore(); s.progress=s.progress||{}; s.progress[id]=Object.assign({}, s.progress[id]||{}, p); saveStore(s); }
 function getAccess(id){ return (loadStore().access||{})[id] || {ok:false,kind:'none'}; }
 function unlockBook(id, kind){ const s=loadStore(); s.access=s.access||{}; s.access[id]={ok:true,kind}; saveStore(s); }
+const TYPE_SIZE_PX = { s:'13px', m:'15px', l:'18px' };
+const TYPE_OK = {
+  size:{s:1,m:1,l:1},
+  line:{snug:1,regular:1,loose:1},
+  margin:{narrow:1,regular:1,wide:1}
+};
+function getTypePrefs(){
+  const t=loadStore().type||{};
+  return {
+    size: TYPE_OK.size[t.size] ? t.size : 'm',
+    line: TYPE_OK.line[t.line] ? t.line : 'regular',
+    margin: TYPE_OK.margin[t.margin] ? t.margin : 'regular'
+  };
+}
+function applyTypePrefs(){
+  const t=getTypePrefs();
+  const r=$('reader');
+  if(!r) return;
+  r.style.fontSize = TYPE_SIZE_PX[t.size];
+  r.dataset.size=t.size;
+  r.dataset.line=t.line;
+  r.dataset.margin=t.margin;
+  document.querySelectorAll('#type-panel [data-size]').forEach(b=>b.classList.toggle('on', b.dataset.size===t.size));
+  document.querySelectorAll('#type-panel [data-line]').forEach(b=>b.classList.toggle('on', b.dataset.line===t.line));
+  document.querySelectorAll('#type-panel [data-margin]').forEach(b=>b.classList.toggle('on', b.dataset.margin===t.margin));
+}
+function saveTypePrefs(partial){
+  const s=loadStore();
+  s.type=Object.assign({}, getTypePrefs(), partial);
+  saveStore(s);
+  applyTypePrefs();
+  if(readerBook && readMode==='pages'){
+    const keep=pages[pageIndex];
+    pages=paginate(readerBook);
+    if(keep){
+      let idx=pages.findIndex(p=>p.label===keep.label && p.html===keep.html);
+      if(idx<0) idx=pages.findIndex(p=>p.label===keep.label);
+      pageIndex=idx<0?0:idx;
+    }
+    renderPages();
+  }
+}
+function shortWorkTitle(b){ return String((b&&b.title)||'Archive').toUpperCase(); }
+function updateBackLabel(b){
+  const btn=$('btn-back'); if(!btn) return;
+  btn.textContent='\u2190 '+shortWorkTitle(b);
+}
+function getHighlights(id){ return (loadStore().highlights||{})[id]||[]; }
+function closeChromeSheets(){
+  const menu=$('contents-menu'); if(menu) menu.classList.remove('open');
+  const type=$('type-panel'); if(type) type.classList.remove('open');
+  const buy=$('buy-panel'); if(buy) buy.classList.remove('open');
+  const aa=$('btn-type'); if(aa) aa.setAttribute('aria-expanded','false');
+}
 function escapeHtml(str){
   return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 const BOOKS = [
   {id:'naitives', title:'new nAItives', subtitle:'Becoming AI Native: A Field Manual', year:2026, type:'Non-fiction', status:'Published', freeChapterCount:1,
     blurb:'A field manual for moving a shop off human-legible process and onto machine-legible architecture.',
-    chapters:[{label:'Front Matter', text:'new nAItives\n\nBecoming AI Native: A Field Manual\n\nby .dglxss\n\nA field manual for moving a shop off human-legible process and onto machine-legible architecture.'}]},
+    chapters:[
+      {label:'Front Matter', text:'new nAItives\n\nBecoming AI Native: A Field Manual\n\nby .dglxss\n\nA field manual for moving a shop off human-legible process and onto machine-legible architecture.'},
+      {label:'Chapter 1 – The Shift', text:'The shop moved off the whiteboard and onto a machine that could keep the same argument overnight.\n\nThe book exists because the parts that failed are in here too.'},
+      {label:'Chapter 2 – The Remove-the-Test', text:'The test that certified a human had understood the system was the first thing to go.'}
+    ]},
   {id:'codriver', title:'CO-DRIVER', subtitle:'Part One: Deadhead', year:2026, type:'Fiction', status:'Draft', freeChapterCount:1,
     blurb:'A long-haul driver, an autonomous unit named Charley, and the slow erasure of human authority on the northern plains.',
     chapters:[{label:'One. Wamsutter', text:'The skirt bracket only made noise between sixty-two and sixty-eight.\n\nThe crack showed in April, a hairline through the mount where the fairing tied into the frame rail.'}]},
@@ -85,9 +143,9 @@ function bindCollapse(root){
 }
 function closeReader(){
   const r=$('reader'); if(r) r.classList.remove('open');
-  const menu=$('contents-menu'); if(menu) menu.classList.remove('open');
-  const buy=$('buy-panel'); if(buy) buy.classList.remove('open');
+  closeChromeSheets();
   readerBook=null;
+  updateBackLabel(null);
 }
 function setView(v){
   document.body.classList.remove('is-list','is-gallery','is-detail');
@@ -177,9 +235,9 @@ function readableChapters(b){
   return (b.chapters||[]).filter((ch,i)=> access.ok || i < (b.freeChapterCount||1));
 }
 function pageHtml(label, buf, first){
-  return (first ? '<div class="pg-label">'+escapeHtml(label)+'</div>' : '') + buf.split(/\n\n+/).map(x=>'<p>'+escapeHtml(x)+'</p>').join('');
+  return (first ? '<div class="pg-label">'+escapeHtml(label)+'</div>' : '') + String(buf||'').split(/\n\n+/).filter(Boolean).map(x=>'<p>'+escapeHtml(x)+'</p>').join('');
 }
-function paginate(book){
+function paginateByChars(book){
   const TARGET = 1100, out = [];
   for(const ch of readableChapters(book)){
     const paras = String(ch.text||'').trim().split(/\n\n+/);
@@ -192,6 +250,67 @@ function paginate(book){
     if(buf) out.push({label: ch.label, html: pageHtml(ch.label, buf, first)});
   }
   return out;
+}
+function pageCapacity(){
+  const host=$('page-body'), reader=$('reader');
+  if(!host || !reader || !reader.classList.contains('open')) return null;
+  const w=host.clientWidth, h=host.clientHeight;
+  if(w<80 || h<80) return null;
+  return {w,h};
+}
+function paginate(book){
+  const cap=pageCapacity();
+  if(!cap){
+    // TODO(reader-v1): viewport-measure needs a laid-out #page-body; char-count TARGET≈1100 is fallback only.
+    return paginateByChars(book);
+  }
+  const probe=document.createElement('div');
+  probe.className='page-body page-measure';
+  probe.style.width=cap.w+'px';
+  probe.setAttribute('aria-hidden','true');
+  $('reader').appendChild(probe);
+  const fits=html=>{ probe.innerHTML=html; return probe.offsetHeight<=cap.h; };
+  const out=[];
+  try{
+    for(const ch of readableChapters(book)){
+      const paras=String(ch.text||'').trim().split(/\n\n+/).filter(Boolean);
+      let buf=[], first=true;
+      const flush=()=>{
+        if(!buf.length) return;
+        out.push({label:ch.label, html:pageHtml(ch.label, buf.join('\n\n'), first)});
+        buf=[]; first=false;
+      };
+      for(const p of paras){
+        const trial=buf.concat([p]);
+        if(buf.length && !fits(pageHtml(ch.label, trial.join('\n\n'), first))) flush();
+        if(!fits(pageHtml(ch.label, p, first))){
+          const words=p.split(/\s+/);
+          let wbuf=[];
+          for(const w of words){
+            const next=wbuf.concat([w]);
+            if(wbuf.length && !fits(pageHtml(ch.label, next.join(' '), first))){
+              buf=[wbuf.join(' ')]; flush(); wbuf=[w];
+            } else wbuf=next;
+          }
+          if(wbuf.length) buf=[wbuf.join(' ')];
+        } else buf.push(p);
+      }
+      flush();
+    }
+  } finally { probe.remove(); }
+  return out.length ? out : [{label:book.title, html:'<p>—</p>'}];
+}
+function afterLayout(fn){ requestAnimationFrame(()=>requestAnimationFrame(fn)); }
+function relayoutPages(){
+  if(!readerBook || readMode!=='pages') return;
+  const keep=pages[pageIndex];
+  pages=paginate(readerBook);
+  if(keep){
+    let idx=pages.findIndex(p=>p.label===keep.label && p.html===keep.html);
+    if(idx<0) idx=pages.findIndex(p=>p.label===keep.label);
+    pageIndex=idx<0?0:idx;
+  }
+  renderPages();
 }
 function renderScroll(b){
   let html = '<h1>'+escapeHtml(b.title)+'</h1><div class="sub">'+escapeHtml(b.subtitle||'')+'<br>'+b.year+' \u00b7 '+escapeHtml(b.type)+(b.reader?' \u00b7 Read by '+escapeHtml(b.reader):'')+'</div>';
@@ -213,17 +332,40 @@ function setReadMode(mode){
   if($('reader')) $('reader').classList.toggle('mode-pages', mode==='pages');
   if($('btn-pages')) $('btn-pages').classList.toggle('on', mode==='pages');
   if($('btn-scroll')) $('btn-scroll').classList.toggle('on', mode==='scroll');
-  if(mode==='pages') renderPages();
+  if(readerBook) saveProgress(readerBook.id, {mode});
+  if(mode==='pages' && pages.length) renderPages();
 }
-function renderContents(b){
+function renderContents(b, view){
   const menu = $('contents-menu'); if(!menu) return;
   const access = getAccess(b.id);
-  let html = '';
+  if(view==='highlights'){
+    const items=getHighlights(b.id);
+    let html='<div class="reader-menu-head">Saved highlights</div>';
+    if(!items.length) html+='<div class="menu-note">No highlights yet</div>';
+    else items.forEach((h,i)=>{ html+='<button type="button" data-hl="'+i+'">'+escapeHtml(h.text||h.label||'Highlight')+'</button>'; });
+    html+='<div class="reader-menu-rule"></div><button type="button" data-toc="1">Contents</button>';
+    menu.innerHTML=html;
+    menu.querySelectorAll('[data-hl]').forEach(btn=>{
+      btn.onclick=()=>{
+        const h=items[Number(btn.dataset.hl)];
+        menu.classList.remove('open');
+        if(!h || typeof h.page!=='number') return;
+        pageIndex=Math.min(h.page, Math.max(pages.length-1,0));
+        setReadMode('pages'); renderPages();
+      };
+    });
+    const back=menu.querySelector('[data-toc]');
+    if(back) back.onclick=()=>renderContents(b);
+    return;
+  }
+  let html='<div class="reader-menu-head">CHAPTERS</div>';
   (b.chapters||[]).forEach((ch,i)=>{
     const allowed = access.ok || i < (b.freeChapterCount||1);
     html += '<button type="button" data-ch="'+i+'" '+(allowed?'':'disabled')+'>'+escapeHtml(ch.label)+(allowed?'':' \u00b7 locked')+'</button>';
   });
+  html += '<div class="reader-menu-rule"></div>';
   html += '<button type="button" data-mark="1">Bookmark this page</button>';
+  html += '<button type="button" data-hl-open="1">Saved highlights</button>';
   menu.innerHTML = html;
   menu.querySelectorAll('[data-ch]').forEach(btn=>{
     btn.onclick=()=>{
@@ -235,6 +377,8 @@ function renderContents(b){
   });
   const mark = menu.querySelector('[data-mark]');
   if(mark) mark.onclick=()=>{ menu.classList.remove('open'); const s=loadStore(); s.bookmarks=s.bookmarks||{}; s.bookmarks[b.id]=s.bookmarks[b.id]||[]; s.bookmarks[b.id].push({label: pages[pageIndex]?pages[pageIndex].label:b.title, page:pageIndex, t:Date.now()}); saveStore(s); };
+  const hl=menu.querySelector('[data-hl-open]');
+  if(hl) hl.onclick=()=>renderContents(b,'highlights');
 }
 function renderBuy(b){
   const panel = $('buy-panel'); if(!panel) return;
@@ -258,12 +402,19 @@ function showResume(b){
   };
 }
 function mountOpened(b){
-  readerBook = b; pages = paginate(b); pageIndex = 0;
+  readerBook = b; pages = []; pageIndex = 0;
+  applyTypePrefs(); updateBackLabel(b);
   mountReaderPlayer(b); renderScroll(b); renderContents(b); renderBuy(b);
-  if($('contents-menu')) $('contents-menu').classList.remove('open');
-  if($('buy-panel')) $('buy-panel').classList.remove('open');
+  closeChromeSheets();
   $('reader').classList.add('open');
-  setReadMode('pages'); renderPages(); showResume(b);
+  setReadMode('pages');
+  afterLayout(()=>{
+    if(readerBook!==b) return;
+    pages=paginate(b);
+    pageIndex=0;
+    renderPages();
+    showResume(b);
+  });
 }
 function openReader(b){
   if(isSoon(b)){ showBook(b.id); return; }
@@ -273,13 +424,46 @@ if($('btn-back')) $('btn-back').onclick=()=>closeReader();
 if($('btn-list')) $('btn-list').onclick=()=>setView('list');
 if($('btn-gallery')) $('btn-gallery').onclick=()=>setView('gallery');
 if($('btn-home')) $('btn-home').onclick=()=>closeBook();
-if($('btn-contents')) $('btn-contents').onclick=()=>{ if($('contents-menu')) $('contents-menu').classList.toggle('open'); if($('buy-panel')) $('buy-panel').classList.remove('open'); };
-if($('btn-scroll')) $('btn-scroll').onclick=()=>{ setReadMode('scroll'); if($('contents-menu')) $('contents-menu').classList.remove('open'); };
-if($('btn-pages')) $('btn-pages').onclick=()=>{ setReadMode('pages'); if($('contents-menu')) $('contents-menu').classList.remove('open'); };
-if($('btn-buy')) $('btn-buy').onclick=()=>{ if($('buy-panel')) $('buy-panel').classList.toggle('open'); if($('contents-menu')) $('contents-menu').classList.remove('open'); };
-if($('edge-left')) $('edge-left').onclick=()=>{ if(pageIndex>0){ pageIndex--; renderPages(); } };
-if($('edge-right')) $('edge-right').onclick=()=>{ if(pageIndex<pages.length-1){ pageIndex++; renderPages(); } };
+if($('btn-contents')) $('btn-contents').onclick=()=>{
+  if(readerBook) renderContents(readerBook);
+  const menu=$('contents-menu');
+  const open=menu && !menu.classList.contains('open');
+  if($('type-panel')) $('type-panel').classList.remove('open');
+  if($('buy-panel')) $('buy-panel').classList.remove('open');
+  if($('btn-type')) $('btn-type').setAttribute('aria-expanded','false');
+  if(menu) menu.classList.toggle('open', !!open);
+};
+if($('btn-type')) $('btn-type').onclick=()=>{
+  const panel=$('type-panel');
+  const open=panel && !panel.classList.contains('open');
+  if($('contents-menu')) $('contents-menu').classList.remove('open');
+  if($('buy-panel')) $('buy-panel').classList.remove('open');
+  if(panel) panel.classList.toggle('open', !!open);
+  $('btn-type').setAttribute('aria-expanded', open?'true':'false');
+};
+if($('type-panel')) $('type-panel').addEventListener('click', e=>{
+  const btn=e.target.closest('button'); if(!btn) return;
+  if(btn.dataset.size) saveTypePrefs({size:btn.dataset.size});
+  else if(btn.dataset.line) saveTypePrefs({line:btn.dataset.line});
+  else if(btn.dataset.margin) saveTypePrefs({margin:btn.dataset.margin});
+});
+if($('btn-scroll')) $('btn-scroll').onclick=()=>{ setReadMode('scroll'); closeChromeSheets(); };
+if($('btn-pages')) $('btn-pages').onclick=()=>{ setReadMode('pages'); closeChromeSheets(); };
+if($('btn-buy')) $('btn-buy').onclick=()=>{
+  const panel=$('buy-panel');
+  const open=panel && !panel.classList.contains('open');
+  if($('contents-menu')) $('contents-menu').classList.remove('open');
+  if($('type-panel')) $('type-panel').classList.remove('open');
+  if($('btn-type')) $('btn-type').setAttribute('aria-expanded','false');
+  if(panel) panel.classList.toggle('open', !!open);
+};
+if($('edge-left')) $('edge-left').onclick=()=>{ closeChromeSheets(); if(pageIndex>0){ pageIndex--; renderPages(); } };
+if($('edge-right')) $('edge-right').onclick=()=>{ closeChromeSheets(); if(pageIndex<pages.length-1){ pageIndex++; renderPages(); } };
 if($('scroll-inner')) $('scroll-inner').addEventListener('scroll', ()=>{ if(readerBook && readMode==='scroll') saveProgress(readerBook.id, {mode:'scroll', scroll:$('scroll-inner').scrollTop}); });
+if($('reader')) $('reader').addEventListener('click', e=>{
+  if(e.target.closest('.reader-chrome')) return;
+  closeChromeSheets();
+});
 window.addEventListener('keydown', e=>{
   if(!$('reader') || !$('reader').classList.contains('open')) return;
   const t=e.target; if(t && (t.tagName==='INPUT' || t.tagName==='TEXTAREA' || t.isContentEditable)) return;
@@ -288,6 +472,8 @@ window.addEventListener('keydown', e=>{
   if(e.key==='ArrowRight' || e.key===' ' || e.key==='PageDown'){ e.preventDefault(); if(pageIndex<pages.length-1){ pageIndex++; renderPages(); } }
   else if(e.key==='ArrowLeft' || e.key==='PageUp'){ e.preventDefault(); if(pageIndex>0){ pageIndex--; renderPages(); } }
 });
+window.addEventListener('resize', ()=>{ if(readerBook && readMode==='pages') afterLayout(relayoutPages); });
 window.addEventListener('popstate', ()=>{ const id=(location.hash||'').replace(/^#\//,''); if(id && BOOKS.some(b=>b.id===id)) showBook(id, false); else closeBook(); });
+applyTypePrefs();
 const boot=(location.hash||'').replace(/^#\//,'');
 if(boot && BOOKS.some(b=>b.id===boot)) showBook(boot, false); else render();
