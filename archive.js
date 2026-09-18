@@ -53,12 +53,33 @@ function saveTypePrefs(partial){
     renderPages();
   }
 }
-function shortWorkTitle(b){ return String((b&&b.title)||'Archive').toUpperCase(); }
+function shortWorkTitle(b){ return String((b&&b.title)||'Archive'); }
 function updateBackLabel(b){
   const btn=$('btn-back'); if(!btn) return;
   btn.textContent='\u2190 '+shortWorkTitle(b);
 }
+function getBookmarks(id){ return (loadStore().bookmarks||{})[id]||[]; }
 function getHighlights(id){ return (loadStore().highlights||{})[id]||[]; }
+function getSavedMarks(id){
+  const marks=[];
+  getBookmarks(id).forEach(x=>marks.push(Object.assign({kind:'bookmark'}, x)));
+  getHighlights(id).forEach(x=>marks.push(Object.assign({kind:'highlight'}, x)));
+  marks.sort((a,b)=>(b.t||0)-(a.t||0));
+  return marks;
+}
+function addBookmark(b){
+  const s=loadStore();
+  s.bookmarks=s.bookmarks||{};
+  s.bookmarks[b.id]=s.bookmarks[b.id]||[];
+  const label=pages[pageIndex]?pages[pageIndex].label:b.title;
+  s.bookmarks[b.id].push({label, page:pageIndex, t:Date.now()});
+  saveStore(s);
+}
+function markLabel(h){
+  if(h.kind==='highlight' && h.text) return h.text;
+  const page=typeof h.page==='number' ? ' · p. '+(h.page+1) : '';
+  return (h.label||'Bookmark')+page;
+}
 function closeChromeSheets(){
   const menu=$('contents-menu'); if(menu) menu.classList.remove('open');
   const type=$('type-panel'); if(type) type.classList.remove('open');
@@ -339,10 +360,10 @@ function renderContents(b, view){
   const menu = $('contents-menu'); if(!menu) return;
   const access = getAccess(b.id);
   if(view==='highlights'){
-    const items=getHighlights(b.id);
+    const items=getSavedMarks(b.id);
     let html='<div class="reader-menu-head">Saved highlights</div>';
     if(!items.length) html+='<div class="menu-note">No highlights yet</div>';
-    else items.forEach((h,i)=>{ html+='<button type="button" data-hl="'+i+'">'+escapeHtml(h.text||h.label||'Highlight')+'</button>'; });
+    else items.forEach((h,i)=>{ html+='<button type="button" data-hl="'+i+'">'+escapeHtml(markLabel(h))+'</button>'; });
     html+='<div class="reader-menu-rule"></div><button type="button" data-toc="1">Contents</button>';
     menu.innerHTML=html;
     menu.querySelectorAll('[data-hl]').forEach(btn=>{
@@ -376,7 +397,7 @@ function renderContents(b, view){
     };
   });
   const mark = menu.querySelector('[data-mark]');
-  if(mark) mark.onclick=()=>{ menu.classList.remove('open'); const s=loadStore(); s.bookmarks=s.bookmarks||{}; s.bookmarks[b.id]=s.bookmarks[b.id]||[]; s.bookmarks[b.id].push({label: pages[pageIndex]?pages[pageIndex].label:b.title, page:pageIndex, t:Date.now()}); saveStore(s); };
+  if(mark) mark.onclick=(e)=>{ e.stopPropagation(); addBookmark(b); renderContents(b,'highlights'); menu.classList.add('open'); };
   const hl=menu.querySelector('[data-hl-open]');
   if(hl) hl.onclick=(e)=>{ e.stopPropagation(); renderContents(b,'highlights'); menu.classList.add('open'); };
 }

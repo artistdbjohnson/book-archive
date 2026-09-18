@@ -71,19 +71,20 @@ body.is-detail .list-view,body.is-detail .gallery{display:none}
 .reader-root[data-margin="wide"]{--reader-pad-x:2.6rem}
 .reader-root.open{display:flex;flex-direction:column}
 .reader-chrome{min-height:42px;display:flex;align-items:center;justify-content:center;padding:0 14px;border-bottom:1px solid var(--line);background:var(--page);flex-shrink:0;position:relative}
-.reader-chrome-inner{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;max-width:36rem;min-width:0;position:relative}
-.reader-chrome-left,.reader-chrome-actions{display:flex;align-items:center;gap:14px;min-width:0}
-.reader-chrome-left{flex:1}
-.reader-chrome button,.reader-link{border:0;background:transparent;color:var(--muted);font-size:11px;height:28px;padding:0;letter-spacing:.02em}
+.reader-chrome-inner{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;max-width:36rem;min-width:0;position:relative;flex-wrap:nowrap}
+.reader-chrome-left,.reader-chrome-actions{display:flex;align-items:center;gap:8px;min-width:0;flex-wrap:nowrap}
+.reader-chrome-left{flex:1 1 auto}
+.reader-chrome-actions{flex:0 0 auto}
+.reader-chrome button,.reader-link{border:0;background:transparent;color:var(--muted);font-size:11px;height:28px;padding:0;letter-spacing:.02em;white-space:nowrap}
 .reader-chrome button.on,.reader-link.on{color:var(--text)}
 .reader-chrome button:hover,.reader-link:hover{color:var(--text)}
-.reader-back{max-width:8.8em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-transform:uppercase;flex-shrink:1;text-align:left}
+.reader-back{max-width:7.2em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex-shrink:1;text-align:left}
 .reader-aa{font-weight:500;min-width:1.4em}
 .reader-seg{display:inline-flex;align-items:center;gap:2px;flex-shrink:0}
-.reader-seg button{height:26px;padding:0 10px;border-radius:999px}
+.reader-seg button{height:26px;padding:0 8px;border-radius:999px}
 .reader-chrome .reader-seg button.on{background:var(--text);color:#fff}
 .reader-chrome .reader-seg button.on:hover{color:#fff}
-.reader-chrome .reader-buy{background:var(--text);color:#fff;height:26px;padding:0 12px;border-radius:999px;font-weight:500;flex-shrink:0}
+.reader-chrome .reader-buy{background:var(--text);color:#fff;height:26px;padding:0 10px;border-radius:999px;font-weight:500;flex-shrink:0}
 .reader-chrome .reader-buy:hover{color:#fff;opacity:.9}
 .reader-resume{font-size:11px;color:var(--muted);padding:8px 14px 0;flex-shrink:0}
 .reader-resume button{border:0;background:none;color:var(--text);font-size:11px;padding:0;margin-left:8px}
@@ -151,7 +152,7 @@ body.is-detail .list-view,body.is-detail .gallery{display:none}
 @media(max-width:767px){
   .reader-edge{width:28%;max-width:none}
   .page-body{padding:1.5rem var(--reader-pad-x) 1.25rem}
-  .reader-chrome{min-height:calc(42px + env(safe-area-inset-top,0px));padding-top:env(safe-area-inset-top,0px)}
+  .reader-chrome{min-height:calc(42px + env(safe-area-inset-top,0px));padding:env(safe-area-inset-top,0px) 10px 0}
   .reader-root[data-margin="regular"]{--reader-pad-x:1.35rem}
 }
 </style>
