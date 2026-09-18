@@ -59,35 +59,70 @@ body.is-detail .list-view,body.is-detail .gallery{display:none}
 .skip{display:flex;gap:8px;margin:10px 0 0}
 .skip button{flex:1;height:32px;border:1px solid var(--text);background:transparent;color:var(--text);font-size:11px;font-weight:600}
 .audio-status{font-size:11px;color:var(--muted);margin:8px 0 0}
-.reader-root{display:none;position:fixed;inset:0;z-index:40;background:var(--page)}
+.reader-root{display:none;position:fixed;inset:0;z-index:40;background:var(--page);--reader-size:15px;--reader-lh:1.8;--reader-pad-x:2.5rem;font-size:var(--reader-size)}
+.reader-root[data-size="s"]{--reader-size:13px}
+.reader-root[data-size="m"]{--reader-size:15px}
+.reader-root[data-size="l"]{--reader-size:18px}
+.reader-root[data-line="snug"]{--reader-lh:1.55}
+.reader-root[data-line="regular"]{--reader-lh:1.8}
+.reader-root[data-line="loose"]{--reader-lh:2.05}
+.reader-root[data-margin="narrow"]{--reader-pad-x:1.15rem}
+.reader-root[data-margin="regular"]{--reader-pad-x:1.75rem}
+.reader-root[data-margin="wide"]{--reader-pad-x:2.6rem}
 .reader-root.open{display:flex;flex-direction:column}
-.reader-chrome{min-height:42px;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:0 14px;border-bottom:1px solid var(--line);background:var(--page);flex-shrink:0;position:relative}
-.reader-chrome-left,.reader-chrome-actions{display:flex;align-items:center;gap:18px;min-width:0}
-.reader-chrome button,.reader-link{border:0;background:transparent;color:var(--muted);font-size:11px;height:28px;padding:0;letter-spacing:.02em}
+.reader-chrome{min-height:42px;display:flex;align-items:center;justify-content:center;padding:0 14px;border-bottom:1px solid var(--line);background:var(--page);flex-shrink:0;position:relative}
+.reader-chrome-inner{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;max-width:36rem;min-width:0;position:relative;flex-wrap:nowrap}
+.reader-chrome-left,.reader-chrome-actions{display:flex;align-items:center;gap:8px;min-width:0;flex-wrap:nowrap}
+.reader-chrome-left{flex:1 1 auto}
+.reader-chrome-actions{flex:0 0 auto}
+.reader-chrome button,.reader-link{border:0;background:transparent;color:var(--muted);font-size:11px;height:28px;padding:0;letter-spacing:.02em;white-space:nowrap}
 .reader-chrome button.on,.reader-link.on{color:var(--text)}
 .reader-chrome button:hover,.reader-link:hover{color:var(--text)}
+.reader-back{max-width:7.2em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex-shrink:1;text-align:left}
+.reader-aa{font-weight:500;min-width:1.4em}
+.reader-seg{display:inline-flex;align-items:center;gap:2px;flex-shrink:0}
+.reader-seg button{height:26px;padding:0 8px;border-radius:999px}
+.reader-chrome .reader-seg button.on{background:var(--text);color:#fff}
+.reader-chrome .reader-seg button.on:hover{color:#fff}
+.reader-chrome .reader-buy{background:var(--text);color:#fff;height:26px;padding:0 10px;border-radius:999px;font-weight:500;flex-shrink:0}
+.reader-chrome .reader-buy:hover{color:#fff;opacity:.9}
 .reader-resume{font-size:11px;color:var(--muted);padding:8px 14px 0;flex-shrink:0}
 .reader-resume button{border:0;background:none;color:var(--text);font-size:11px;padding:0;margin-left:8px}
 .reader-player{padding:10px 12px 12px;border-bottom:1px solid var(--line);background:var(--page);flex-shrink:0}
-.scroll-inner{flex:1;overflow:auto;max-width:36rem;margin:0 auto;width:100%;padding:2.5rem 1.75rem 4.5rem;font-family:'JetBrains Mono',ui-monospace,monospace;scrollbar-width:none}
+.scroll-inner{flex:1;overflow:auto;max-width:36rem;margin:0 auto;width:100%;padding:2.5rem var(--reader-pad-x) 4.5rem;font-family:'JetBrains Mono',ui-monospace,monospace;scrollbar-width:none}
 .scroll-inner::-webkit-scrollbar{display:none}
 .scroll-inner h1{font-size:1.55rem;font-weight:700;letter-spacing:-.02em;margin-bottom:.35rem}
 .scroll-inner .sub{font-size:11px;color:var(--muted);margin-bottom:2rem}
-.scroll-inner p{font-size:15px;line-height:1.8;margin:0 0 1em}
+.scroll-inner p{font-size:1em;line-height:var(--reader-lh);margin:0 0 1em}
 .scroll-inner .chapter-label{font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:2rem 0 1rem}
 .pageview{position:relative;flex:1;min-height:0;display:none;flex-direction:column}
 .reader-root.mode-pages .scroll-inner{display:none}
 .reader-root.mode-pages .pageview{display:flex}
-.page-body{flex:1;min-height:0;overflow:hidden;padding:2.25rem 2.5rem 1.5rem;font-size:15px;line-height:1.8;scrollbar-width:none}
+.page-body{flex:1;min-height:0;overflow:hidden;padding:2.25rem var(--reader-pad-x) 1.5rem;font-size:1em;line-height:var(--reader-lh);scrollbar-width:none;max-width:36rem;width:100%;margin:0 auto}
 .page-body .pg-label{font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:0 0 1.15em}
 .page-body p{margin:0 0 1em}
-.page-foot{flex-shrink:0;display:flex;justify-content:space-between;padding:12px 1.5rem 14px;font-size:10px;letter-spacing:.04em;color:var(--muted)}
+.page-measure{position:absolute;left:-9999px;top:0;height:auto!important;min-height:0!important;max-height:none!important;overflow:visible!important;flex:none!important;visibility:hidden;pointer-events:none}
+.page-foot{flex-shrink:0;display:flex;justify-content:space-between;padding:12px 1.5rem 14px;font-size:10px;letter-spacing:.04em;color:var(--muted);max-width:36rem;width:100%;margin:0 auto}
 .reader-edge{position:absolute;top:0;bottom:36px;width:18%;max-width:88px;z-index:5;border:0;background:transparent;padding:0}
 .reader-edge.left{left:0;cursor:w-resize}
 .reader-edge.right{right:0;cursor:e-resize}
-.reader-menu{display:none;position:absolute;left:14px;top:calc(100% + 4px);z-index:60;min-width:240px;max-height:50vh;overflow:auto;background:var(--paper);border:1px solid var(--text)}
+.reader-menu{display:none;position:absolute;left:0;top:calc(100% + 4px);z-index:60;min-width:248px;max-width:min(320px,calc(100vw - 28px));max-height:50vh;overflow:auto;background:var(--paper);border:1px solid var(--text)}
 .reader-menu.open{display:block}
-.reader-menu button{display:block;width:100%;text-align:left;font-size:12px;padding:10px 12px;border:0;border-top:1px solid var(--line);background:transparent;color:var(--text)}
+.reader-menu-head{font-size:10px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);padding:11px 12px 9px}
+.reader-menu button,.reader-menu .menu-note{display:block;width:100%;text-align:left;font-size:12px;line-height:1.35;padding:10px 12px;border:0;border-top:1px solid var(--line);background:transparent;color:var(--text);height:auto;letter-spacing:0}
+.reader-menu button:disabled{opacity:.4;color:var(--muted);pointer-events:none;cursor:default}
+.reader-menu .menu-note{color:var(--muted)}
+.reader-menu-rule{border-top:1px solid var(--line-strong);margin:0}
+.reader-menu-rule + button{border-top:0}
+.reader-type-panel{display:none;position:absolute;right:0;top:calc(100% + 4px);z-index:60;min-width:248px;background:var(--paper);border:1px solid var(--text);padding:10px 12px 12px}
+.reader-type-panel.open{display:block}
+.type-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 0}
+.type-row + .type-row{border-top:1px solid var(--line)}
+.type-label{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.type-pills{display:flex;align-items:center;gap:4px}
+.reader-chrome .reader-type-panel button{height:24px;padding:0 8px;border-radius:999px;font-size:11px;color:var(--muted)}
+.reader-chrome .reader-type-panel button.on{background:var(--text);color:#fff}
+.reader-chrome .reader-type-panel button.on:hover{color:#fff}
 .buy-panel{display:none;padding:14px;border-bottom:1px solid var(--line);font-size:12px;color:var(--muted)}
 .buy-panel.open{display:block}
 .buy-panel strong{color:var(--text);font-weight:600}
@@ -116,8 +151,9 @@ body.is-detail .list-view,body.is-detail .gallery{display:none}
 }
 @media(max-width:767px){
   .reader-edge{width:28%;max-width:none}
-  .page-body{padding:1.5rem 1.35rem 1.25rem}
-  .reader-chrome{min-height:calc(42px + env(safe-area-inset-top,0px));padding-top:env(safe-area-inset-top,0px)}
+  .page-body{padding:1.5rem var(--reader-pad-x) 1.25rem}
+  .reader-chrome{min-height:calc(42px + env(safe-area-inset-top,0px));padding:env(safe-area-inset-top,0px) 10px 0}
+  .reader-root[data-margin="regular"]{--reader-pad-x:1.35rem}
 }
 </style>
 </head>
@@ -140,18 +176,49 @@ body.is-detail .list-view,body.is-detail .gallery{display:none}
     </section>
   </main>
 </div>
-<div class="reader-root mode-pages" id="reader">
+<div class="reader-root mode-pages" id="reader" data-size="m" data-line="regular" data-margin="regular">
   <div class="reader-chrome">
+    <div class="reader-chrome-inner">
     <div class="reader-chrome-left">
-      <button type="button" id="btn-back">\u2190 Archive</button>
+      <button type="button" id="btn-back" class="reader-back">\u2190 Archive</button>
       <button type="button" id="btn-contents">Contents</button>
     </div>
     <div class="reader-chrome-actions">
-      <button type="button" id="btn-scroll">Scroll</button>
-      <button type="button" id="btn-pages" class="on">Pages</button>
-      <button type="button" id="btn-buy">Buy</button>
+      <button type="button" id="btn-type" class="reader-aa" aria-haspopup="true" aria-expanded="false" aria-controls="type-panel">Aa</button>
+      <div class="reader-seg" role="group" aria-label="Reading mode">
+        <button type="button" id="btn-scroll">Scroll</button>
+        <button type="button" id="btn-pages" class="on">Pages</button>
+      </div>
+      <button type="button" id="btn-buy" class="reader-buy">Buy</button>
     </div>
     <div class="reader-menu" id="contents-menu"></div>
+    <div class="reader-type-panel" id="type-panel">
+      <div class="type-row">
+        <span class="type-label">Size</span>
+        <div class="type-pills">
+          <button type="button" data-size="s">S</button>
+          <button type="button" data-size="m" class="on">M</button>
+          <button type="button" data-size="l">L</button>
+        </div>
+      </div>
+      <div class="type-row">
+        <span class="type-label">Line</span>
+        <div class="type-pills">
+          <button type="button" data-line="snug">Snug</button>
+          <button type="button" data-line="regular" class="on">Regular</button>
+          <button type="button" data-line="loose">Loose</button>
+        </div>
+      </div>
+      <div class="type-row">
+        <span class="type-label">Margins</span>
+        <div class="type-pills">
+          <button type="button" data-margin="narrow">Narrow</button>
+          <button type="button" data-margin="regular" class="on">Regular</button>
+          <button type="button" data-margin="wide">Wide</button>
+        </div>
+      </div>
+    </div>
+    </div>
   </div>
   <div class="reader-resume" id="reader-resume" hidden></div>
   <div class="buy-panel" id="buy-panel"></div>
