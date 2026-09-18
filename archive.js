@@ -50,7 +50,7 @@ function withSections(items, rowFn, headerFn){
     const sec=sectionLabel(b);
     if(sec && sec!==last){
       close();
-      const collapsed = sec.indexOf('Neo-Damascus')>=0;
+      const collapsed = true;
       out += headerFn(sec, collapsed);
       out += '<div class="sec-body'+(collapsed?' is-collapsed':'')+'" data-sec="'+sec+'">';
       open=true; last=sec;
