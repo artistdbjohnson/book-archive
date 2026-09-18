@@ -47,21 +47,21 @@ body.is-detail .list-view,body.is-detail .gallery{display:none}
 .detail .blurb{font-size:13.5px;line-height:1.7;margin-bottom:22px;max-width:42ch}
 .price-table{border-top:1px solid var(--line);margin-bottom:20px}
 .price-row{display:flex;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--line);font-size:12px}
-.actions{display:flex;flex-wrap:wrap;gap:8px}
+.actions{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
 .btn{font-size:11px;font-weight:600;padding:10px 14px;border:1px solid var(--text);background:transparent;color:var(--text);height:36px}
 .btn.primary{background:var(--text);color:var(--bg)}
 .btn.ghost{border-color:var(--line-strong)}
 .btn:disabled{opacity:.45}
-.audio-row{margin-top:16px;padding-top:14px;border-top:1px solid var(--line)}
-.audio-row audio,.reader-player audio{width:100%;height:36px}
+.audio-row{margin-top:8px;padding-top:16px;border-top:1px solid var(--line)}
+.audio-row audio,.reader-audio audio{width:100%;height:40px}
 .audio-credit{font-size:11px;color:var(--muted);margin:0 0 8px}
 .audio-status{font-size:11px;color:var(--muted);margin:8px 0 0}
 .reader-root{display:none;position:fixed;inset:0;z-index:40;background:var(--page)}
 .reader-root.open{display:flex;flex-direction:column}
 .reader-chrome{min-height:42px;display:flex;align-items:center;justify-content:space-between;padding:0 12px;border-bottom:1px solid var(--line);background:var(--page)}
 .reader-chrome button{border:0;background:transparent;color:var(--muted);font-size:11px;height:28px;padding:0 8px}
-.reader-player{padding:10px 12px 12px;border-bottom:1px solid var(--line)}
-.scroll-inner{max-width:36rem;margin:0 auto;padding:2.5rem 1.75rem 4.5rem;font-family:Literata,Georgia,serif}
+.reader-audio{padding:10px 12px 12px;border-bottom:1px solid var(--line);background:var(--page)}
+.scroll-inner{max-width:36rem;margin:0 auto;padding:2.5rem 1.75rem 4.5rem;font-family:Literata,Georgia,serif;overflow:auto;flex:1}
 .scroll-inner h1{font-size:1.7rem;font-weight:600;margin-bottom:.35rem}
 .scroll-inner .sub{font-size:11px;color:var(--muted);margin-bottom:2rem;font-family:'JetBrains Mono',monospace}
 .scroll-inner p{font-size:16.5px;line-height:1.42;margin:0 0 1em}
@@ -100,6 +100,7 @@ body.is-detail .list-view,body.is-detail .gallery{display:none}
 </div>
 <div class="reader-root" id="reader">
   <div class="reader-chrome"><button type="button" id="btn-back">← Archive</button><span id="reader-title"></span></div>
+  <div class="reader-audio" id="reader-audio" hidden></div>
   <div class="scroll-inner" id="scroll-inner"></div>
 </div>
 <script>
@@ -108,7 +109,7 @@ const PRICE = {
   naitives: {buy:{amount:2400,label:'$24'}, borrow:{amount:700,label:'$7',days:14}},
   codriver: {buy:{amount:1400,label:'$14'}, borrow:{amount:400,label:'$4',days:14}}
 };
-const leaf = (title, pov, extra='') => ({label:'Title', text:`${title}\n\n${pov}\nArk Survey era\n${extra}\n\nThe chapter files here when the manuscript is in the project.`});
+const leaf = (title, pov, extra='') => ({label:'Title', text:`${title}\n\n${pov}\nArk Survey era${extra?('\n'+extra):''}`});
 const BOOKS = [
   {id:'naitives', title:'new nAItives', subtitle:'Becoming AI Native: A Field Manual', year:2026, type:'Non-fiction', status:'Published',
     blurb:'A field manual for moving a shop off human-legible process and onto machine-legible architecture.',
@@ -161,19 +162,51 @@ function setView(v){
   document.body.classList.add('is-'+v);
   $('btn-list').classList.toggle('on', v==='list');
   $('btn-gallery').classList.toggle('on', v==='gallery');
+  $('reader').classList.remove('open');
   render();
+}
+function showDetail(id){
+  selected=id;
+  document.body.classList.add('is-detail');
+  render();
+}
+function audioMarkup(prefix){
+  return `<div class="audio-credit">Read by Leo</div><audio id="${prefix}-el" controls preload="metadata"></audio><div class="audio-status" id="${prefix}-status">Leo · hired reader</div>`;
+}
+function bindAudio(a, st, srcs, autoplay){
+  if(!a || !srcs || !srcs.length) return;
+  let i=0;
+  const label=()=>{ if(st) st.textContent = i<=1 ? 'Leo · hired reader' : 'Leo · hired reader · part '+String(i).padStart(2,'0'); };
+  const next=()=>{
+    if(i>=srcs.length){ if(st) st.textContent='Audio file is not on this host yet.'; return; }
+    a.src=srcs[i++]; label();
+    if(autoplay) a.play().catch(next);
+  };
+  a.onerror=next;
+  a.onended=()=>{ if(i<srcs.length){ autoplay=true; next(); } else if(st) st.textContent='Leo · hired reader · end'; };
+  next();
 }
 function render(){
   const books=BOOKS;
   $('list-view').innerHTML = withSections(books, b=>`<div class="list-row ${isSoon(b)?'soon':''}" data-id="${b.id}"><div><div class="t">${listTitle(b)}</div><div class="m">${b.year} · ${b.type}${b.series?' · '+b.subtitle:''}</div></div><div class="price">${listPrice(b)}</div></div>`, sec=>`<div class="list-section">${sec}</div>`);
   $('list-view').querySelectorAll('.list-row').forEach(el=>{
-    el.onclick=()=>{ selected=el.dataset.id; document.body.classList.add('is-detail'); renderDetail(); };
+    el.onclick=()=>{
+      const b=BOOKS.find(x=>x.id===el.dataset.id);
+      selected=el.dataset.id;
+      if(window.innerWidth<=900 && b && !isSoon(b)) openReader(b);
+      else showDetail(el.dataset.id);
+    };
   });
   $('list-rail').innerHTML = withSections(books, b=>`<div class="row ${b.id===selected?'on':''}" data-id="${b.id}"><div class="t">${listTitle(b)}</div><div class="m">${b.year} · ${listPrice(b)}</div></div>`, sec=>`<div class="section">${sec}</div>`);
-  $('list-rail').querySelectorAll('.row').forEach(el=> el.onclick=()=>{ selected=el.dataset.id; renderDetail(); render(); });
+  $('list-rail').querySelectorAll('.row').forEach(el=> el.onclick=()=>showDetail(el.dataset.id));
   $('gallery').innerHTML = books.map(b=>`<div class="g-card" data-id="${b.id}"><div class="g-cover">${listTitle(b)}</div><div class="g-meta"><div class="t">${listTitle(b)}</div><div class="m">${b.year} · ${b.type} · ${listPrice(b)}</div></div></div>`).join('');
   $('gallery').querySelectorAll('.g-card').forEach(el=>{
-    el.onclick=()=>{ selected=el.dataset.id; const b=BOOKS.find(x=>x.id===selected); if(isSoon(b)||b.audio){ document.body.classList.add('is-detail'); renderDetail(); } else openReader(b); };
+    el.onclick=()=>{
+      const b=BOOKS.find(x=>x.id===el.dataset.id);
+      selected=el.dataset.id;
+      if(window.innerWidth<=900 && b && !isSoon(b)) openReader(b);
+      else showDetail(el.dataset.id);
+    };
   });
   renderDetail();
 }
@@ -182,37 +215,37 @@ function renderDetail(){
   const p=PRICE[b.id];
   let actions = isSoon(b) ? `<button class="btn" type="button" disabled>Coming soon</button>` :
     `<button class="btn primary" type="button" id="d-read">Open</button>`;
-  if(b.audio) actions += `<button class="btn ghost" type="button" id="d-listen">Listen</button>`;
+  if(b.audio) actions += `<button class="btn ghost" type="button" id="d-listen">Play</button>`;
   const prices = p ? `<div class="price-table"><div class="price-row"><span>Borrow · ${p.borrow.days} days</span><span>${p.borrow.label}</span></div><div class="price-row"><span>Buy · permanent</span><span>${p.buy.label}</span></div></div>` :
     (isSoon(b)?`<div class="price-table"><div class="price-row"><span>Status</span><span>Coming soon</span></div></div>`:'');
-  const audio = b.audio ? `<div class="audio-row" id="audio-row"><div class="audio-credit">Read by ${b.reader||'Leo'}</div><audio id="qf-audio" controls preload="metadata"></audio><div class="audio-status" id="audio-status">Leo · hired reader</div></div>` : '';
+  const audio = b.audio ? `<div class="audio-row" id="audio-row">${audioMarkup('qf-audio')}</div>` : '';
   $('detail').innerHTML = `<h1>${b.title}</h1><div class="sub">${b.series?b.series+' · '+(b.era||'')+'<br>':''}${b.subtitle}<br>${b.year} · ${b.type} · ${b.status}${b.reader?' · Read by '+b.reader:''}</div><div class="blurb">${b.blurb||''}</div>${prices}<div class="actions">${actions}</div>${audio}`;
   const r=$('d-read'); if(r) r.onclick=()=>openReader(b);
-  const lis=$('d-listen');
-  if(b.audio) bindAudio($('qf-audio'), $('audio-status'), b.audio.slice(), false);
-  if(lis) lis.onclick=()=>{
-    const a=$('qf-audio'); if(!a) return;
-    if(a.paused) a.play().catch(()=>bindAudio(a, $('audio-status'), b.audio.slice(), true));
-  };
-}
-function bindAudio(a, st, srcs, autoplay){
-  if(!a || !srcs || !srcs.length) return;
-  let i=0;
-  const label=()=>{ if(st) st.textContent = i<=1 ? 'Leo · hired reader' : 'Leo · hired reader · part '+String(i).padStart(2,'0'); };
-  const next=()=>{ if(i>=srcs.length){ if(st) st.textContent='Audio file is not on this host yet.'; return; } a.src=srcs[i++]; label(); if(autoplay) a.play().catch(next); };
-  a.onerror=next;
-  a.onended=()=>{ if(i<srcs.length){ autoplay=true; next(); } else if(st) st.textContent='Leo · hired reader · end'; };
-  a.removeAttribute('src');
-  next();
+  if(b.audio){
+    bindAudio($('qf-audio-el'), $('qf-audio-status'), b.audio.slice(), false);
+    const lis=$('d-listen');
+    if(lis) lis.onclick=()=>{
+      const a=$('qf-audio-el');
+      if(!a) return;
+      if(a.paused) a.play().catch(()=>bindAudio(a, $('qf-audio-status'), b.audio.slice(), true));
+      else a.pause();
+    };
+  }
 }
 function openReader(b){
-  if(isSoon(b)){ selected=b.id; document.body.classList.add('is-detail'); renderDetail(); return; }
+  if(isSoon(b)){ showDetail(b.id); return; }
   $('reader-title').textContent=b.title;
-  const player = b.audio ? `<div class="reader-player"><div class="audio-credit">Read by ${b.reader||'Leo'}</div><audio id="reader-qf-audio" controls preload="metadata"></audio><div class="audio-status" id="reader-audio-status">Leo · hired reader</div></div>` : '';
-  $('scroll-inner').innerHTML = player + `<h1>${b.title}</h1><div class="sub">${b.subtitle}<br>${b.year} · ${b.type}${b.reader?' · Read by '+b.reader:''}</div>` +
+  const slot=$('reader-audio');
+  if(slot){
+    if(b.audio){
+      slot.hidden=false;
+      slot.innerHTML = audioMarkup('reader-qf');
+      bindAudio($('reader-qf-el'), $('reader-qf-status'), b.audio.slice(), false);
+    } else { slot.hidden=true; slot.innerHTML=''; }
+  }
+  $('scroll-inner').innerHTML = `<h1>${b.title}</h1><div class="sub">${b.subtitle}<br>${b.year} · ${b.type}${b.reader?' · Read by '+b.reader:''}</div>` +
     (b.chapters||[]).map(ch=>`<p><strong>${ch.label}</strong></p>`+ch.text.split(/\n\n+/).map(p=>`<p>${p.replace(/\n/g,'<br>')}</p>`).join('')).join('');
   $('reader').classList.add('open');
-  if(b.audio) bindAudio($('reader-qf-audio'), $('reader-audio-status'), b.audio.slice(), false);
 }
 $('btn-back').onclick=()=>$('reader').classList.remove('open');
 $('btn-list').onclick=()=>setView('list');
