@@ -59,73 +59,62 @@ body.is-detail .list-view,body.is-detail .gallery{display:none}
 .skip{display:flex;gap:8px;margin:10px 0 0}
 .skip button{flex:1;height:32px;border:1px solid var(--text);background:transparent;color:var(--text);font-size:11px;font-weight:600}
 .audio-status{font-size:11px;color:var(--muted);margin:8px 0 0}
-.reader-root{display:none;position:fixed;inset:0;z-index:40;background:var(--page);--reader-size:15px;--reader-lh:1.8;--reader-pad-x:2.5rem;font-size:var(--reader-size)}
-.reader-root[data-size="s"]{--reader-size:13px}
-.reader-root[data-size="m"]{--reader-size:15px}
-.reader-root[data-size="l"]{--reader-size:18px}
-.reader-root[data-line="snug"]{--reader-lh:1.55}
-.reader-root[data-line="regular"]{--reader-lh:1.8}
-.reader-root[data-line="loose"]{--reader-lh:2.05}
-.reader-root[data-margin="narrow"]{--reader-pad-x:1.15rem}
-.reader-root[data-margin="regular"]{--reader-pad-x:1.75rem}
-.reader-root[data-margin="wide"]{--reader-pad-x:2.6rem}
+body.reader-open{overflow:hidden}
+.reader-root{display:none;position:fixed;inset:0;z-index:40;background:#fff;color:#000;--listen-size:20px;font-size:var(--listen-size);font-family:'JetBrains Mono',ui-monospace,monospace;user-select:none;-webkit-user-select:none;overscroll-behavior:none}
+.reader-root[data-size="s"]{--listen-size:17px}
+.reader-root[data-size="m"]{--listen-size:20px}
+.reader-root[data-size="l"]{--listen-size:23px}
 .reader-root.open{display:flex;flex-direction:column}
-.reader-chrome{min-height:42px;display:flex;align-items:center;justify-content:center;padding:0 14px;border-bottom:1px solid var(--line);background:var(--page);flex-shrink:0;position:relative}
-.reader-chrome-inner{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;max-width:36rem;min-width:0;position:relative;flex-wrap:nowrap}
-.reader-chrome-left,.reader-chrome-actions{display:flex;align-items:center;gap:8px;min-width:0;flex-wrap:nowrap}
-.reader-chrome-left{flex:1 1 auto}
-.reader-chrome-actions{flex:0 0 auto}
-.reader-chrome button,.reader-link{border:0;background:transparent;color:var(--muted);font-size:11px;height:28px;padding:0;letter-spacing:.02em;white-space:nowrap}
-.reader-chrome button.on,.reader-link.on{color:var(--text)}
-.reader-chrome button:hover,.reader-link:hover{color:var(--text)}
-.reader-back{max-width:7.2em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex-shrink:1;text-align:left}
-.reader-aa{font-weight:500;min-width:1.4em}
-.reader-seg{display:inline-flex;align-items:center;gap:2px;flex-shrink:0}
-.reader-seg button{height:26px;padding:0 8px;border-radius:999px}
-.reader-chrome .reader-seg button.on{background:var(--text);color:#fff}
-.reader-chrome .reader-seg button.on:hover{color:#fff}
-.reader-chrome .reader-buy{background:var(--text);color:#fff;height:26px;padding:0 10px;border-radius:999px;font-weight:500;flex-shrink:0}
-.reader-chrome .reader-buy:hover{color:#fff;opacity:.9}
-.reader-resume{font-size:11px;color:var(--muted);padding:8px 14px 0;flex-shrink:0}
-.reader-resume button{border:0;background:none;color:var(--text);font-size:11px;padding:0;margin-left:8px}
-.reader-player{padding:10px 12px 12px;border-bottom:1px solid var(--line);background:var(--page);flex-shrink:0}
-.scroll-inner{flex:1;overflow:auto;max-width:36rem;margin:0 auto;width:100%;padding:2.5rem var(--reader-pad-x) 4.5rem;font-family:'JetBrains Mono',ui-monospace,monospace;scrollbar-width:none}
-.scroll-inner::-webkit-scrollbar{display:none}
-.scroll-inner h1{font-size:1.55rem;font-weight:700;letter-spacing:-.02em;margin-bottom:.35rem}
-.scroll-inner .sub{font-size:11px;color:var(--muted);margin-bottom:2rem}
-.scroll-inner p{font-size:1em;line-height:var(--reader-lh);margin:0 0 1em}
-.scroll-inner .chapter-label{font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:2rem 0 1rem}
-.pageview{position:relative;flex:1;min-height:0;display:none;flex-direction:column}
-.reader-root.mode-pages .scroll-inner{display:none}
-.reader-root.mode-pages .pageview{display:flex}
-.page-body{flex:1;min-height:0;overflow:hidden;padding:2.25rem var(--reader-pad-x) 1.5rem;font-size:1em;line-height:var(--reader-lh);scrollbar-width:none;max-width:36rem;width:100%;margin:0 auto}
-.page-body .pg-label{font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:0 0 1.15em}
-.page-body p{margin:0 0 1em}
-.page-measure{position:absolute;left:-9999px;top:0;height:auto!important;min-height:0!important;max-height:none!important;overflow:visible!important;flex:none!important;visibility:hidden;pointer-events:none}
-.page-foot{flex-shrink:0;display:flex;justify-content:space-between;padding:12px 1.5rem 14px;font-size:10px;letter-spacing:.04em;color:var(--muted);max-width:36rem;width:100%;margin:0 auto}
-.reader-edge{position:absolute;top:0;bottom:36px;width:18%;max-width:88px;z-index:5;border:0;background:transparent;padding:0}
-.reader-edge.left{left:0;cursor:w-resize}
-.reader-edge.right{right:0;cursor:e-resize}
-.reader-menu{display:none;position:absolute;left:0;top:calc(100% + 4px);z-index:60;min-width:248px;max-width:min(320px,calc(100vw - 28px));max-height:50vh;overflow:auto;background:var(--paper);border:1px solid var(--text)}
-.reader-menu.open{display:block}
-.reader-menu-head{font-size:10px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);padding:11px 12px 9px}
-.reader-menu button,.reader-menu .menu-note{display:block;width:100%;text-align:left;font-size:12px;line-height:1.35;padding:10px 12px;border:0;border-top:1px solid var(--line);background:transparent;color:var(--text);height:auto;letter-spacing:0}
-.reader-menu button:disabled{opacity:.4;color:var(--muted);pointer-events:none;cursor:default}
-.reader-menu .menu-note{color:var(--muted)}
-.reader-menu-rule{border-top:1px solid var(--line-strong);margin:0}
-.reader-menu-rule + button{border-top:0}
-.reader-type-panel{display:none;position:absolute;right:0;top:calc(100% + 4px);z-index:60;min-width:248px;background:var(--paper);border:1px solid var(--text);padding:10px 12px 12px}
-.reader-type-panel.open{display:block}
-.type-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 0}
-.type-row + .type-row{border-top:1px solid var(--line)}
-.type-label{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
-.type-pills{display:flex;align-items:center;gap:4px}
-.reader-chrome .reader-type-panel button{height:24px;padding:0 8px;border-radius:999px;font-size:11px;color:var(--muted)}
-.reader-chrome .reader-type-panel button.on{background:var(--text);color:#fff}
-.reader-chrome .reader-type-panel button.on:hover{color:#fff}
-.buy-panel{display:none;padding:14px;border-bottom:1px solid var(--line);font-size:12px;color:var(--muted)}
-.buy-panel.open{display:block}
-.buy-panel strong{color:var(--text);font-weight:600}
+.reader-root button{font-family:inherit;-webkit-tap-highlight-color:transparent}
+.reader-root button:focus-visible{outline:1px solid #000;outline-offset:3px}
+.listen-top,.listen-foot{width:min(100%,calc(46ch + 64px));margin:0 auto;padding-left:32px;padding-right:32px;position:relative;z-index:4;flex-shrink:0}
+.listen-top{padding-top:calc(18px + env(safe-area-inset-top,0px));padding-bottom:14px}
+.listen-nav,.listen-controls{display:flex;align-items:baseline;justify-content:space-between;font-size:13px;line-height:1.4;font-weight:400}
+.listen-nav button,.listen-controls button{border:0;background:transparent;padding:6px 0;color:#8d8d8d;font-size:13px;line-height:1;font-weight:400}
+#btn-library,#btn-play{color:#111}
+.listen-title{margin:16px 0 0;font-size:14px;font-weight:400;line-height:1.45;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.listen-name{color:#111}
+.listen-by{color:#9a9a9a}
+.listen-stage{position:relative;flex:1;min-height:0}
+.listen-art{position:absolute;inset:0;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none;color:#a3a3a3;transition:opacity .5s ease,transform .55s ease}
+.listen-art pre{margin:0;width:max-content;max-width:100%;font:12px/1.2 'JetBrains Mono',ui-monospace,monospace;color:#a8a8a8;text-align:left;white-space:pre}
+.listen-dots{display:flex;align-items:center;justify-content:center;gap:9px;margin-top:22px}
+.listen-dots i{display:block;width:4px;height:4px;border-radius:50%;background:#dedede}
+.listen-dots i.on{width:5px;height:5px;background:#8a8a8a}
+.reader-root.is-reading .listen-art{opacity:0;transform:translateY(-14px)}
+.listen-viewport{position:absolute;inset:0;overflow:hidden;z-index:1;touch-action:none}
+.listen-flow{opacity:0;transition:opacity .55s ease}
+.reader-root.is-reading .listen-flow{opacity:1}
+.listen-track{width:min(calc(100% - 64px),46ch);margin:0 auto;padding:0 0 62vh;font-weight:400;text-align:left}
+.listen-p{margin:0 0 1.35em;color:#c5c5c5;font-size:1em;line-height:1.5;font-weight:400}
+.listen-p.is-active{color:#737373}
+.listen-p.is-active .w.is-now{color:#000}
+.listen-fade{position:absolute;left:0;right:0;pointer-events:none;z-index:3}
+.listen-fade-top{top:0;height:22%;background:linear-gradient(to bottom,#fff 0%,rgba(255,255,255,0) 100%)}
+.listen-fade-bot{bottom:0;height:38%;background:linear-gradient(to top,#fff 0%,rgba(255,255,255,.78) 46%,rgba(255,255,255,0) 100%)}
+.listen-foot{padding-top:4px;padding-bottom:calc(18px + env(safe-area-inset-bottom,0px))}
+.listen-progress-wrap{transition:opacity .4s ease}
+.reader-root.is-reading .listen-progress-wrap{opacity:0;pointer-events:none}
+.listen-progress{position:relative;display:block;width:100%;height:18px;border:0;background:transparent;padding:0}
+.listen-progress::before{content:"";position:absolute;left:0;right:0;top:8px;height:1px;background:#e6e6e6}
+.listen-progress-fill{position:absolute;left:0;top:8px;height:1px;width:0%;background:#111;pointer-events:none}
+.listen-controls{padding-top:2px}
+.listen-sheet{display:none;position:absolute;z-index:6;min-width:220px;max-width:min(280px,calc(100vw - 48px));max-height:46vh;overflow:auto;background:#fff;border:1px solid rgba(0,0,0,.08);padding:6px 0}
+.listen-sheet.open{display:block}
+#edit-sheet{top:calc(100% - 6px);right:32px}
+#chapter-sheet{top:auto;bottom:calc(100% - 4px);right:32px}
+.listen-sheet .type-row{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:9px 14px}
+.listen-sheet .type-label{font-size:12px;color:#8d8d8d}
+.listen-sheet .type-pills{display:flex;align-items:center;gap:10px}
+.listen-sheet button{display:block;width:100%;text-align:left;border:0;background:transparent;color:#8d8d8d;font-size:13px;line-height:1.35;padding:9px 14px}
+.listen-sheet .type-pills button{width:auto;padding:0;font-size:13px}
+.listen-sheet button.on{color:#000}
+.listen-sheet button:disabled{color:#d2d2d2}
+.listen-sheet-rule{height:1px;margin:4px 14px;background:rgba(0,0,0,.08)}
+.listen-sheet .paper-lock{color:#111}
+@media(prefers-reduced-motion:reduce){
+  .listen-art,.listen-flow,.listen-progress-wrap,.listen-track{transition:none}
+}
 .list-section,.list-rail .section{display:flex;align-items:center;width:100%;text-align:left;background:transparent;border:0;border-bottom:1px solid var(--line);cursor:pointer}
 .list-section::after,.list-rail .section::after{content:'\2013';margin-left:auto;color:var(--muted);font-size:12px}
 .list-section.is-collapsed::after,.list-rail .section.is-collapsed::after{content:'+'}
@@ -149,12 +138,6 @@ body.is-detail .list-view,body.is-detail .gallery{display:none}
   body.is-detail .gallery{display:none !important}
   body.is-detail .detail{display:block}
 }
-@media(max-width:767px){
-  .reader-edge{width:28%;max-width:none}
-  .page-body{padding:1.5rem var(--reader-pad-x) 1.25rem}
-  .reader-chrome{min-height:calc(42px + env(safe-area-inset-top,0px));padding:env(safe-area-inset-top,0px) 10px 0}
-  .reader-root[data-margin="regular"]{--reader-pad-x:1.35rem}
-}
 </style>
 </head>
 <body class="is-list">
@@ -176,65 +159,60 @@ body.is-detail .list-view,body.is-detail .gallery{display:none}
     </section>
   </main>
 </div>
-<div class="reader-root mode-pages" id="reader" data-size="m" data-line="regular" data-margin="regular">
-  <div class="reader-chrome">
-    <div class="reader-chrome-inner">
-    <div class="reader-chrome-left">
-      <button type="button" id="btn-back" class="reader-back">\u2190 Archive</button>
-      <button type="button" id="btn-contents">Contents</button>
+<div class="reader-root" id="reader" data-size="m">
+  <header class="listen-top">
+    <div class="listen-nav">
+      <button type="button" id="btn-library">library</button>
+      <button type="button" id="btn-edit" aria-haspopup="true" aria-expanded="false" aria-controls="edit-sheet">edit</button>
     </div>
-    <div class="reader-chrome-actions">
-      <button type="button" id="btn-type" class="reader-aa" aria-haspopup="true" aria-expanded="false" aria-controls="type-panel">Aa</button>
-      <div class="reader-seg" role="group" aria-label="Reading mode">
-        <button type="button" id="btn-scroll">Scroll</button>
-        <button type="button" id="btn-pages" class="on">Pages</button>
-      </div>
-      <button type="button" id="btn-buy" class="reader-buy">Buy</button>
-    </div>
-    <div class="reader-menu" id="contents-menu"></div>
-    <div class="reader-type-panel" id="type-panel">
+    <h1 class="listen-title"><span class="listen-name" id="listen-name"></span><span class="listen-by" id="listen-by"></span></h1>
+    <div class="listen-sheet" id="edit-sheet" role="dialog" aria-label="Reading settings">
       <div class="type-row">
-        <span class="type-label">Size</span>
+        <span class="type-label">size</span>
         <div class="type-pills">
-          <button type="button" data-size="s">S</button>
-          <button type="button" data-size="m" class="on">M</button>
-          <button type="button" data-size="l">L</button>
+          <button type="button" data-size="s">s</button>
+          <button type="button" data-size="m" class="on">m</button>
+          <button type="button" data-size="l">l</button>
         </div>
       </div>
       <div class="type-row">
-        <span class="type-label">Line</span>
+        <span class="type-label">speed</span>
         <div class="type-pills">
-          <button type="button" data-line="snug">Snug</button>
-          <button type="button" data-line="regular" class="on">Regular</button>
-          <button type="button" data-line="loose">Loose</button>
+          <button type="button" data-speed="0.75">.75</button>
+          <button type="button" data-speed="1" class="on">1</button>
+          <button type="button" data-speed="1.25">1.25</button>
+          <button type="button" data-speed="1.5">1.5</button>
         </div>
       </div>
       <div class="type-row">
-        <span class="type-label">Margins</span>
-        <div class="type-pills">
-          <button type="button" data-margin="narrow">Narrow</button>
-          <button type="button" data-margin="regular" class="on">Regular</button>
-          <button type="button" data-margin="wide">Wide</button>
-        </div>
+        <span class="type-label">paper</span>
+        <div class="type-pills"><span class="paper-lock">white</span></div>
       </div>
     </div>
+  </header>
+  <div class="listen-stage">
+    <div class="listen-art" id="listen-art" aria-hidden="true">
+      <pre id="listen-mark"></pre>
+      <div class="listen-dots"><i></i><i class="on"></i><i class="on"></i><i></i></div>
+    </div>
+    <div class="listen-viewport" id="listen-viewport">
+      <div class="listen-flow" id="listen-flow">
+        <div class="listen-track" id="listen-track"></div>
+      </div>
+      <div class="listen-fade listen-fade-top"></div>
+      <div class="listen-fade listen-fade-bot"></div>
     </div>
   </div>
-  <div class="reader-resume" id="reader-resume" hidden></div>
-  <div class="buy-panel" id="buy-panel"></div>
-  <div class="reader-player" id="reader-player" hidden>
-    <div class="audio-credit" id="reader-audio-credit">Read by Leo</div>
-    <audio id="reader-qf-audio" controls preload="metadata"></audio>
-    <div class="skip"><button type="button" data-skip="-15">\u221215</button><button type="button" data-skip="15">+15</button></div>
-    <div class="audio-status" id="reader-audio-status">Leo \u00b7 hired reader</div>
-  </div>
-  <div class="scroll-inner" id="scroll-inner"></div>
-  <div class="pageview" id="pageview">
-    <button class="reader-edge left" id="edge-left" type="button" aria-label="Previous page"></button>
-    <div class="page-body" id="page-body"></div>
-    <button class="reader-edge right" id="edge-right" type="button" aria-label="Next page"></button>
-    <div class="page-foot"><span id="page-left"></span><span id="page-right"></span></div>
-  </div>
+  <footer class="listen-foot">
+    <div class="listen-sheet" id="chapter-sheet" role="dialog" aria-label="Chapters"></div>
+    <div class="listen-progress-wrap">
+      <button type="button" class="listen-progress" id="listen-progress" aria-label="Reading progress"><span class="listen-progress-fill" id="listen-progress-fill"></span></button>
+    </div>
+    <div class="listen-controls">
+      <button type="button" id="btn-play" aria-pressed="false">play</button>
+      <button type="button" id="btn-chapter" aria-haspopup="true" aria-expanded="false" aria-controls="chapter-sheet">chapter 01</button>
+    </div>
+  </footer>
 </div>
 <script src="/archive.js"></script>
 </body>
