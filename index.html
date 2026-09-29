@@ -68,10 +68,25 @@ body.reader-open{overflow:hidden}
 .reader-root button{font-family:inherit;-webkit-tap-highlight-color:transparent}
 .reader-root button:focus-visible{outline:1px solid #000;outline-offset:3px}
 .listen-top,.listen-foot{width:min(100%,calc(46ch + 64px));margin:0 auto;padding-left:32px;padding-right:32px;position:relative;z-index:4;flex-shrink:0}
-.listen-top{padding-top:calc(18px + env(safe-area-inset-top,0px));padding-bottom:14px}
-.listen-nav,.listen-controls{display:flex;align-items:baseline;justify-content:space-between;font-size:13px;line-height:1.4;font-weight:400}
+.listen-top{padding-top:calc(18px + env(safe-area-inset-top,0px));padding-bottom:14px;transition:opacity .45s ease,transform .45s ease}
+.listen-nav,.listen-controls{display:flex;align-items:center;justify-content:space-between;font-size:13px;line-height:1.4;font-weight:400;gap:10px}
 .listen-nav button,.listen-controls button{border:0;background:transparent;padding:6px 0;color:#8d8d8d;font-size:13px;line-height:1;font-weight:400}
 #btn-library,#btn-play{color:#111}
+.mode-seg{display:flex;align-items:center;flex:1 1 auto;min-width:0;max-width:17.5rem;gap:2px}
+.listen-controls .mode-seg button{flex:1 1 0;min-width:0;height:26px;padding:0 6px;border-radius:999px;font-size:11px;line-height:1;color:#8d8d8d;text-align:center;white-space:nowrap}
+.listen-controls .mode-seg button.on{background:#111;color:#fff}
+.listen-transport{display:flex;align-items:center;gap:14px;flex:0 0 auto;margin-left:8px}
+#btn-play{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;padding:0}
+#btn-play .icon-pause{display:none}
+#btn-play[aria-pressed="true"] .icon-play{display:none}
+#btn-play[aria-pressed="true"] .icon-pause{display:block}
+#btn-play:disabled{opacity:.35}
+.reader-root:not([data-mode="autoplay"]) #btn-play{display:none}
+#btn-chapter{white-space:nowrap}
+.page-foot{display:none;justify-content:space-between;align-items:baseline;gap:12px;padding-top:8px;font-size:10px;letter-spacing:.04em;color:#8d8d8d;min-width:0}
+.reader-root[data-mode="pages"] .page-foot{display:flex}
+#page-left{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+#page-right{flex-shrink:0;font-variant-numeric:tabular-nums}
 .listen-title{margin:16px 0 0;font-size:14px;font-weight:400;line-height:1.45;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .listen-name{color:#111}
 .listen-by{color:#9a9a9a}
@@ -81,10 +96,31 @@ body.reader-open{overflow:hidden}
 .listen-dots{display:flex;align-items:center;justify-content:center;gap:9px;margin-top:22px}
 .listen-dots i{display:block;width:4px;height:4px;border-radius:50%;background:#dedede}
 .listen-dots i.on{width:5px;height:5px;background:#8a8a8a}
+.reader-root[data-mode="autoplay"].is-reading .listen-top{opacity:0;transform:translateY(-10px);pointer-events:none}
 .reader-root.is-reading .listen-art{opacity:0;transform:translateY(-14px)}
 .listen-viewport{position:absolute;inset:0;overflow:hidden;z-index:1;touch-action:none}
+.reader-root:not([data-mode="autoplay"]) .listen-viewport,
+.reader-root:not([data-mode="autoplay"]) .listen-art{display:none}
 .listen-flow{opacity:0;transition:opacity .55s ease}
 .reader-root.is-reading .listen-flow{opacity:1}
+.scroll-view{display:none;position:absolute;inset:0;z-index:1;overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;scrollbar-width:none;touch-action:pan-y}
+.scroll-view::-webkit-scrollbar{display:none}
+.reader-root[data-mode="scroll"] .scroll-view{display:block}
+.scroll-inner{width:min(calc(100% - 64px),46ch);margin:0 auto;padding:1.15rem 0 72vh}
+.scroll-inner .chapter-label{font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:#8d8d8d;margin:1.85em 0 .95em}
+.scroll-inner .chapter-label:first-child{margin-top:.15em}
+.scroll-p{margin:0 0 1.15em;color:#111;font-size:1em;line-height:1.7;font-weight:400}
+.pageview{display:none;position:absolute;inset:0;z-index:1;flex-direction:column;min-height:0;overflow:hidden}
+.reader-root[data-mode="pages"] .pageview{display:flex}
+.page-body{flex:1;min-height:0;overflow:hidden;width:min(calc(100% - 64px),46ch);margin:0 auto;padding:1.15rem 0 .4rem;color:#111;font-size:1em;line-height:1.7}
+.page-body .pg-label{font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:#8d8d8d;margin:0 0 1.15em}
+.page-body p{margin:0 0 1em}
+.page-measure{position:absolute;left:0;top:0;visibility:hidden;pointer-events:none;z-index:-1;height:auto!important;min-height:0!important;max-height:none!important;overflow:visible!important;flex:none!important}
+.reader-edge{position:absolute;top:0;bottom:0;width:22%;max-width:96px;z-index:5;border:0;background:transparent;padding:0}
+.reader-edge.left{left:0;cursor:w-resize}
+.reader-edge.right{right:0;cursor:e-resize}
+.reader-root[data-mode="scroll"] .scroll-view,
+.reader-root[data-mode="pages"] .page-body{user-select:text;-webkit-user-select:text}
 .listen-track{width:min(calc(100% - 64px),46ch);margin:0 auto;padding:0 0 62vh;font-weight:400;text-align:left}
 .listen-p{margin:0 0 1.35em;color:#c5c5c5;font-size:1em;line-height:1.5;font-weight:400}
 .listen-p.is-active{color:#737373}
@@ -94,6 +130,8 @@ body.reader-open{overflow:hidden}
 .listen-fade-bot{bottom:0;height:38%;background:linear-gradient(to top,#fff 0%,rgba(255,255,255,.78) 46%,rgba(255,255,255,0) 100%)}
 .listen-foot{padding-top:4px;padding-bottom:calc(18px + env(safe-area-inset-bottom,0px))}
 .listen-progress-wrap{transition:opacity .4s ease}
+.reader-root:not([data-mode="autoplay"]) .listen-progress-wrap,
+.reader-root:not([data-mode="autoplay"]) .speed-row{display:none}
 .reader-root.is-reading .listen-progress-wrap{opacity:0;pointer-events:none}
 .listen-progress{position:relative;display:block;width:100%;height:18px;border:0;background:transparent;padding:0}
 .listen-progress::before{content:"";position:absolute;left:0;right:0;top:8px;height:1px;background:#e6e6e6}
@@ -112,8 +150,17 @@ body.reader-open{overflow:hidden}
 .listen-sheet button:disabled{color:#d2d2d2}
 .listen-sheet-rule{height:1px;margin:4px 14px;background:rgba(0,0,0,.08)}
 .listen-sheet .paper-lock{color:#111}
+@media(max-width:420px){
+  .listen-top,.listen-foot{padding-left:16px;padding-right:16px}
+  .scroll-inner,.page-body{width:min(calc(100% - 32px),46ch)}
+  .listen-track{width:min(calc(100% - 32px),46ch)}
+}
+@media(max-width:359px){
+  .listen-controls .mode-seg button{font-size:10px;padding:0 3px}
+  #btn-chapter{font-size:12px}
+}
 @media(prefers-reduced-motion:reduce){
-  .listen-art,.listen-flow,.listen-progress-wrap,.listen-track{transition:none}
+  .listen-art,.listen-flow,.listen-progress-wrap,.listen-track,.listen-top{transition:none}
 }
 .list-section,.list-rail .section{display:flex;align-items:center;width:100%;text-align:left;background:transparent;border:0;border-bottom:1px solid var(--line);cursor:pointer}
 .list-section::after,.list-rail .section::after{content:'\2013';margin-left:auto;color:var(--muted);font-size:12px}
@@ -159,7 +206,7 @@ body.reader-open{overflow:hidden}
     </section>
   </main>
 </div>
-<div class="reader-root" id="reader" data-size="m">
+<div class="reader-root mode-pages" id="reader" data-size="m" data-mode="pages">
   <header class="listen-top">
     <div class="listen-nav">
       <button type="button" id="btn-library">library</button>
@@ -175,7 +222,7 @@ body.reader-open{overflow:hidden}
           <button type="button" data-size="l">l</button>
         </div>
       </div>
-      <div class="type-row">
+      <div class="type-row speed-row">
         <span class="type-label">speed</span>
         <div class="type-pills">
           <button type="button" data-speed="0.75">.75</button>
@@ -202,6 +249,14 @@ body.reader-open{overflow:hidden}
       <div class="listen-fade listen-fade-top"></div>
       <div class="listen-fade listen-fade-bot"></div>
     </div>
+    <div class="scroll-view" id="scroll-view">
+      <div class="scroll-inner" id="scroll-inner"></div>
+    </div>
+    <div class="pageview" id="pageview">
+      <button class="reader-edge left" id="edge-left" type="button" aria-label="Previous page"></button>
+      <div class="page-body" id="page-body"></div>
+      <button class="reader-edge right" id="edge-right" type="button" aria-label="Next page"></button>
+    </div>
   </div>
   <footer class="listen-foot">
     <div class="listen-sheet" id="chapter-sheet" role="dialog" aria-label="Chapters"></div>
@@ -209,9 +264,20 @@ body.reader-open{overflow:hidden}
       <button type="button" class="listen-progress" id="listen-progress" aria-label="Reading progress"><span class="listen-progress-fill" id="listen-progress-fill"></span></button>
     </div>
     <div class="listen-controls">
-      <button type="button" id="btn-play" aria-pressed="false">play</button>
-      <button type="button" id="btn-chapter" aria-haspopup="true" aria-expanded="false" aria-controls="chapter-sheet">chapter 01</button>
+      <div class="mode-seg" role="group" aria-label="Reading mode">
+        <button type="button" id="btn-mode-autoplay" data-mode="autoplay" aria-pressed="false">Autoplay</button>
+        <button type="button" id="btn-mode-scroll" data-mode="scroll" aria-pressed="false">Scroll</button>
+        <button type="button" id="btn-mode-pages" data-mode="pages" aria-pressed="true" class="on">Pages</button>
+      </div>
+      <div class="listen-transport">
+        <button type="button" id="btn-play" aria-pressed="false" aria-label="Play">
+          <svg class="icon-play" viewBox="0 0 12 12" width="11" height="11" aria-hidden="true"><path d="M2.7 1.35v9.3L10.15 6z" fill="currentColor"/></svg>
+          <svg class="icon-pause" viewBox="0 0 12 12" width="11" height="11" aria-hidden="true"><path d="M2.05 1.35h2.55v9.3H2.05zm5.35 0h2.55v9.3H7.4z" fill="currentColor"/></svg>
+        </button>
+        <button type="button" id="btn-chapter" aria-haspopup="true" aria-expanded="false" aria-controls="chapter-sheet">chapter 01</button>
+      </div>
     </div>
+    <div class="page-foot" id="page-foot"><span id="page-left"></span><span id="page-right"></span></div>
   </footer>
 </div>
 <script src="/archive.js"></script>

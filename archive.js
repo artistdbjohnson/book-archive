@@ -1,4 +1,4 @@
-/* listen reader — white paper karaoke. shelf chrome unchanged. */
+/* reader modes — autoplay karaoke, manual scroll, viewport pages. shelf chrome unchanged. */
 const $ = id => document.getElementById(id);
 const STORE = 'dglxss-archive-pwa-v1';
 const PRICE = {
@@ -32,7 +32,11 @@ function saveTypePrefs(partial){
   s.type=Object.assign({}, s.type||{}, getTypePrefs(), partial);
   saveStore(s);
   applyTypePrefs();
-  if(readerBook) afterLayout(()=>placeListen(true));
+  if(!readerBook) return;
+  afterLayout(()=>{
+    if(readMode==='pages') relayoutPages();
+    else if(readMode==='autoplay') placeListen(true);
+  });
 }
 function closeSheets(){
   const edit=$('edit-sheet'); if(edit) edit.classList.remove('open');
@@ -393,6 +397,9 @@ const BOOKS = [
 ];
 let selected = BOOKS[0].id;
 let readerBook = null;
+let readMode = 'pages';
+let pages = [];
+let pageIndex = 0;
 const listen = { words:[], paras:[], index:0, playing:false, finished:false, timer:null, drag:0, y:0, prevEl:null, prevPara:null };
 const isSoon = b => !b || b.status==='Coming soon' || (!(b.chapters&&b.chapters.length) && !(b.audio&&b.audio.length));
 const listTitle = b => (b.series && b.title.indexOf(b.series+': ')===0) ? b.title.slice(b.series.length+2) : b.title;
@@ -431,6 +438,8 @@ function bindCollapse(root){
   });
 }
 function closeReader(){
+  if(readerBook && readMode==='scroll') listen.index=wordFromScroll();
+  else if(readerBook && readMode==='pages') listen.index=pageWord();
   clearTimeout(listen.timer);
   listen.playing=false;
   if(readerBook) saveListenProgress();
@@ -541,10 +550,287 @@ function afterLayout(fn){ requestAnimationFrame(()=>requestAnimationFrame(fn)); 
 function chapterLabel(index){
   return 'chapter '+String(index+1).padStart(2,'0');
 }
+function clampWord(index){
+  if(!listen.words.length) return 0;
+  let i=index|0;
+  if(!isFinite(i) || i<0) i=0;
+  if(i>=listen.words.length) i=listen.words.length-1;
+  return i;
+}
+function storedMode(prog){
+  if(!prog || !prog.mode) return 'pages';
+  if(prog.mode==='autoplay' || prog.mode==='listen') return 'autoplay';
+  if(prog.mode==='scroll' || prog.mode==='pages') return prog.mode;
+  return 'pages';
+}
 function saveListenProgress(){
-  if(!readerBook || !listen.words.length) return;
-  const w=listen.words[Math.min(listen.index, listen.words.length-1)];
-  saveProgress(readerBook.id, {mode:'listen', word:listen.index, chapter:w?w.chapterIndex:0});
+  if(!readerBook) return;
+  const word=listen.words.length?clampWord(listen.index):0;
+  const w=listen.words[word];
+  const payload={mode:readMode, word:word, chapter:w?w.chapterIndex:0};
+  if(readMode==='scroll'){
+    const sc=$('scroll-view');
+    if(sc) payload.scroll=sc.scrollTop|0;
+  }
+  if(readMode==='pages') payload.page=pageIndex;
+  saveProgress(readerBook.id, payload);
+}
+function syncChapterButton(chapterIndex){
+  const ch=$('btn-chapter');
+  if(!ch) return;
+  let idx=chapterIndex;
+  if(typeof idx!=='number'){
+    const w=listen.words[listen.index];
+    idx=w?w.chapterIndex:0;
+  }
+  ch.textContent=chapterLabel(idx||0);
+}
+function sheetsOpen(){
+  const edit=$('edit-sheet'), ch=$('chapter-sheet');
+  return !!((edit && edit.classList.contains('open')) || (ch && ch.classList.contains('open')));
+}
+function updateModeChrome(){
+  const root=$('reader');
+  if(!root) return;
+  root.dataset.mode=readMode;
+  root.classList.toggle('mode-autoplay', readMode==='autoplay');
+  root.classList.toggle('mode-scroll', readMode==='scroll');
+  root.classList.toggle('mode-pages', readMode==='pages');
+  if(readMode!=='autoplay') root.classList.remove('is-reading');
+  document.querySelectorAll('.mode-seg [data-mode]').forEach(b=>{
+    const on=b.dataset.mode===readMode;
+    b.classList.toggle('on', on);
+    b.setAttribute('aria-pressed', on?'true':'false');
+  });
+  const speed=document.querySelector('#edit-sheet .speed-row');
+  if(speed) speed.hidden=readMode!=='autoplay';
+}
+function renderScroll(){
+  const inner=$('scroll-inner');
+  if(!inner) return;
+  if(!listen.paras.length || !readerBook){
+    inner.innerHTML='<p class="scroll-p">\u2014</p>';
+    return;
+  }
+  const byPara={};
+  listen.words.forEach(w=>{ (byPara[w.pi]=byPara[w.pi]||[]).push(w); });
+  let last=-1;
+  inner.innerHTML=listen.paras.map(p=>{
+    let head='';
+    if(p.chapterIndex!==last){
+      last=p.chapterIndex;
+      const ch=readerBook.chapters[p.chapterIndex];
+      const label=ch&&ch.label?ch.label:chapterLabel(p.chapterIndex);
+      head='<div class="chapter-label" id="ch-'+p.chapterIndex+'" data-ch="'+p.chapterIndex+'">'+escapeHtml(label)+'</div>';
+    }
+    const words=(byPara[p.pi]||[]).map(w=>'<span class="w" data-i="'+w.i+'">'+escapeHtml(w.text)+'</span>').join(' ');
+    return head+'<p class="scroll-p">'+words+'</p>';
+  }).join('');
+}
+function scrollToWord(index){
+  const sc=$('scroll-view');
+  if(!sc) return;
+  const el=sc.querySelector('.w[data-i="'+index+'"]');
+  if(!el){ sc.scrollTop=0; return; }
+  const next=sc.scrollTop+(el.getBoundingClientRect().top-sc.getBoundingClientRect().top)-14;
+  sc.scrollTop=Math.max(0, next);
+}
+function scrollToChapter(chapterIndex){
+  const sc=$('scroll-view');
+  const el=document.getElementById('ch-'+chapterIndex);
+  if(!sc||!el){ scrollToWord(listen.index); return; }
+  const next=sc.scrollTop+(el.getBoundingClientRect().top-sc.getBoundingClientRect().top)-8;
+  sc.scrollTo({top:Math.max(0, next), behavior:window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});
+}
+function wordFromScroll(){
+  const sc=$('scroll-view');
+  if(!sc||!listen.words.length) return listen.index||0;
+  const line=sc.getBoundingClientRect().top+18;
+  const nodes=sc.querySelectorAll('.w[data-i]');
+  let best=listen.words[0].i;
+  for(let i=0;i<nodes.length;i++){
+    const id=Number(nodes[i].dataset.i);
+    if(nodes[i].getBoundingClientRect().bottom>=line) return id;
+    best=id;
+  }
+  return best;
+}
+function chapterTitle(index){
+  const ch=readerBook&&readerBook.chapters&&readerBook.chapters[index];
+  return ch&&ch.label?ch.label:chapterLabel(index||0);
+}
+function pageHtml(label, text, showLabel){
+  const body=String(text||'').split(/\n\n+/).filter(Boolean).map(p=>'<p>'+escapeHtml(p)+'</p>').join('');
+  return (showLabel?'<div class="pg-label">'+escapeHtml(label)+'</div>':'')+(body||'<p>\u2014</p>');
+}
+function pageCapacity(){
+  const host=$('page-body'), reader=$('reader');
+  if(!host||!reader||!reader.classList.contains('open')||reader.dataset.mode!=='pages') return null;
+  const w=host.clientWidth, h=host.clientHeight;
+  if(w<80||h<80) return null;
+  return {w:w, h:h};
+}
+function emptyPage(){
+  return [{label:readerBook?readerBook.title:'', html:'<p>\u2014</p>', startWord:0, endWord:0, chapterIndex:0}];
+}
+function paragraphBlocks(){
+  const byPara={}, seen={}, blocks=[];
+  listen.words.forEach(w=>{ (byPara[w.pi]=byPara[w.pi]||[]).push(w); });
+  listen.paras.forEach(p=>{
+    const ws=byPara[p.pi]||[];
+    if(!ws.length) return;
+    blocks.push({
+      chapterIndex:p.chapterIndex,
+      label:chapterTitle(p.chapterIndex),
+      text:ws.map(w=>w.text).join(' '),
+      startWord:ws[0].i,
+      endWord:ws[ws.length-1].i,
+      showLabel:!seen[p.chapterIndex]
+    });
+    seen[p.chapterIndex]=1;
+  });
+  return blocks;
+}
+function paginate(book){
+  if(!book) return emptyPage();
+  const blocks=paragraphBlocks();
+  if(!blocks.length) return emptyPage();
+  const cap=pageCapacity();
+  const asPage=b=>({label:b.label, html:pageHtml(b.label, b.text, b.showLabel), startWord:b.startWord, endWord:b.endWord, chapterIndex:b.chapterIndex});
+  if(!cap) return blocks.map(asPage);
+  const probe=document.createElement('div');
+  probe.className='page-body page-measure';
+  probe.style.width=cap.w+'px';
+  probe.setAttribute('aria-hidden','true');
+  ($('pageview')||$('reader')).appendChild(probe);
+  const fits=html=>{ probe.innerHTML=html; return probe.offsetHeight<=cap.h+1; };
+  const units=[];
+  const out=[];
+  try{
+    blocks.forEach(block=>{
+      if(fits(pageHtml(block.label, block.text, block.showLabel))){
+        units.push({text:block.text, startWord:block.startWord, endWord:block.endWord, label:block.label, chapterIndex:block.chapterIndex, showLabel:block.showLabel});
+        return;
+      }
+      const words=block.text.split(/\s+/);
+      let i=0, show=block.showLabel;
+      while(i<words.length){
+        let lo=1, hi=words.length-i, best=1;
+        while(lo<=hi){
+          const mid=(lo+hi)>>1;
+          if(fits(pageHtml(block.label, words.slice(i, i+mid).join(' '), show))){ best=mid; lo=mid+1; }
+          else hi=mid-1;
+        }
+        units.push({
+          text:words.slice(i, i+best).join(' '),
+          startWord:block.startWord+i,
+          endWord:block.startWord+i+best-1,
+          label:block.label,
+          chapterIndex:block.chapterIndex,
+          showLabel:show
+        });
+        show=false;
+        i+=best;
+      }
+    });
+    const unitsHtml=group=>group.map(u=>pageHtml(u.label, u.text, !!u.showLabel)).join('');
+    let cur=[];
+    const push=group=>{
+      if(!group.length) return;
+      const first=group[0];
+      out.push({
+        label:first.label,
+        chapterIndex:first.chapterIndex,
+        startWord:first.startWord,
+        endWord:group[group.length-1].endWord,
+        html:unitsHtml(group)
+      });
+    };
+    units.forEach(u=>{
+      if(!cur.length){ cur=[u]; return; }
+      const trial=cur.concat([u]);
+      if(fits(unitsHtml(trial))) cur=trial;
+      else { push(cur); cur=[u]; }
+    });
+    push(cur);
+  } finally { probe.remove(); }
+  return out.length?out:emptyPage();
+}
+function pageForWord(index){
+  if(!pages.length) return 0;
+  let found=0;
+  for(let i=0;i<pages.length;i++){
+    if(typeof pages[i].startWord==='number' && pages[i].startWord<=index) found=i;
+    else break;
+  }
+  return found;
+}
+function pageWord(){
+  const pg=pages[pageIndex];
+  if(!pg || !listen.words.length) return listen.index||0;
+  const i=clampWord(listen.index);
+  if(typeof pg.startWord==='number' && i>=pg.startWord && (typeof pg.endWord!=='number' || i<=pg.endWord)) return i;
+  return pg.startWord;
+}
+function renderPages(opts){
+  if(!pages.length) pages=emptyPage();
+  if(pageIndex<0) pageIndex=0;
+  if(pageIndex>=pages.length) pageIndex=pages.length-1;
+  const pg=pages[pageIndex];
+  const body=$('page-body');
+  if(body) body.innerHTML=pg&&pg.html?pg.html:'<p>\u2014</p>';
+  if(!(opts&&opts.keepWord) && pg && typeof pg.startWord==='number') listen.index=clampWord(pg.startWord);
+  const w=listen.words.length?listen.words[clampWord(listen.index)]:null;
+  const section=w?chapterTitle(w.chapterIndex):(pg?(pg.label||''):'');
+  if($('page-left')) $('page-left').textContent=section;
+  if($('page-right')) $('page-right').textContent=(pageIndex+1)+' / '+pages.length;
+  syncChapterButton(w?w.chapterIndex:(pg?pg.chapterIndex:0));
+  saveListenProgress();
+}
+function relayoutPages(){
+  if(!readerBook || readMode!=='pages') return;
+  const word=clampWord(listen.index);
+  pages=paginate(readerBook);
+  pageIndex=pageForWord(word);
+  listen.index=word;
+  renderPages({keepWord:true});
+}
+function turnPage(dir){
+  if(readMode!=='pages' || !pages.length) return;
+  const next=pageIndex+dir;
+  if(next<0 || next>=pages.length) return;
+  pageIndex=next;
+  renderPages();
+}
+function setReadMode(mode){
+  if(mode!=='autoplay' && mode!=='scroll' && mode!=='pages') return;
+  if(!readerBook){ readMode=mode; updateModeChrome(); return; }
+  if(mode===readMode){ closeSheets(); return; }
+  if(readMode==='autoplay') stopAutoplay();
+  else if(readMode==='scroll') listen.index=wordFromScroll();
+  else if(readMode==='pages') listen.index=pageWord();
+  listen.index=clampWord(listen.index);
+  listen.finished=false;
+  readMode=mode;
+  updateModeChrome();
+  closeSheets();
+  afterLayout(()=>{
+    if(!readerBook || readMode!==mode) return;
+    if(mode==='autoplay'){
+      paintListen();
+      setPlayLabel(false);
+      placeListen(true);
+      saveListenProgress();
+    } else if(mode==='scroll'){
+      scrollToWord(listen.index);
+      syncChapterButton();
+      saveListenProgress();
+    } else {
+      pages=paginate(readerBook);
+      pageIndex=pageForWord(listen.index);
+      renderPages({keepWord:true});
+    }
+  });
 }
 function setListenTitle(b){
   const name=$('listen-name'), by=$('listen-by');
@@ -647,11 +933,19 @@ function scheduleListen(){
 function setPlayLabel(playing){
   const btn=$('btn-play');
   if(!btn) return;
-  btn.textContent=playing?'pause':'play';
   btn.setAttribute('aria-pressed', playing?'true':'false');
+  btn.setAttribute('aria-label', playing?'Pause':'Play');
+}
+function stopAutoplay(){
+  listen.playing=false;
+  listen.drag=0;
+  clearTimeout(listen.timer);
+  const root=$('reader');
+  if(root) root.classList.remove('is-reading');
+  setPlayLabel(false);
 }
 function playListen(){
-  if(!listen.words.length) return;
+  if(readMode!=='autoplay' || !listen.words.length) return;
   if(listen.finished){
     listen.finished=false;
     listen.index=0;
@@ -669,22 +963,12 @@ function playListen(){
   saveListenProgress();
 }
 function pauseListen(){
-  listen.playing=false;
-  listen.drag=0;
-  clearTimeout(listen.timer);
-  const root=$('reader');
-  if(root) root.classList.remove('is-reading');
-  setPlayLabel(false);
+  stopAutoplay();
   saveListenProgress();
 }
 function finishListen(){
-  listen.playing=false;
   listen.finished=true;
-  listen.drag=0;
-  clearTimeout(listen.timer);
-  const root=$('reader');
-  if(root) root.classList.remove('is-reading');
-  setPlayLabel(false);
+  stopAutoplay();
   saveListenProgress();
 }
 function seekListen(index){
@@ -721,7 +1005,19 @@ function renderChapterSheet(){
 function jumpChapter(chapterIndex){
   const idx=listen.words.findIndex(w=>w.chapterIndex===chapterIndex);
   if(idx<0) return;
-  seekListen(idx);
+  listen.finished=false;
+  listen.index=idx;
+  if(readMode==='autoplay') seekListen(idx);
+  else if(readMode==='scroll'){
+    paintListen();
+    scrollToChapter(chapterIndex);
+    saveListenProgress();
+  } else {
+    if(!pages.length) pages=paginate(readerBook);
+    listen.index=idx;
+    pageIndex=pageForWord(idx);
+    renderPages({keepWord:true});
+  }
 }
 function reloadListen(keepChapter){
   const b=readerBook;
@@ -737,9 +1033,22 @@ function reloadListen(keepChapter){
   listen.index=idx;
   listen.finished=false;
   renderTrack();
+  renderScroll();
   paintListen();
-  afterLayout(()=>placeListen(true));
-  saveListenProgress();
+  if(readMode==='pages'){
+    pages=paginate(b);
+    pageIndex=pageForWord(listen.index);
+    renderPages({keepWord:true});
+    return;
+  }
+  afterLayout(()=>{
+    if(readerBook!==b) return;
+    if(readMode==='scroll'){
+      scrollToWord(listen.index);
+      syncChapterButton();
+    } else placeListen(true);
+    saveListenProgress();
+  });
 }
 function mountOpened(b){
   clearTimeout(listen.timer);
@@ -747,6 +1056,8 @@ function mountOpened(b){
   listen.finished=false;
   listen.drag=0;
   listen.y=0;
+  pages=[];
+  pageIndex=0;
   readerBook=b;
   const built=buildListen(b);
   listen.words=built.words;
@@ -754,20 +1065,34 @@ function mountOpened(b){
   const prog=getProgress(b.id);
   let idx=0;
   if(prog && typeof prog.word==='number' && isFinite(prog.word)) idx=prog.word|0;
-  if(idx<0) idx=0;
-  if(idx>=listen.words.length) idx=Math.max(0, listen.words.length-1);
-  listen.index=idx;
+  listen.index=clampWord(idx);
+  readMode=storedMode(prog);
   applyTypePrefs();
   setListenTitle(b);
   renderTrack();
+  renderScroll();
   paintListen();
   setPlayLabel(false);
+  updateModeChrome();
   const root=$('reader');
   root.classList.remove('is-reading');
   root.classList.add('open');
   document.body.classList.add('reader-open');
   closeSheets();
-  const go=()=>{ if(readerBook===b) placeListen(true); };
+  const go=()=>{
+    if(readerBook!==b) return;
+    if(readMode==='pages'){
+      pages=paginate(b);
+      if(prog && prog.mode==='pages' && typeof prog.page==='number' && typeof prog.word!=='number'){
+        pageIndex=Math.min(Math.max(prog.page|0, 0), Math.max(pages.length-1, 0));
+      } else pageIndex=pageForWord(listen.index);
+      renderPages({keepWord:true});
+    } else if(readMode==='scroll'){
+      scrollToWord(listen.index);
+      syncChapterButton();
+      saveListenProgress();
+    } else placeListen(true);
+  };
   if(document.fonts && document.fonts.ready) document.fonts.ready.then(()=>afterLayout(go));
   else afterLayout(go);
 }
@@ -781,7 +1106,10 @@ function toggleSheet(id, btnId){
   const willOpen=!sheet.classList.contains('open');
   closeSheets();
   if(willOpen){
-    if(id==='chapter-sheet') renderChapterSheet();
+    if(id==='chapter-sheet'){
+      if(readMode==='scroll') listen.index=wordFromScroll();
+      renderChapterSheet();
+    }
     sheet.classList.add('open');
     if(btn) btn.setAttribute('aria-expanded','true');
   }
@@ -838,6 +1166,17 @@ if($('btn-list')) $('btn-list').onclick=()=>setView('list');
 if($('btn-gallery')) $('btn-gallery').onclick=()=>setView('gallery');
 if($('btn-home')) $('btn-home').onclick=()=>closeBook();
 if($('btn-play')) $('btn-play').onclick=()=>{ if(listen.playing) pauseListen(); else playListen(); };
+document.querySelectorAll('.mode-seg [data-mode]').forEach(btn=>{
+  btn.onclick=()=>setReadMode(btn.dataset.mode);
+});
+if($('edge-left')) $('edge-left').onclick=()=>{ closeSheets(); turnPage(-1); };
+if($('edge-right')) $('edge-right').onclick=()=>{ closeSheets(); turnPage(1); };
+if($('scroll-view')) $('scroll-view').addEventListener('scroll', ()=>{
+  if(!readerBook || readMode!=='scroll') return;
+  listen.index=wordFromScroll();
+  syncChapterButton();
+  saveListenProgress();
+});
 if($('btn-edit')) $('btn-edit').onclick=()=>toggleSheet('edit-sheet','btn-edit');
 if($('btn-chapter')) $('btn-chapter').onclick=()=>toggleSheet('chapter-sheet','btn-chapter');
 if($('edit-sheet')) $('edit-sheet').addEventListener('click', e=>{
@@ -870,26 +1209,48 @@ if($('listen-progress')) $('listen-progress').addEventListener('click', e=>{
   seekListen(Math.round(Math.min(1, Math.max(0, t))*(listen.words.length-1)));
 });
 if($('reader')) $('reader').addEventListener('click', e=>{
-  if(e.target.closest && e.target.closest('#btn-edit, #btn-chapter, #btn-play, #btn-library, .listen-sheet, #listen-progress')) return;
-  closeSheets();
+  if(e.target.closest && e.target.closest('#btn-edit, #btn-chapter, #btn-play, #btn-library, .listen-sheet, #listen-progress, .mode-seg, .reader-edge')) return;
+  if(sheetsOpen()){ closeSheets(); return; }
+  if(readMode==='autoplay' && e.target.closest && e.target.closest('.listen-stage')){
+    if(listen.playing) pauseListen(); else playListen();
+  }
 });
 window.addEventListener('keydown', e=>{
   if(!$('reader') || !$('reader').classList.contains('open')) return;
   const t=e.target;
   if(t && (t.tagName==='INPUT' || t.tagName==='TEXTAREA' || t.isContentEditable)) return;
   if(e.key==='Escape'){
-    const edit=$('edit-sheet'), ch=$('chapter-sheet');
-    if((edit && edit.classList.contains('open')) || (ch && ch.classList.contains('open'))){ closeSheets(); return; }
+    if(sheetsOpen()){ closeSheets(); return; }
     closeReader();
     return;
   }
-  if(e.key===' ' || e.code==='Space'){
+  if(sheetsOpen()) return;
+  const space=e.key===' ' || e.code==='Space';
+  if(readMode==='autoplay' && space){
     if(t && t.closest && t.closest('button')) return;
     e.preventDefault();
     if(listen.playing) pauseListen(); else playListen();
+    return;
+  }
+  if(readMode!=='pages') return;
+  if(e.key==='ArrowRight' || e.key==='PageDown' || space){
+    if(space && t && t.closest && t.closest('button')) return;
+    e.preventDefault();
+    turnPage(1);
+  } else if(e.key==='ArrowLeft' || e.key==='PageUp'){
+    e.preventDefault();
+    turnPage(-1);
   }
 });
-window.addEventListener('resize', ()=>{ if(readerBook && $('reader') && $('reader').classList.contains('open')) placeListen(true); });
+let resizeTimer=0;
+window.addEventListener('resize', ()=>{
+  if(!readerBook || !$('reader') || !$('reader').classList.contains('open')) return;
+  clearTimeout(resizeTimer);
+  resizeTimer=setTimeout(()=>{
+    if(readMode==='autoplay') placeListen(true);
+    else if(readMode==='pages') relayoutPages();
+  }, 60);
+});
 window.addEventListener('popstate', ()=>{ const id=(location.hash||'').replace(/^#\//,''); if(id && BOOKS.some(b=>b.id===id)) showBook(id, false); else closeBook(); });
 bindListenDrag();
 mountListenMark();
