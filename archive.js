@@ -748,8 +748,9 @@ function paginate(book){
     };
     units.forEach(u=>{
       if(!cur.length){ cur=[u]; return; }
+      const same=cur[0].chapterIndex===u.chapterIndex;
       const trial=cur.concat([u]);
-      if(fits(unitsHtml(trial))) cur=trial;
+      if(same && fits(unitsHtml(trial))) cur=trial;
       else { push(cur); cur=[u]; }
     });
     push(cur);
@@ -780,11 +781,9 @@ function renderPages(opts){
   const body=$('page-body');
   if(body) body.innerHTML=pg&&pg.html?pg.html:'<p>\u2014</p>';
   if(!(opts&&opts.keepWord) && pg && typeof pg.startWord==='number') listen.index=clampWord(pg.startWord);
-  const w=listen.words.length?listen.words[clampWord(listen.index)]:null;
-  const section=w?chapterTitle(w.chapterIndex):(pg?(pg.label||''):'');
-  if($('page-left')) $('page-left').textContent=section;
+  if($('page-left')) $('page-left').textContent=pg?(pg.label||''):'';
   if($('page-right')) $('page-right').textContent=(pageIndex+1)+' / '+pages.length;
-  syncChapterButton(w?w.chapterIndex:(pg?pg.chapterIndex:0));
+  syncChapterButton(pg?pg.chapterIndex:0);
   saveListenProgress();
 }
 function relayoutPages(){
@@ -1198,7 +1197,7 @@ if($('chapter-sheet')) $('chapter-sheet').addEventListener('click', e=>{
     const keep=listen.words[listen.index]?listen.words[listen.index].chapterIndex:0;
     unlockBook(readerBook.id, btn.dataset.unlock);
     reloadListen(keep);
-    renderChapterSheet();
+    closeSheets();
   }
 });
 if($('listen-progress')) $('listen-progress').addEventListener('click', e=>{
