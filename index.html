@@ -25,8 +25,8 @@ header.site-hd{display:flex;align-items:center;justify-content:space-between;fle
 .search-btn[aria-pressed="true"]{background:rgba(0,0,0,.06)}
 .search-btn:focus-visible{outline:2px solid #1c1c1c;outline-offset:2px}
 .view-seg button:focus-visible{outline:2px solid currentColor;outline-offset:-3px}
-.view-seg{display:flex;align-items:stretch;height:28px;border:1px solid #1c1c1c;border-radius:999px;overflow:hidden;background:#fbf9f4;flex-shrink:0}
-.view-seg button{width:34px;border:0;background:transparent;color:#1c1c1c;display:flex;align-items:center;justify-content:center;padding:0}
+.view-seg{box-sizing:content-box;display:flex;align-items:stretch;height:28px;padding:0;border:1px solid #1c1c1c;border-radius:999px;overflow:hidden;background:#fbf9f4;flex-shrink:0}
+.view-seg button{box-sizing:border-box;flex:0 0 28px;width:28px;min-width:28px;height:28px;min-height:28px;border:0;background:transparent;color:#1c1c1c;display:flex;align-items:center;justify-content:center;padding:0}
 .view-seg button.on{background:#1c1c1c;color:#f4f1ea}
 .search-bar{flex:1 0 100%;padding:2px 0 0}
 .search-bar[hidden]{display:none}
