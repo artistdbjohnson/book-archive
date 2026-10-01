@@ -1,4 +1,4 @@
-/* reader modes — autoplay karaoke, manual scroll, viewport pages. shelf chrome unchanged. */
+/* reader modes — autoplay karaoke, manual scroll, viewport pages. library view toggle is shelf-only. */
 const $ = id => document.getElementById(id);
 const STORE = 'dglxss-archive-pwa-v1';
 const PRICE = {
@@ -507,43 +507,139 @@ function closeReader(){
   closeSheets();
   readerBook=null;
 }
-function setView(v){
-  document.body.classList.remove('is-list','is-gallery','is-detail');
-  document.body.classList.add('is-'+v);
-  $('btn-list').classList.toggle('on', v==='list');
-  $('btn-gallery').classList.toggle('on', v==='gallery');
+const LIBRARY_VIEWS = {folders:1, grid:1, list:1};
+const CARD_SWATCHES = [
+  {bg:'#e8c43a', ink:'#1c1a16'},
+  {bg:'#f0a36c', ink:'#1c1a16'},
+  {bg:'#e36a4a', ink:'#1c1a16'},
+  {bg:'#9a6b38', ink:'#fbf6ee'},
+  {bg:'#3a6fd4', ink:'#f7f4ee'},
+  {bg:'#c5d0c2', ink:'#1c1a16'},
+  {bg:'#1b2d6b', ink:'#f7f4ee'},
+  {bg:'#d3dde8', ink:'#1c1a16'},
+  {bg:'#c9846a', ink:'#1c1a16'},
+  {bg:'#6e7f68', ink:'#fbf6ee'},
+  {bg:'#d7c4a3', ink:'#1c1a16'},
+  {bg:'#8d4e45', ink:'#fbf6ee'}
+];
+let shelfQuery = '';
+function getLibraryView(){
+  const v = loadStore().libraryView;
+  return LIBRARY_VIEWS[v] ? v : 'folders';
+}
+function saveLibraryView(v){
+  try{
+    const s = loadStore();
+    s.libraryView = v;
+    saveStore(s);
+  }catch(e){}
+}
+function applyLibraryChrome(v){
+  document.querySelectorAll('#view-seg [data-view]').forEach(btn=>{
+    const on = btn.dataset.view===v;
+    btn.classList.toggle('on', on);
+    btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+  });
+}
+function libraryBodyClass(v){
+  return v==='grid' ? 'is-grid' : v==='list' ? 'is-rows' : 'is-list';
+}
+function applyLibraryViewClass(v){
+  const mode = LIBRARY_VIEWS[v] ? v : 'folders';
+  document.body.classList.remove('is-list','is-gallery','is-grid','is-rows');
+  document.body.classList.add(libraryBodyClass(mode));
+  applyLibraryChrome(mode);
+  return mode;
+}
+function setLibraryView(v){
+  const mode = applyLibraryViewClass(v);
+  saveLibraryView(mode);
+  document.body.classList.remove('is-detail');
   closeReader();
-  if(v!=='detail' && location.hash) history.pushState({}, '', location.pathname);
-  render(); window.scrollTo(0,0);
+  if(location.hash) history.pushState({}, '', location.pathname);
+  render();
+  window.scrollTo(0,0);
+}
+function cardSwatch(b){
+  const s = String(b && b.id || '') + '\n' + String(b && b.title || '');
+  let h = 2166136261;
+  for(let i=0;i<s.length;i++){
+    h ^= s.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  return CARD_SWATCHES[(h>>>0) % CARD_SWATCHES.length];
+}
+function shelfBooks(){
+  const q = shelfQuery.trim().toLowerCase();
+  if(!q) return BOOKS;
+  return BOOKS.filter(b=>{
+    const hay = [b.title, b.subtitle, b.series, b.status, b.type, b.era, b.year, listTitle(b)].join(' ').toLowerCase();
+    return hay.indexOf(q) !== -1;
+  });
+}
+function emptyShelf(){
+  return '<div class="shelf-empty">No titles match.</div>';
+}
+function quotedTitle(b){
+  return '\u201c' + escapeHtml(listTitle(b)) + '\u201d';
+}
+function bookCardHtml(b){
+  const c = cardSwatch(b);
+  const year = b.year ? '<span class="y">' + escapeHtml(b.year) + '</span>' : '';
+  return '<button type="button" class="book-card' + (isSoon(b)?' soon':'') + '" data-id="' + escapeHtml(b.id) + '" style="background:' + c.bg + ';color:' + c.ink + '"><span class="t">' + quotedTitle(b) + '</span>' + year + '</button>';
+}
+function compactMeta(b){
+  const bits = [];
+  if(b.year) bits.push(String(b.year));
+  if(b.status) bits.push(String(b.status));
+  return escapeHtml(bits.join(' \u00b7 '));
+}
+function compactRowHtml(b){
+  return '<button type="button" class="compact-row' + (isSoon(b)?' soon':'') + '" data-id="' + escapeHtml(b.id) + '"><span class="t">' + escapeHtml(listTitle(b)) + '</span><span class="m">' + compactMeta(b) + '</span></button>';
 }
 function showBook(id, push){
   const b = BOOKS.find(x=>x.id===id); if(!b) return;
   selected = id;
   document.body.classList.remove('is-gallery');
-  document.body.classList.add('is-list','is-detail');
-  $('btn-list').classList.add('on');
-  $('btn-gallery').classList.remove('on');
-  closeReader(); render(); window.scrollTo(0,0);
+  document.body.classList.add('is-detail');
+  closeReader();
+  render();
+  window.scrollTo(0,0);
   if(push !== false && location.hash !== '#/'+id) history.pushState({book:id}, '', '#/'+id);
 }
 function closeBook(){
   document.body.classList.remove('is-detail','is-gallery');
-  document.body.classList.add('is-list');
-  $('btn-list').classList.add('on');
-  $('btn-gallery').classList.remove('on');
-  closeReader(); render(); window.scrollTo(0,0);
+  applyLibraryViewClass(getLibraryView());
+  closeReader();
+  render();
+  window.scrollTo(0,0);
   if(location.hash) history.pushState({}, '', location.pathname);
 }
-function render(){
-  const books=BOOKS;
-  $('list-view').innerHTML = withSections(books, b=>`<div class="list-row ${isSoon(b)?'soon':''}" data-id="${b.id}"><div><div class="t">${listTitle(b)}</div><div class="m">${b.subtitle|| (b.year+' \u00b7 '+b.type)}</div></div></div>`, (sec,collapsed)=>`<button type="button" class="list-section ${collapsed?'is-collapsed':''}" data-sec="${sec}">${sectionHead(sec)}</button>`);
+function renderShelf(){
+  const books=shelfBooks();
+  const empty = !!shelfQuery.trim() && !books.length;
+
+  $('list-view').innerHTML = empty ? emptyShelf() : withSections(books, b=>`<div class="list-row ${isSoon(b)?'soon':''}" data-id="${b.id}"><div><div class="t">${listTitle(b)}</div><div class="m">${b.subtitle|| (b.year+' \u00b7 '+b.type)}</div></div></div>`, (sec,collapsed)=>`<button type="button" class="list-section ${collapsed?'is-collapsed':''}" data-sec="${sec}">${sectionHead(sec)}</button>`);
   $('list-view').querySelectorAll('.list-row').forEach(el=>{ el.onclick=()=>showBook(el.dataset.id); });
   bindCollapse($('list-view'));
-  $('list-rail').innerHTML = withSections(books, b=>`<div class="row ${b.id===selected?'on':''}" data-id="${b.id}"><div class="t">${listTitle(b)}</div><div class="m">${b.subtitle||b.type}</div></div>`, (sec,collapsed)=>`<button type="button" class="section ${collapsed?'is-collapsed':''}" data-sec="${sec}">${sectionHead(sec)}</button>`);
+  $('list-rail').innerHTML = empty ? '' : withSections(books, b=>`<div class="row ${b.id===selected?'on':''}" data-id="${b.id}"><div class="t">${listTitle(b)}</div><div class="m">${b.subtitle||b.type}</div></div>`, (sec,collapsed)=>`<button type="button" class="section ${collapsed?'is-collapsed':''}" data-sec="${sec}">${sectionHead(sec)}</button>`);
   $('list-rail').querySelectorAll('.row').forEach(el=> el.onclick=()=>showBook(el.dataset.id));
   bindCollapse($('list-rail'));
-  $('gallery').innerHTML = books.map(b=>`<div class="g-card" data-id="${b.id}"><div class="g-cover">${listTitle(b)}</div><div class="g-meta"><div class="t">${listTitle(b)}</div><div class="m">${b.subtitle|| (b.year+' \u00b7 '+b.type)}</div></div></div>`).join('');
-  $('gallery').querySelectorAll('.g-card').forEach(el=> el.onclick=()=>showBook(el.dataset.id));
+  const grid=$('book-grid');
+  if(grid){
+    grid.innerHTML = empty ? emptyShelf() : books.map(bookCardHtml).join('');
+    grid.querySelectorAll('.book-card').forEach(el=>{ el.onclick=()=>showBook(el.dataset.id); });
+  }
+  const rows=$('row-view');
+  if(rows){
+    rows.innerHTML = empty ? emptyShelf() : books.map(compactRowHtml).join('');
+    rows.querySelectorAll('.compact-row').forEach(el=>{ el.onclick=()=>showBook(el.dataset.id); });
+  }
+  const gallery=$('gallery');
+  if(gallery) gallery.innerHTML='';
+}
+function render(){
+  renderShelf();
   renderDetail();
 }
 function bindSkip(root, a){
@@ -1220,8 +1316,34 @@ function mountListenMark(){
   ].join('\n');
 }
 if($('btn-library')) $('btn-library').onclick=()=>closeReader();
-if($('btn-list')) $('btn-list').onclick=()=>setView('list');
-if($('btn-gallery')) $('btn-gallery').onclick=()=>setView('gallery');
+if($('btn-search')) $('btn-search').onclick=()=>{
+  const bar=$('search-bar');
+  const opening=!bar || bar.hasAttribute('hidden');
+  if(opening){
+    if(bar) bar.removeAttribute('hidden');
+    $('btn-search').setAttribute('aria-pressed','true');
+    $('btn-search').setAttribute('aria-expanded','true');
+    const input=$('shelf-search');
+    if(input) input.focus();
+  } else {
+    shelfQuery='';
+    const input=$('shelf-search');
+    if(input) input.value='';
+    if(bar) bar.setAttribute('hidden','');
+    $('btn-search').setAttribute('aria-pressed','false');
+    $('btn-search').setAttribute('aria-expanded','false');
+    renderShelf();
+  }
+};
+if($('shelf-search')) $('shelf-search').addEventListener('input', ()=>{
+  shelfQuery=$('shelf-search').value || '';
+  renderShelf();
+});
+if($('view-seg')) $('view-seg').addEventListener('click', e=>{
+  const btn=e.target.closest('button[data-view]');
+  if(!btn) return;
+  setLibraryView(btn.dataset.view);
+});
 if($('btn-home')) $('btn-home').onclick=()=>closeBook();
 if($('btn-play')) $('btn-play').onclick=()=>{ if(listen.playing) pauseListen(); else playListen(); };
 document.querySelectorAll('.mode-seg [data-mode]').forEach(btn=>{
@@ -1274,6 +1396,19 @@ if($('reader')) $('reader').addEventListener('click', e=>{
   }
 });
 window.addEventListener('keydown', e=>{
+  if(e.key!=='Escape') return;
+  if($('reader') && $('reader').classList.contains('open')) return;
+  const bar=$('search-bar');
+  if(!bar || bar.hasAttribute('hidden')) return;
+  shelfQuery='';
+  const input=$('shelf-search');
+  if(input) input.value='';
+  bar.setAttribute('hidden','');
+  const btn=$('btn-search');
+  if(btn){ btn.setAttribute('aria-pressed','false'); btn.setAttribute('aria-expanded','false'); }
+  renderShelf();
+});
+window.addEventListener('keydown', e=>{
   if(!$('reader') || !$('reader').classList.contains('open')) return;
   const t=e.target;
   if(t && (t.tagName==='INPUT' || t.tagName==='TEXTAREA' || t.isContentEditable)) return;
@@ -1313,5 +1448,6 @@ window.addEventListener('popstate', ()=>{ const id=(location.hash||'').replace(/
 bindListenDrag();
 mountListenMark();
 applyTypePrefs();
+applyLibraryViewClass(getLibraryView());
 const boot=(location.hash||'').replace(/^#\//,'');
 if(boot && BOOKS.some(b=>b.id===boot)) showBook(boot, false); else render();
