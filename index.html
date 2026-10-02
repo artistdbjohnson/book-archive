@@ -17,9 +17,20 @@ button,input{font-family:inherit}a{color:inherit;text-decoration:none}
 button:not(:disabled){cursor:pointer}
 .shell{min-height:100%;display:flex;flex-direction:column}
 .preview-banner{font-size:10px;font-weight:500;letter-spacing:.04em;text-align:center;padding:6px 12px;border-bottom:1px solid var(--line);color:var(--muted)}
-header.site-hd{display:flex;align-items:center;justify-content:space-between;padding:12px 18px;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:30;background:rgba(251,249,244,.92)}
-.brand{font-weight:600;font-size:13px;letter-spacing:.02em;background:none;border:0;color:inherit;padding:0}
+header.site-hd{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;padding:14px 16px;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:30;background:rgba(251,249,244,.92)}
+.brand{font-weight:600;font-size:13px;letter-spacing:.02em;background:none;border:0;color:inherit;padding:0;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:left}
 .brand span{font-weight:400;color:var(--muted)}
+.hd-tools{display:flex;align-items:center;gap:8px;flex:0 0 auto}
+.search-btn{width:32px;height:32px;border:0;border-radius:8px;background:transparent;color:#1c1c1c;display:flex;align-items:center;justify-content:center;padding:0}
+.search-btn[aria-pressed="true"]{background:rgba(0,0,0,.06)}
+.search-btn:focus-visible{outline:2px solid #1c1c1c;outline-offset:2px}
+.view-seg button:focus-visible{outline:2px solid currentColor;outline-offset:-3px}
+.view-seg{box-sizing:content-box;display:flex;align-items:stretch;height:28px;padding:0;border:1px solid #1c1c1c;border-radius:999px;overflow:hidden;background:#fbf9f4;flex-shrink:0}
+.view-seg button{box-sizing:border-box;flex:0 0 28px;width:28px;min-width:28px;height:28px;min-height:28px;border:0;background:transparent;color:#1c1c1c;display:flex;align-items:center;justify-content:center;padding:0}
+.view-seg button.on{background:#1c1c1c;color:#f4f1ea}
+.search-bar{flex:1 0 100%;padding:2px 0 0}
+.search-bar[hidden]{display:none}
+.search-bar input{width:100%;height:34px;border:1px solid var(--line-strong);border-radius:8px;background:var(--paper);color:var(--text);padding:0 10px;font-size:13px}
 .controls{display:flex;gap:4px}
 .ctrl{font-size:11px;font-weight:500;background:transparent;border:1px solid transparent;color:var(--muted);padding:6px 10px;height:28px}
 .ctrl.on{color:var(--text);border-color:var(--text)}
@@ -43,7 +54,24 @@ body.is-gallery .gallery{display:grid}
 .g-meta .m{font-size:11px;color:var(--muted);margin-top:3px}
 .detail{display:none;padding:28px 22px 64px;max-width:680px;margin:0 auto}
 body.is-detail .detail{display:block}
-body.is-detail .list-view,body.is-detail .gallery{display:none}
+body.is-detail .list-view,body.is-detail .gallery,body.is-detail .book-grid,body.is-detail .row-view{display:none}
+.book-grid,.row-view{display:none}
+body.is-grid:not(.is-detail) .book-grid{display:grid}
+body.is-rows:not(.is-detail) .row-view{display:block}
+body.is-grid .list-view,body.is-rows .list-view,body.is-grid .gallery,body.is-rows .gallery{display:none}
+.book-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;padding:16px 16px 56px;align-items:stretch;width:100%;max-width:720px;margin:0 auto}
+.book-card{position:relative;display:flex;flex-direction:column;justify-content:space-between;aspect-ratio:3/4.05;min-width:0;border:0;border-radius:8px;padding:12px 10px 10px;text-align:left;font-family:inherit;cursor:pointer;overflow:hidden;-webkit-tap-highlight-color:transparent}
+.book-card .t{font-size:12px;font-weight:600;line-height:1.28;letter-spacing:-.02em;display:-webkit-box;-webkit-line-clamp:6;-webkit-box-orient:vertical;overflow:hidden}
+.book-card .y{margin-top:10px;font-size:12px;font-weight:500;letter-spacing:-.01em}
+.book-card.soon,.compact-row.soon{opacity:.72}
+.compact-row{display:flex;align-items:baseline;justify-content:space-between;gap:16px;width:100%;padding:14px 20px;border:0;border-bottom:1px solid var(--line);background:transparent;color:inherit;text-align:left;font-family:inherit;cursor:pointer}
+.compact-row .t{font-size:14px;font-weight:700;letter-spacing:-.02em;min-width:0}
+.compact-row .m{font-size:11px;color:var(--muted);flex-shrink:0;font-weight:400}
+.compact-row:hover{background:rgba(0,0,0,.02)}
+.shelf-empty{padding:28px 20px;color:var(--muted);font-size:12px}
+@media(min-width:800px){
+  .book-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;padding:24px 24px 64px}
+}
 .back-shelf{display:block;border:0;background:none;color:var(--muted);font-size:11px;padding:0 0 18px;letter-spacing:.02em}
 .detail h1{font-size:24px;font-weight:700;letter-spacing:-.025em;margin-bottom:6px}
 .detail .sub{font-size:12px;color:var(--muted);margin-bottom:16px;line-height:1.55;font-weight:400}
@@ -177,12 +205,18 @@ body.reader-open{overflow:hidden}
   .list-rail .row .t{font-size:13px;font-weight:700}
   .list-rail .row .m{font-size:10px;color:var(--muted);margin-top:3px;font-weight:400}
   .list-rail .section{padding:16px 18px;font-size:13px;font-weight:700;letter-spacing:-.02em;text-transform:none;color:var(--text)}
+  body.is-grid:not(.is-detail) .list-rail,
+  body.is-rows:not(.is-detail) .list-rail{display:none}
+  body.is-grid:not(.is-detail) main,
+  body.is-rows:not(.is-detail) main{display:block}
 }
 @media(max-width:899px){
   .list-rail{display:none}
   body.is-list:not(.is-detail) .list-view{display:block}
   body.is-detail .list-view,
-  body.is-detail .gallery{display:none !important}
+  body.is-detail .gallery,
+  body.is-detail .book-grid,
+  body.is-detail .row-view{display:none !important}
   body.is-detail .detail{display:block}
 }
 </style>
@@ -192,9 +226,24 @@ body.reader-open{overflow:hidden}
   <div class="preview-banner">ARCHIVE \u00b7 dglxss. \u00b7 catalog</div>
   <header class="site-hd">
     <button class="brand" id="btn-home" type="button">Archive <span>/ dglxss.</span></button>
-    <div class="controls">
-      <button class="ctrl on" id="btn-list" type="button">List</button>
-      <button class="ctrl" id="btn-gallery" type="button">Gallery</button>
+    <div class="hd-tools">
+      <button class="search-btn" id="btn-search" type="button" aria-label="Search library" aria-pressed="false" aria-expanded="false" aria-controls="search-bar">
+        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="10.5" cy="10.5" r="5.25" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M14.6 14.6L19 19" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+      </button>
+      <div class="view-seg" id="view-seg" role="group" aria-label="Library view">
+        <button type="button" data-view="folders" class="on" aria-pressed="true" aria-label="Folders">
+          <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M3.8 8.1v9.2a1.7 1.7 0 0 0 1.7 1.7h13a1.7 1.7 0 0 0 1.7-1.7V9.4a1.5 1.5 0 0 0-1.5-1.5h-6.2L11.2 6a1.4 1.4 0 0 0-1.1-.5H5.3a1.5 1.5 0 0 0-1.5 1.5v1.1z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
+        </button>
+        <button type="button" data-view="grid" aria-pressed="false" aria-label="Grid">
+          <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><rect x="4.15" y="4.15" width="6.2" height="6.2" rx="1.15" fill="none" stroke="currentColor" stroke-width="1.6"/><rect x="13.65" y="4.15" width="6.2" height="6.2" rx="1.15" fill="none" stroke="currentColor" stroke-width="1.6"/><rect x="4.15" y="13.65" width="6.2" height="6.2" rx="1.15" fill="none" stroke="currentColor" stroke-width="1.6"/><rect x="13.65" y="13.65" width="6.2" height="6.2" rx="1.15" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
+        </button>
+        <button type="button" data-view="list" aria-pressed="false" aria-label="List">
+          <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M5 7.25h14M5 12h14M5 16.75h14" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="search-bar" id="search-bar" hidden>
+      <input id="shelf-search" type="search" placeholder="Search titles" autocomplete="off" enterkeyhint="search" aria-label="Search titles"/>
     </div>
   </header>
   <main>
@@ -202,6 +251,8 @@ body.reader-open{overflow:hidden}
     <section>
       <div class="list-view" id="list-view"></div>
       <div class="gallery" id="gallery"></div>
+      <div class="book-grid" id="book-grid"></div>
+      <div class="row-view" id="row-view"></div>
       <div class="detail" id="detail"></div>
     </section>
   </main>
