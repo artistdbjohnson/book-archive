@@ -193,6 +193,9 @@ body.reader-open{overflow:hidden}
 .listen-sheet .comp-switch{display:flex;flex-wrap:wrap;align-items:center;gap:0;padding:8px 14px 2px}
 .listen-sheet .comp-switch button{display:inline;width:auto;padding:8px 0;font-size:12px}
 .listen-sheet .comp-switch button+button::before{content:'\00b7';color:#c8c8c8;padding:0 8px}
+.listen-sheet .comp-switch button.on{position:relative;background:#111;color:#fff;border-radius:999px;padding:4px 8px}
+.listen-sheet .comp-switch button+button.on{margin-left:calc(16px + .6em)}
+.listen-sheet .comp-switch button+button.on::before{position:absolute;right:100%;top:50%;transform:translateY(-50%);background:transparent;color:#c8c8c8}
 .reader-root[data-role="screenplay"] .scroll-inner,
 .reader-root[data-role="screenplay"] .page-body,
 .reader-root[data-role="screenplay"] .listen-track{font-family:'JetBrains Mono',ui-monospace,monospace;line-height:1.55}
