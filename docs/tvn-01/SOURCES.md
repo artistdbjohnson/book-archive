@@ -2,7 +2,7 @@
 
 Repo documentation only. This file is not a Book Archive shelf title and is not loaded by the reader.
 
-The prose on the shelf is *The Hills Above Allentown* (series: A Thin Veiled Night), imported from the canonical short. The older standalone draft (`the-hills-above-allentown.md`, dad-and-keys) was not imported.
+The prose on the shelf is *The Hills Above Allentown* (series: A Thin Veiled Night), imported from the canonical short. Its companion study is a separate shelf title. This sources note is not. The older standalone draft (`the-hills-above-allentown.md`, dad-and-keys) was not imported.
 
 ---
 

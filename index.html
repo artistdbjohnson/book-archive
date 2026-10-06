@@ -41,9 +41,9 @@ main{flex:1}
 .list-row .m{font-size:11px;color:var(--muted);margin-top:4px;font-weight:400}
 .list-row.soon{opacity:.78}
 .list-section{padding:18px 20px;font-size:15px;font-weight:700;letter-spacing:-.02em;text-transform:none;color:var(--text);border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;width:100%;background:transparent;border-left:0;border-right:0;border-top:0;text-align:left;cursor:pointer}
-.list-section .sec-copy,.list-rail .section .sec-copy{display:flex;flex-direction:column;align-items:flex-start}
+.list-section .sec-copy,.list-rail .section .sec-copy{display:flex;flex-direction:column;align-items:flex-start;min-width:0;flex:1 1 auto;padding-right:14px}
 .list-section .t,.list-rail .section .t{font-size:15px;font-weight:700;letter-spacing:-.02em;color:var(--text)}
-.list-section .m,.list-rail .section .m{font-size:11px;color:var(--muted);margin-top:4px;font-weight:400;letter-spacing:0}
+.list-section .m,.list-rail .section .m{font-size:11px;color:var(--muted);margin-top:4px;font-weight:400;letter-spacing:0;line-height:1.45;max-width:62ch}
 .gallery{display:none;padding:32px 24px 48px;gap:20px;grid-template-columns:repeat(auto-fill,minmax(180px,220px));justify-content:center;max-width:920px;margin:0 auto}
 body.is-gallery .list-view{display:none}
 body.is-gallery .gallery{display:grid}
@@ -190,8 +190,8 @@ body.reader-open{overflow:hidden}
 @media(prefers-reduced-motion:reduce){
   .listen-art,.listen-flow,.listen-progress-wrap,.listen-track,.listen-top{transition:none}
 }
-.list-section,.list-rail .section{display:flex;align-items:center;width:100%;text-align:left;background:transparent;border:0;border-bottom:1px solid var(--line);cursor:pointer}
-.list-section::after,.list-rail .section::after{content:'\2013';margin-left:auto;color:var(--muted);font-size:12px}
+.list-section,.list-rail .section{display:flex;align-items:flex-start;width:100%;text-align:left;background:transparent;border:0;border-bottom:1px solid var(--line);cursor:pointer}
+.list-section::after,.list-rail .section::after{content:'\2013';margin-left:auto;margin-top:3px;flex:0 0 auto;color:var(--muted);font-size:12px}
 .list-section.is-collapsed::after,.list-rail .section.is-collapsed::after{content:'+'}
 .sec-body.is-collapsed{display:none}
 @media(min-width:900px){
