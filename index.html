@@ -61,10 +61,13 @@ body.is-rows:not(.is-detail) .row-view{display:block}
 body.is-grid .list-view,body.is-rows .list-view,body.is-grid .gallery,body.is-rows .gallery{display:none}
 .book-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;padding:16px 16px 56px;align-items:stretch;width:100%;max-width:720px;margin:0 auto}
 .book-card{position:relative;display:flex;flex-direction:column;justify-content:space-between;aspect-ratio:3/4.05;min-width:0;border:0;border-radius:8px;padding:12px 10px 10px;text-align:left;font-family:inherit;cursor:pointer;overflow:hidden;-webkit-tap-highlight-color:transparent}
-.book-card .copy{display:flex;flex-direction:column;min-width:0}
+.book-card .copy{display:flex;flex-direction:column;min-width:0;min-height:0;flex:1 1 auto}
 .book-card .t{font-size:12px;font-weight:600;line-height:1.28;letter-spacing:-.02em;display:-webkit-box;-webkit-line-clamp:6;-webkit-box-orient:vertical;overflow:hidden}
-.book-card .s{margin-top:6px;font-size:10px;font-weight:400;line-height:1.35;letter-spacing:0;opacity:.72}
-.book-card .y{margin-top:10px;font-size:12px;font-weight:500;letter-spacing:-.01em}
+.book-card .s{margin-top:6px;font-size:10px;font-weight:400;line-height:1.35;letter-spacing:0;opacity:.72;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.book-card .y{margin-top:10px;font-size:12px;font-weight:500;letter-spacing:-.01em;flex-shrink:0}
+@media(max-width:520px){
+  .book-card .t{-webkit-line-clamp:4}
+}
 .book-card.soon,.compact-row.soon{opacity:.72}
 .compact-row{display:flex;align-items:baseline;justify-content:space-between;gap:16px;width:100%;padding:14px 20px;border:0;border-bottom:1px solid var(--line);background:transparent;color:inherit;text-align:left;font-family:inherit;cursor:pointer}
 .compact-row .copy{display:flex;flex-direction:column;min-width:0;gap:3px}
@@ -101,20 +104,20 @@ body.reader-open{overflow:hidden}
 .reader-root button:focus-visible{outline:1px solid #000;outline-offset:3px}
 .listen-top,.listen-foot{width:min(100%,calc(46ch + 64px));margin:0 auto;padding-left:32px;padding-right:32px;position:relative;z-index:4;flex-shrink:0}
 .listen-top{padding-top:calc(18px + env(safe-area-inset-top,0px));padding-bottom:14px;transition:opacity .45s ease,transform .45s ease}
-.listen-nav,.listen-controls{display:flex;align-items:center;justify-content:space-between;font-size:13px;line-height:1.4;font-weight:400;gap:10px}
+.listen-nav,.listen-controls{display:flex;align-items:center;justify-content:space-between;font-size:13px;line-height:1.4;font-weight:400;gap:10px;min-width:0}
 .listen-nav button,.listen-controls button{border:0;background:transparent;padding:6px 0;color:#8d8d8d;font-size:13px;line-height:1;font-weight:400}
 #btn-library,#btn-play{color:#111}
-.mode-seg{display:flex;align-items:center;flex:1 1 auto;min-width:0;max-width:17.5rem;gap:2px}
-.listen-controls .mode-seg button{flex:1 1 0;min-width:0;height:26px;padding:0 6px;border-radius:999px;font-size:11px;line-height:1;color:#8d8d8d;text-align:center;white-space:nowrap}
+.mode-seg{display:flex;align-items:center;flex:0 0 auto;max-width:17.5rem;gap:2px}
+.listen-controls .mode-seg button{flex:0 0 auto;height:26px;padding:0 6px;border-radius:999px;font-size:11px;line-height:1;color:#8d8d8d;text-align:center;white-space:nowrap}
 .listen-controls .mode-seg button.on{background:#111;color:#fff}
-.listen-transport{display:flex;align-items:center;justify-content:flex-end;gap:14px;flex:1 1 auto;min-width:0;margin-left:8px}
+.listen-transport{display:flex;align-items:center;justify-content:flex-end;gap:14px;flex:1 1 auto;min-width:0;margin-left:8px;overflow:hidden}
 #btn-play{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;padding:0}
 #btn-play .icon-pause{display:none}
 #btn-play[aria-pressed="true"] .icon-play{display:none}
 #btn-play[aria-pressed="true"] .icon-pause{display:block}
 #btn-play:disabled{opacity:.35}
 .reader-root:not([data-mode="autoplay"]) #btn-play{display:none}
-#btn-chapter{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;max-width:100%}
+#btn-chapter{flex:1 1 auto;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;max-width:100%}
 .page-foot{display:none;justify-content:space-between;align-items:baseline;gap:12px;padding-top:8px;font-size:10px;letter-spacing:.04em;color:#8d8d8d;min-width:0}
 .reader-root[data-mode="pages"] .page-foot{display:flex}
 #page-left{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
