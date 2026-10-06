@@ -11,12 +11,24 @@ function getProgress(id){ return (loadStore().progress||{})[id] || null; }
 function saveProgress(id, p){ const s=loadStore(); s.progress=s.progress||{}; s.progress[id]=Object.assign({}, s.progress[id]||{}, p); saveStore(s); }
 function getAccess(id){ return (loadStore().access||{})[id] || {ok:false,kind:'none'}; }
 function unlockBook(id, kind){ const s=loadStore(); s.access=s.access||{}; s.access[id]={ok:true,kind}; saveStore(s); }
-const TYPE_SIZE_PX = { s:'17px', m:'20px', l:'23px' };
-const SPEEDS = { 0.75:1, 1:1, 1.25:1, 1.5:1 };
+const TYPE_SIZE_PX = { s:'17px', m:'18px', l:'21px' };
+const SPEED_STEPS = [0.75, 1, 1.25, 1.5, 2];
+const SPEEDS = { 0.75:1, 1:1, 1.25:1, 1.5:1, 2:1 };
+function speedText(n){
+  const v=Number(n);
+  return (v===0.75 ? '.75' : String(v)) + '\u00d7';
+}
 function getTypePrefs(){
   const t=loadStore().type||{};
-  const speed = SPEEDS[Number(t.speed)] ? Number(t.speed) : 1;
+  const speed = SPEEDS[Number(t.speed)] ? Number(t.speed) : 1.25;
   return { size: TYPE_SIZE_PX[t.size] ? t.size : 'm', speed: speed };
+}
+function syncSpeedChip(){
+  const btn=$('btn-speed');
+  if(!btn) return;
+  const label=speedText(getTypePrefs().speed);
+  btn.textContent=label;
+  btn.setAttribute('aria-label', 'Autoplay speed '+label);
 }
 function applyTypePrefs(){
   const t=getTypePrefs();
@@ -26,6 +38,11 @@ function applyTypePrefs(){
   r.dataset.size=t.size;
   document.querySelectorAll('#edit-sheet [data-size]').forEach(b=>b.classList.toggle('on', b.dataset.size===t.size));
   document.querySelectorAll('#edit-sheet [data-speed]').forEach(b=>b.classList.toggle('on', Number(b.dataset.speed)===t.speed));
+  syncSpeedChip();
+}
+function setSpeed(speed){
+  saveTypePrefs({speed:speed});
+  if(listen.playing) scheduleListen();
 }
 function saveTypePrefs(partial){
   const s=loadStore();
@@ -342,11 +359,15 @@ const BOOKS = [
       {label:"ACT FOUR", text:"EXT. BACK THROUGH YARDS TO CARPORT - DUSK / NIGHT\n\nPlastic bag still fluttering in the sweetgum. Picture-window light from the ranch houses finds them again. Somebody's window AC rattles in a side yard. A plastic lawn chair sits tipped under a neighboring carport like it gave up on company.\n\nGRANNY is on the picture-window side shelling beans into a bowl on her lap, kitchen radio low behind the screen. Bean strings stuck to her apron pocket like thin green letters.\n\nShe looks up when their shoes hit the carport concrete. She sees the wet goad and the clay on the tip.\n\nShe does not ask.\n\nGRANNY\n\nWash before you eat those.\n\nTY\n\nYes ma'am.\n\nMarcus puts the goad back by the water heater where it belongs. The tape grip has cooled. Malik leaves the belt scrap flat on the dryer like something that finished its errand and can wait for the next one.\n\nGranny flicks a bean string off with her thumb and keeps shelling. Her saying still sits in the air: you don't poke that creek without your armor on.\n\nNIKKI\n\nI'm going before Mom starts counting.\n\nCOREY\n\nRematch tomorrow.\n\nNIKKI\n\nYou owe me a hill that ain't crooked.\n\nThey peel off — Corey toward the creek crossing for home, Nikki running the last half block because that is how her body finishes a night, Keisha with the little wave that Malik answers without looking like he is answering.\n\nEXT. CARPORT - NIGHT\n\nMarcus alone a minute with an old rag. Heat still rising off the driveway. Oil-stain boot shape the same as that afternoon. A June bug bounces off the bare bulb and falls, gets up, tries again.\n\nHe wipes mud and clay off the goad.\n\nUnder the bark near the grip — faint as a fingernail — initials scratched careful. Theirs, or close enough the hair on his arms goes up.\n\nNot his handwriting. Not Malik's. Not Ty's. Older. Careful. Like somebody in the family — or somebody who watched the family — marked the wood for a night that had not happened yet.\n\nHe turns the goad once in the light. The initials stay faint. He does not say it out loud.\n\nHe sets the goad back by the water heater and goes inside with the rag still in his hand.\n\nINT. RANCH HOUSE / KITCHEN DOORWAY - NIGHT\n\nMOM in the doorway — silhouette more than a lecture, dish towel in one hand, ordinary voice.\n\nMOM\n\nY'all smell like the creek.\n\nMARCUS\n\nWe were at the creek.\n\nMOM\n\nWash your hands anyway. And don't think popcorn and Now &amp; Laters counts as dinner if Granny already cooked.\n\nTY\n\nI'm already planning tomorrow. Movie. Store. Creek again. Maybe both.\n\nMALIK\n\nYou can't do both before breakfast.\n\nTY\n\nWatch me.\n\nMom almost smiles and then remembers she is Mom.\n\nMOM\n\nWatch you wash first.\n\nINT. LIVING ROOM - NIGHT\n\nPlates. Soft CRT glow. Plastic-covered sofa. Ty already talking movie-store-creek tomorrow like thin places were just another route. Malik on the sofa edge does not correct him. Keisha's little wave earlier still sits on Malik's face. Nikki's laugh from the street still in the air.\n\nRematch debt. Candy debt. Summer open.\n\nFrom the carport utility corner the goad leans quiet. From the dryer the belt scrap waits flat. From outside the porch light is already on — grandparents' habit, early, wanting them counted.\n\nEXT. CARPORT SLAB - NIGHT\n\nThe quiet man sits on the cool edge with the torn glove in his good hand. Palm throbs with the neighbor window-unit drip. Ants on the spilled sweet-tea ring. Cracked watering can still unused under the ledge.\n\nBrace tighter than he found it. Blood dots on the two-by-four.\n\nKids inside loud, still themselves. Cost stayed on him.\n\nThe shake leaves his knees slow. He does not look at the door.\n\nINT. BROTHERS' ROOM - NIGHT\n\nMarcus awake. Window AC hums, rattles, hums — the way it always does in Belvedere Park summers when the brick holds the day's heat past dark. Malik already asleep in the other bed, breathing steady. One arm thrown up over his head like he won an argument in a dream. Ty's night-light a thin yellow line under the door from the hallway.\n\nMarcus turns on his side. Turns on his back. The sheet sticks and then unsticks.\n\nHe thinks about the initials under the clay — faint, careful, older than his hand. He thinks about the ring in the mud that sounded like a bike bell under a towel. He thinks about Malik seeing the holes first and still not being the one the iron answered.\n\nHe does not know why the goad rang for him and not for Malik. Malik saw the holes first. Malik had the scrap. Marcus only planted the iron and held on.\n\nThe question sits in the dark with him and does not answer itself. He lets it sit. He does not ask Granny. He does not wake Malik. He does not go back to the water heater with a flashlight like a person who needs the wood to explain itself tonight.\n\nOutside, AC drip ticks into the flower bed, steady as a clock with no face.\n\nMarcus closes his eyes and listens to that until sleep comes anyway. Summer stretches out in front of them now — ninth year waiting after Labor Day for the older ones, seventh still sitting on Ty like a badge he complains about and loves. Dunwoody still just a word. The creek quiet. The porch light on.\n\n---"},
       {label:"TAG", text:"EXT. CARPORT - NIGHT\n\nPorch light on.\n\nKids' voices through the screen — rematch, candy, whether the wash looked deeper than last week. Arguing under CRT glow and AC drip. Still themselves. Still loud. Still owed a crooked hill and a green pack of Now &amp; Laters and a dollar movie that can wait until tomorrow.\n\nThe quiet man on the cool slab, glove in the good hand, shake leaving his knees. He looks at the unused watering can. At the brace. At the board with the three dark dots. At the oil-stain boot shape that looks the same as it did when school let out.\n\nHe does not know who put him on this block's summer roster.\n\nOnly that the hours were his, the heat was honest, and the kids got home.\n\nFADE OUT.\n\n---\n\nEND OF PILOT"}
     ]},
-  {id:"tvn-the-hills-above-allentown", title:"The Hills Above Allentown", subtitle:"Douglxss Burley Johnson / d.b.j.", series:"A Thin Veiled Night", year:2026, type:"Fiction", status:"Draft", freeChapterCount:2, companionId:"tvn-the-hills-above-allentown-study", blurb:"Four kids on South Mountain after the last bell. The lights answer every question but one.", pdfUrl:"/pdfs/tvn-01-the-hills-above-allentown.pdf", chapters:[
+  {id:"tvn-the-hills-above-allentown", title:"The Hills Above Allentown", subtitle:"Douglxss Burley Johnson / d.b.j.", series:"A Thin Veiled Night", year:2026, type:"Fiction", status:"Draft", freeChapterCount:2, companionGroup:"tvn-01-hills", role:"story", blurb:"Four kids on South Mountain after the last bell. The lights answer every question but one.", pdfUrl:"/pdfs/tvn-01-the-hills-above-allentown.pdf", chapters:[
       {label:"Front Matter", text:"The Hills Above Allentown\n\nby Douglxss Burley Johnson / d.b.j."},
       {label:"The Hills Above Allentown", text:"There are hills above Allentown, and the one that sits closest over the city is South Mountain, and if you drive up it after dark you will come to a pull-off on the city side, a wide spot of gravel big enough for maybe six cars, with a steel guardrail at the edge of it. On the far side of that rail the mountain falls away fast, red sumac and little crooked oaks all the way down, and down below them the whole town is spread out under you like somebody spilled a jar of lights across a dark table. Kids have been climbing up there for as long as there has been a road. I'm going to tell you about four of them, and a Friday in October, and what came up the hill at them while they stood at that rail.\n\nDani Peña's mother zipped the Bible into the front pocket of Dani's backpack every morning at the kitchen table, the same way she zipped Dani's coat up to her chin and pulled her braid out from under the collar. It was a small Bible, about the size of a paperback, in Spanish, with a blue vinyl cover and a zipper that ran around three sides of it like a pencil case. Her mother had bought it in Santiago the week before they flew up, and on the first page she had written Daniela Peña Almonte in ballpoint, pressing hard enough that you could read the name backwards from the other side of the paper. Dani was twelve. Two years she had lived in Allentown, and she had spent both of them in the English learner class down the hall at South Mountain Middle School, and in those two years she had never once opened that pocket during a school day. All she knew about it during the day was that the backpack hung a little heavier on the left.\n\nThat Friday the last bell let out at the regular time and the four of them met on the front steps on Emaus Avenue. A custodian was out on the walk with a push broom, sweeping a busted bag of Takis into a dustpan, and the wind kept picking up the little red pieces and carrying them off down the steps away from him.\n\nIsaiah Whitfield had the plan, the way he usually did. Thirteen years old and in the eighth grade, he had his phone already screwed into a little tripod with bendy legs from his birthday, and he was holding it up in front of him like a flashlight.\n\n\"Everybody keeps posting the lights,\" he said. \"White lights over South Mountain, real low, no sound. Two hundred comments under every video, and it's aliens, it's ghosts, it's the end of the world.\" He turned the phone so they could see the screen. \"It's drones. Or it's planes coming into the airport and the angle is weird. I'm going to get it clear, from close, and put it up, and that's the end of it.\"\n\n\"From close how?\" Yadiel asked.\n\n\"From the pull-off. Right over top of where they come up.\"\n\nYadiel Rosario was thirteen too, and the tallest of them by a head. That day he had on his older brother's William Allen hoodie with the canary on the front, and the sleeves hung down past his fingers. His family was Puerto Rican, and his abuela lived with them in the back bedroom of a row house off Fourth Street, and she prayed out loud in the kitchen every morning over the radio with the volume up, so the whole house got prayed for whether it was awake or not.\n\n\"My abuela says don't go up the mountain after dark,\" he said.\n\n\"So we come down before dark.\"\n\n\"Sunset is at six-thirty,\" Dani said. At lunch she had looked it up on her phone, because she had known since Wednesday that they were going whether she said yes or no. \"We have three hours.\"\n\nThe fourth one was Bryce Kressley, who was eleven, a sixth grader, small for it, and he lived two doors down from Isaiah with his grandmother, who said \"ach\" when she dropped a pot lid and still kept a jar of pickled eggs in the refrigerator door. Bryce had her binoculars around his neck in a cracked leather case. Every fall she used them for counting hawks up at Hawk Mountain, and she had let him take them on the condition, which she said twice at the front door, that they came home with him by dark.\n\nThey went up Emaus a couple of blocks and turned up a side street that climbed and kept climbing, past the last houses, where the sidewalk quit and the pavement got patchy and then there was just a gravel shoulder and the trees. Everybody who went to South Mountain knew the path. It started behind a yellow sign that said the road was not maintained in winter, and it went up through the woods in a long zigzag, worn down to dirt and roots by about a hundred years of kids.\n\nIt was a warm afternoon for October, warm enough that they were sweating inside ten minutes. The oaks were just starting to go brown, but the poplars had dropped already, and the path was covered in leaves that went in with a dry crunch and slid a little before they caught. Dani was in her school shoes, flat black ones with no grip on the bottom, and twice she went down on one knee in the leaves. The second time Yadiel stuck his hand back without turning around and she took it and he pulled her up the steep part, and neither one of them mentioned it afterward. Halfway up, off to the side of the path, there was a single roller skate lying on its back in the leaves, white with pink laces, and all four of its wheels were gone. Bryce poked at it with his sneaker as he went by. That was all anybody did about it.\n\nIsaiah talked most of the way up, about frame rates and the zoom on his phone, and about how people believed whatever they saw in a video if it was blurry enough. Bryce asked him what he thought it was if it turned out not to be drones, and Isaiah said it would be drones.\n\n\"But if it isn't,\" Bryce said.\n\n\"Then it's planes.\"\n\n\"But if it isn't planes.\"\n\nIsaiah stopped on the path and put both of his hands on his knees to breathe. \"My mom says people see what they need to see,\" he said. \"She says that's what church is. People needed a story, so they got one. She quit going when I was eight.\"\n\nYadiel said, \"My abuela says your mom is going to come back.\"\n\n\"Your abuela says that about everybody.\"\n\n\"She's been right about a lot of everybody,\" Yadiel said, and he went on up the path ahead of them, and that was the end of that.\n\nThey came out of the trees at the top a little after five, onto the shoulder of the road just above the pull-off, all four of them breathing hard and red in the face. Nobody else was there. A car had been there not long before, because there was a fresh set of tire tracks swung around in the gravel, but it was gone now, and the only sound was the wind going through the sumac below the rail and, way down, the traffic on the streets.\n\nThe sumac below the guardrail had gone red the way it does in October, a deep red like a stop sign, and it ran down the slope in a thick tangle into the scrub oak and then down to the backs of the first houses. The sun was dropping on their left, way out toward Trexlertown, flat and orange, and it laid long shadows from every church steeple and smokestack across the rooftops. Right in the middle of downtown the PPL Building stood up out of everything else, tall and pale, and the top of it already had its lights on, same as every night anybody in that town can remember. Hamilton Street ran off east from there in a line of streetlights coming on one at a time. Past that was the dark cut where the Lehigh River went through, and way off to the right, past where the hills folded together, the old steel stacks in Bethlehem were lit up in colored lights against the sky. A freight train was coming along the river, slow, and every time it got to a crossing it gave two long pulls on the horn, like a man leaning on it, and the sound took a second or two to climb the mountain to them.\n\nIsaiah bent the tripod legs around the top of a guardrail post until it held, and he pointed the phone out over the sumac and hit record. The guardrail was cold. Dani could feel it through the sleeve of her coat where she leaned on it. Somebody, a long time ago, had painted J.R. + M.T. on the post next to her in silver paint, and the paint had flaked so that most of the M was gone.\n\nThey waited a long time. The sun went down behind the far ridge and the city went from orange to blue, and the streetlights started to matter. Bryce kept the binoculars up to his eyes and called out what he saw, which was a man walking a dog in a park, and a bus, and a pigeon on top of a church. Yadiel ate a bag of chips he had been saving since lunch and did not share them, and when Dani looked at him he shared them.\n\nAt twenty minutes to seven the first light came up out of the sumac.\n\nIt was close. That was the first thing that was wrong about it. Everybody in the comments had talked about lights over the mountain, up in the sky, and this one was below them. It rose up out of the red bushes maybe a hundred feet down the slope and stopped, level with the tops of the scrub oak, so that the four kids were looking down at it with the whole city behind it. It was white, about the size of a basketball, and it did not blink. Then there was a second one beside it, and a third, and the three of them hung there in a row in the dusk without making any sound at all.\n\n\"Drones,\" Isaiah said.\n\n\"There's no buzz,\" Bryce said, with the binoculars on them. \"There's no propellers. I can see the bushes right through the bottom of them. Isaiah, there's no anything holding them up.\"\n\nIsaiah's phone was still recording on the post, and his face was lit white from the screen, and he did not reach for it.\n\nAll four phones lit up at once. Dani's buzzed in her coat pocket and Yadiel's buzzed in the pocket of the hoodie, and Bryce's went off in his back pocket loud enough to make him jump. Then the speaker on Isaiah's phone came on, and a voice came out of it, and it was the voice of the map lady. You know the one, the lady who tells you to turn left in four hundred feet, calm and friendly and a little bit slow.\n\n\"Isaiah,\" the voice said. \"You came to see us. Go ahead and ask.\"\n\nYadiel put his hand on the back of Isaiah's hoodie and took a fistful of it. Isaiah did not shake him off, and he stood there at the rail with his mouth a little bit open, and then he closed it, and his jaw got set, the way it did in science class when Mr. Ortiz said a thing he didn't believe.\n\n\"How many cars on that train?\" Isaiah said.\n\n\"Ninety-one,\" said the map lady.\n\n\"Bryce,\" Isaiah said. \"Count it.\"\n\nBryce swung the binoculars over to the river. His hands were shaking so bad he had to brace his elbows on the rail, and he counted out loud under his breath, and it took a long time, because the train was long and the back half of it was going behind buildings. Nobody moved while he counted. When he got to the end he lowered the binoculars and he did not say the number right away.\n\n\"Ninety-one,\" he said.\n\n\"What's my grandmother's middle name?\" Isaiah asked.\n\n\"Loretta,\" said the voice, and Isaiah's hand closed on the top of the guardrail.\n\n\"We were here before your city,\" the map lady said. \"We were here before the river had its name. We made the first of you, a long time ago, and then we went away, and now we have come back for the ones who can see. You can see, Isaiah. The others are not ready. Step over the rail and come down, and we will show you where you came from. You can bring your camera.\"\n\nThe three lights drifted a little nearer up the slope, and the sumac under them moved, all the red leaves turning over and showing their pale undersides, though there was no wind on the kids' faces at all.\n\nIsaiah put his hand flat on the top of the rail. Then he put his left knee up on it.\n\n\"Isaiah,\" Yadiel said. \"No, bro. No.\"\n\n\"They answered,\" Isaiah said. \"They answered everything. You heard them.\"\n\nThen Isaiah got his leg over. The other side of the guardrail was maybe two feet of loose gravel and then just sumac all the way down, with no place to put a foot, and his sneaker came down on the gravel and it slid and he caught himself on the rail. Yadiel still had his hoodie in one fist. Bryce dropped the binoculars against his own chest and grabbed Isaiah's belt in the back with both hands and sat down hard in the gravel with his heels dug in, the way you would hold a dog on a leash.\n\nDani unzipped the front pocket of her backpack.\n\nNever once had she done it at school, and she did it now with her fingers going stiff in the cold, and she took the Bible out and held it in both hands against her coat without opening it. Her mother had told her one thing, a long time ago in Santiago, sitting on the edge of the bed with the fan going, and she had never needed it until now. If a voice comes to you and it is not right, her mother had said, ask it about Jesus. Ask it if He came in the flesh. If they are from God they will tell you yes. The others will not say it.\n\n\"Una pregunta,\" Dani said. Her voice came out small and she made it bigger. \"¿Jesucristo vino en carne? Sí o no.\" Then she said it again in English for the others, slow and careful, the way she said things in Mrs. Bauer's class. \"I have one question. Jesus Christ came in the body. Yes or no?\"\n\nIsaiah's phone stayed quiet on top of the post, with the little red record dot still blinking in the corner of the screen.\n\nThe three lights hung there over the sumac. The leaves under them went still. Down below, the train blew for another crossing by the river, and the sound came up the mountain and went past them.\n\n\"Answer her,\" Isaiah said.\n\nHe was still on the wrong side of the rail, with one leg over and Bryce's whole weight hanging off the back of his belt.\n\n\"You did the train,\" he said. \"You did my grandma. Answer her. It's a yes or a no.\"\n\n\"Isaiah,\" said the map lady, in the same friendly voice. \"Come down.\"\n\n\"Answer her question first.\"\n\n\"Come down, Isaiah. The others are not ready.\"\n\nIsaiah stood there a long time, and his face was lit up by the screen and you could see him working on it, the same as when he worked on a test. They had passed every question he had. They knew his grandmother's name, and they knew the train, and there was one question they would not touch, and it was Dani's. His eyes went to the lights, and to the little blue Bible in Dani's hands, and back to the lights again. Then he swung his leg back over the guardrail, and his knee caught the tripod and knocked it half around on the post, and Bryce fell over backwards in the gravel, and Isaiah stood on the right side of the rail with both hands holding onto it.\n\nThe lights came up the hill.\n\nThey came all at once and fast, tearing up through the sumac and the scrub oak, and the bushes thrashed under them like there was a whole herd of deer running underneath. Every phone they had started buzzing and would not stop. Out of Isaiah's phone the map lady's voice came again, saying turn left, turn left, turn left, faster and faster until the words all ran together. Up close the lights were bigger and had lost their round shape, and none of the four of them would ever agree afterward on what shape they had turned into.\n\nYadiel let go of Isaiah's hoodie and stepped up to the guardrail in front of the other three. He said it the way his abuela had said it in the kitchen the time the grease caught fire in the pan, loud and flat and sure, while she reached for the lid with her other hand.\n\n\"En el nombre de Jesús,\" he said. \"In the name of Jesus. Get off this mountain.\"\n\nThe lights stopped. They stopped so hard it was like they had run into the guardrail, about twenty feet down the slope, and they hung there shaking. Then they dropped. All three went down into the sumac like stones into a pond and came out the bottom of it going away, low over the rooftops, over Hamilton Street, over the river, and on out into the dark toward the airport until the four kids could not tell them from any other light.\n\nEvery phone went dead at once. In the quiet the wind came back up through the sumac, ordinary wind, and they could hear the traffic again down on the streets.\n\nThat was when Bryce found out the binoculars were gone. Their strap had snapped when he sat down hard, and the empty leather case still hung around his neck on its own strap. He ran his hands all over the gravel where he'd been sitting, and they weren't there, and when he got up on his knees and looked over the rail there was just the slope going down into the dark through the red bushes.\n\n\"Those are my grandma's,\" he said. \"Those are for the hawks.\"\n\n\"Nobody goes over that rail,\" Yadiel said. \"Not tonight. Not for anything.\"\n\nBryce stayed on his knees a while longer looking down at the dark, and then he got up and brushed the gravel off the seat of his jeans and did not go over.\n\nThey walked down the mountain in the dark. Isaiah's phone came back on halfway down with four percent battery, and he turned the flashlight on and walked in front, holding it out at arm's length, and nobody said a word the whole way. Dani held the Bible in her hand all the way down and never put it back in the pocket. When they came out at the bottom onto the first street with houses, there was a man up on a stepladder on his porch, stringing Christmas lights along the gutter in the middle of October, or maybe taking down last year's, and they never did figure out which.\n\nIsaiah charged his phone that night on the floor of his bedroom with his back against the bed, while the radiator under the window ticked and knocked, warming up for the first time that fall. The two hundred comments he had planned for did not happen, because every video he had taken that evening was gone off the phone except one, and it was eleven seconds long. When his knee caught the tripod it had swung the camera half around on the post, and for those eleven seconds the camera was pointed back at the four of them instead of out at the city. You can see Isaiah's leg coming back over the guardrail, and Bryce going over backwards in the gravel, and Yadiel letting go of the hoodie and stepping up to the rail, and Dani in her coat holding the little blue Bible up against her chest with both hands. And behind Dani, standing on the gravel of the pull-off where nobody had been standing, there is a tall shape, taller than any grown man by a good deal, standing with its back to the camera and one hand resting on the guardrail beside her, facing down the hill the same way she was. None of the four of them saw it there. Isaiah watched those eleven seconds about forty times that night, and he did not post it, and he has never posted it. Ask him and he will tell you the tall one never turns around, and he would very much like to know who it is.\n\nOn Monday morning, with the radio on the counter giving the traffic on Route 22, Dani's mother picked up the Bible off the kitchen table to zip it into the front pocket of the backpack, the way she always did. Dani took it out of her mother's hands before she could and put it in the pocket of her own coat instead, on the right side, where she could get at it, and her mother let her, and stood at the door and watched her go down the steps toward Emaus Avenue with her hand in her pocket and her thumb on the zipper pull."}
     ]},
-  {id:"tvn-the-hills-above-allentown-study", title:"After the Story: The One Question the Lights Would Not Answer", subtitle:"Douglxss Burley Johnson / d.b.j.", series:"A Thin Veiled Night", year:2026, type:"Non-fiction", status:"Draft", freeChapterCount:6, parentId:"tvn-the-hills-above-allentown", blurb:"Companion study to The Hills Above Allentown.", pdfUrl:"/pdfs/tvn-01-the-hills-above-allentown-study.pdf", chapters:[
+    {id:"tvn-the-hills-above-allentown-screenplay", title:"The Hills Above Allentown", subtitle:"Douglxss Burley Johnson / d.b.j.", series:"A Thin Veiled Night", year:2026, type:"Screenplay", status:"Draft", freeChapterCount:2, companionGroup:"tvn-01-hills", role:"screenplay", blurb:"Teleplay of The Hills Above Allentown. Four kids on South Mountain after the last bell.", pdfUrl:"/pdfs/tvn-01-the-hills-above-allentown-teleplay.pdf", chapters:[
+      {label:"Front Matter", text:"The Hills Above Allentown\n\nTeleplay\n\nby Douglxss Burley Johnson / d.b.j.\n\nA Thin Veiled Night"},
+      {label:"The Hills Above Allentown", text:"INT. DANI'S KITCHEN - FRIDAY MORNING\n\nDANI'S MOTHER stands at the kitchen table with Dani's backpack open in front of her. She picks up a small SPANISH BIBLE, about the size of a paperback, blue vinyl cover, zipper around three sides like a pencil case. She opens it to the flyleaf.\n\nIn ballpoint, pressed hard enough to read from the other side of the paper: \"Daniela Peña Almonte.\"\n\nShe zips the Bible into the front pocket of the backpack. Then she zips DANI PEÑA ALMONTE (12, seventh grade) into her coat up to the chin and pulls Dani's braid out from under the collar. Dani is wearing flat black school shoes. Once the Bible is in, the backpack hangs a little heavier on the left.\n\nCUT TO:\n\nEXT. SOUTH MOUNTAIN MIDDLE SCHOOL / FRONT STEPS - AFTERNOON\n\nLast bell. Kids pour out onto Emaus Avenue. A CUSTODIAN works a push broom on the walk, herding a busted bag of Takis toward a dustpan. The wind keeps lifting the little red pieces and carrying them down the steps away from him.\n\nISAIAH WHITFIELD (13, eighth grade) already has his phone screwed into a little bendy-leg tripod from his birthday. He holds it up in front of him like a flashlight.\n\nYADIEL ROSARIO (13, eighth, tallest by a head) wears his older brother's William Allen hoodie, canary on the front, sleeves past his fingers.\n\nDani stands with that backpack. Braid out over her coat collar.\n\nBRYCE KRESSLEY (11, sixth, small for it) has a cracked leather binocular case around his neck on a strap. The binoculars inside are his grandmother's. Every fall she takes them up to Hawk Mountain for counting hawks, and she let him bring them today only if he is home by dark.\n\nISAIAH\nEverybody keeps posting the lights. White lights over South Mountain, real low, no sound. Two hundred comments under every video, and it's aliens, it's ghosts, it's the end of the world.\n\nHe turns the phone so they can see the screen. Comment threads. Blurry white blobs.\n\nISAIAH (CONT'D)\nIt's drones. Or it's planes coming into the airport and the angle is weird. I'm going to get it clear, from close, and put it up, and that's the end of it.\n\nYADIEL\nFrom close how?\n\nISAIAH\nFrom the pull-off. Right over top of where they come up.\n\nYADIEL\nMy abuela says don't go up the mountain after dark.\n\nISAIAH\nSo we come down before dark.\n\nDANI\nSunset is at six-thirty. We have three hours.\n\nBryce touches the binocular case like he is checking it is still there.\n\nBRYCE\nGrandma said twice. Home by dark.\n\nISAIAH\nThen we go now.\n\nThey start up Emaus. The custodian loses another handful of Takis to the wind and keeps sweeping.\n\nEXT. SIDE STREET CLIMBING SOUTH MOUNTAIN - CONTINUOUS\n\nThey pass the last houses. The sidewalk quits under their feet, and the pavement goes patchy. After that it is just gravel shoulder and trees.\n\nBehind a yellow sign that says the road is not maintained in winter, a path starts up through the woods in a long zigzag. Dirt and roots, worn down by about a hundred years of kids.\n\nEXT. SOUTH MOUNTAIN PATH - CONTINUOUS\n\nIt is warm for October. They are sweating inside ten minutes. The oaks are just starting to go brown, but the poplars have already dropped, and the leaves crunch and slide under their feet.\n\nIsaiah talks most of the way up about how to shoot video clear, how to zoom in, and how a blurry clip can make people believe almost anything.\n\nDani's school shoes have no grip. She goes down on one knee in the leaves. Yadiel sticks his hand back without turning. She takes it. He pulls her up the steep part. Neither one mentions it.\n\nHalfway up, off the path: a single roller skate on its back in the leaves. It is white, with pink laces, and all four wheels are missing. Bryce pokes it with his sneaker as he goes by. That is all anybody does about it.\n\nBRYCE\nWhat if it isn't drones.\n\nISAIAH\nThen it's planes.\n\nBRYCE\nWhat if it isn't planes.\n\nIsaiah halts on the path and braces both palms on his knees until he can catch his breath.\n\nISAIAH\nMy mom says people see what they need to see. She says that's what church is. People needed a story, so they got one. She quit going when I was eight.\n\nYADIEL\nMy abuela says your mom is going to come back.\n\nISAIAH\nYour abuela says that about everybody.\n\nYADIEL\nShe's been right about a lot of everybody.\n\nYadiel goes on up ahead. That is the end of that.\n\nEXT. SOUTH MOUNTAIN OVERLOOK - LATER\n\nThey come out of the trees onto the shoulder just above the pull-off a little after five. All four of them are breathing hard, faces flushed red.\n\nA wide pull-off of gravel on the city side of the mountain. Room for maybe six cars. A steel guardrail at the edge. Nobody else is there. Fresh tire tracks swing around in the gravel. Wind moves the sumac below the rail. Way down, traffic.\n\nThe sumac has gone deep red like a stop sign, a thick tangle down into scrub oak and then the backs of the first houses. The sun drops left toward Trexlertown, flat and orange. Long shadows from every steeple and smokestack stretch across the rooftops.\n\nDowntown, the PPL Building rises pale above the rest, its top already lit. East along Hamilton the streetlights blink on one after another. The Lehigh River cuts a dark line through the middle. Off to the right, past where the hills fold, Bethlehem's old steel stacks glow in colored lights against the sky.\n\nDown by the water a freight crawls along. At a crossing the horn gives two long pulls, the way a man leans his weight on it. The sound takes a second or two to climb up the mountain to them.\n\nIsaiah wraps the tripod legs around a guardrail post until the phone sits steady. He aims it out over the sumac and starts recording.\n\nThe rail is cold under Dani's coat sleeve when she leans on it. On the post beside her someone painted J.R. + M.T. in silver a long time ago. Most of the M has flaked off.\n\nThey wait.\n\nBehind the far ridge the sun sinks. Orange drains out of the rooftops into blue, and the streetlights start to matter.\n\nBryce keeps the binoculars up and calls what he sees.\n\nBRYCE\nMan walking a dog in a park. Bus. Pigeon on a church.\n\nYadiel eats a bag of chips he has been saving since lunch and does not share them. Dani looks at him. He shares them.\n\nEXT. SOUTH MOUNTAIN OVERLOOK - DUSK\n\nTwenty minutes to seven.\n\nPast the rail the hillside drops hard through red sumac and twisted little oaks. Allentown lies open under them, bright points scattered across the dark like a jar tipped over on a table.\n\nBelow them, the first light comes up out of the sumac.\n\nIt climbs out of the red bushes maybe a hundred feet downslope and hangs even with the scrub-oak tops. The kids look down on it, city lights behind. Below them. That is the first thing that is wrong about it. Everybody talked about lights up in the sky, and this one is close.\n\nThe light is white and about the size of a basketball. It does not blink once.\n\nA second one rises beside it. Then a third. The three hang in a row at dusk and make no sound at all.\n\nISAIAH\nDrones.\n\nBRYCE\nThere's no buzz. There's no propellers. I can see the bushes right through the bottom of them. Isaiah, there's no anything holding them up.\n\nIsaiah's phone keeps recording on the post. His face is lit white from the screen. He does not reach for it.\n\nAll four phones light up together. Dani's buzzes inside her coat. Yadiel's inside the hoodie. Bryce's back-pocket buzz is loud enough to make him jump.\n\nThen Isaiah's phone speaker wakes up. Out comes the map lady's voice, calm and friendly and a touch slow, the same tone she uses when she says turn left in four hundred feet.\n\nMAP LADY (ON PHONE)\nIsaiah. You came to see us. Go ahead and ask.\n\nYadiel puts his hand on the back of Isaiah's hoodie and takes a fistful of it. Isaiah does not shake him off. He stands at the rail with his mouth a little open. Then he closes it. His jaw sets.\n\nISAIAH\nHow many cars on that train?\n\nMAP LADY (ON PHONE)\nNinety-one.\n\nISAIAH\nBryce. Count it.\n\nBryce swings the binoculars to the river. His hands shake. He braces his elbows on the rail and counts out loud under his breath. The train is long. The back half is going behind buildings. Nobody moves.\n\nHe lets the binoculars drop. For a moment he holds the count to himself.\n\nBRYCE\nNinety-one.\n\nISAIAH\nWhat's my grandmother's middle name?\n\nMAP LADY (ON PHONE)\nLoretta.\n\nIsaiah's fingers close hard on the guardrail top.\n\nMAP LADY (ON PHONE) (CONT'D)\nWe were here before your city. We were here before the river had its name. We made the first of you, a long time ago, and then we went away, and now we have come back for the ones who can see. You can see, Isaiah. The others are not ready. Step over the rail and come down, and we will show you where you came from. You can bring your camera.\n\nThe three lights ease a little farther uphill. Under them the sumac stirs, red leaves flipping to show pale undersides, while the kids' faces feel no wind at all.\n\nIsaiah lays a palm flat along the rail top. Next his left knee comes up onto the metal.\n\nYADIEL\nIsaiah. No, bro. No.\n\nISAIAH\nThey answered. They answered everything. You heard them.\n\nIsaiah swings a leg across. Beyond the rail sits maybe two feet of loose gravel, then sumac falling away with nowhere solid to step. His sneaker lands, skids, and he grabs the rail to catch himself.\n\nYadiel keeps a fistful of the hoodie. Bryce lets the binoculars thump against his chest, seizes Isaiah's belt from behind with both hands, and drops his weight into the gravel with his heels planted.\n\nDani unzips the front pocket of her backpack. Her fingers go stiff in the cold.\n\nFLASHBACK TO:\n\nINT. BEDROOM - SANTIAGO, DOMINICAN REPUBLIC - NIGHT (YEARS EARLIER)\n\nDani's mother sits on the edge of the bed. A fan runs in the window. Younger Dani listens from the pillow.\n\nDANI'S MOTHER\nIf a voice comes to you and it is not right, ask it about Jesus. Ask it if He came in the flesh. If they are from God they will tell you yes. The others will not say it.\n\nBACK TO:\n\nEXT. SOUTH MOUNTAIN OVERLOOK - DUSK\n\nDani draws out the small Spanish Bible and presses it shut against her coat with both hands.\n\nDANI\nUna pregunta.\n\nHer voice comes out small. She makes it bigger.\n\nDANI (CONT'D)\n¿Jesucristo vino en carne? Sí o no.\n\nThen again in English, slow and careful.\n\nDANI (CONT'D)\nI have one question. Jesus Christ came in the body. Yes or no?\n\nIsaiah's phone stays quiet on the post. The little red record dot is still blinking.\n\nThe three lights hang over the sumac. The leaves under them go still. Down below, the train blows for another crossing. The sound comes up the mountain and goes past them.\n\nISAIAH\nAnswer her.\n\nHe is still stranded on the wrong side of the rail, one leg across, Bryce's full weight dragging on the back of his belt.\n\nISAIAH (CONT'D)\nYou did the train. You did my grandma. Answer her. It's a yes or a no.\n\nMAP LADY (ON PHONE)\nIsaiah. Come down.\n\nISAIAH\nAnswer her question first.\n\nMAP LADY (ON PHONE)\nCome down, Isaiah. The others are not ready.\n\nIsaiah stands there a long time. The phone screen lights his face. He looks from the lights to the little blue Bible in Dani's hands and back again, the way he does when a science answer will not sit right.\n\nThen Isaiah brings his leg back over to the safe side. His knee clips the tripod and spins it halfway around on the post. Bryce topples backward into the gravel. Isaiah stands where he belongs, both hands locked on the rail.\n\nThe lights come up the hill.\n\nThey rush the hill together, ripping through sumac and scrub oak. The brush under them flails like a whole herd of deer tearing through.\n\nEvery phone buzzes and will not quit. From Isaiah's phone the map lady starts up again:\n\nMAP LADY (ON PHONE)\nTurn left. Turn left. Turn left.\n\nIt speeds up until the words smear into one sound.\n\nUp close the lights are bigger. They have lost their round shape. None of the four will ever agree afterward on what shape they turned into.\n\nYadiel releases Isaiah's hoodie. He moves to the guardrail ahead of the other three and speaks the way his abuela spoke in the kitchen when grease caught fire in the pan: loud, flat, and sure.\n\nYADIEL\nEn el nombre de Jesús. In the name of Jesus. Get off this mountain.\n\nThe lights stop. So hard it is like they ran into the guardrail, about twenty feet down the slope. They hang there shaking.\n\nThen they drop.\n\nAll three lights sink into the sumac like stones into a pond, then slide out under the bushes and flee. They skim low over the rooftops, cross Hamilton Street and the river, and go dark toward the airport until the four kids can no longer pick them out from any other light.\n\nEvery phone goes dead at once.\n\nIt goes quiet. Ordinary wind climbs back through the sumac. Down on the streets they can hear the traffic again.\n\nBryce discovers the binoculars are missing. The strap broke when he sat down hard, and only the empty leather case still hangs from its own strap around his neck. He pats the gravel where he was sitting. They aren't there. Up on his knees he peers over the rail and all he sees is the slope going down into the dark through the red bushes.\n\nBRYCE\nThose are my grandma's. Those are for the hawks.\n\nYADIEL\nNobody goes over that rail. Not tonight. Not for anything.\n\nBryce stays on his knees a while longer, staring into the dark. At last he stands, brushes gravel off the seat of his jeans, and stays on this side of the rail.\n\nEXT. SOUTH MOUNTAIN PATH - NIGHT\n\nThey take the path down in the dark. Halfway, Isaiah's phone wakes with four percent left. He switches on the flashlight and leads, arm stretched out ahead. Nobody talks the whole way.\n\nDani keeps the Bible in her hand the whole walk down. She never returns it to the pocket.\n\nEXT. BOTTOM OF THE HILL / RESIDENTIAL STREET - NIGHT\n\nAt the bottom they step onto a residential street. On a porch a MAN stands on a stepladder working Christmas lights along the gutter in mid-October, hanging them or taking last year's down. He does not look down at them.\n\nThey pass under him without stopping.\n\nINT. ISAIAH'S BEDROOM - NIGHT\n\nIsaiah sits on the floor with his back against the bed. His phone is on the charger. Under the window the radiator ticks and knocks as it warms for the first time this fall.\n\nOn the phone: every video from that evening is gone except one. Eleven seconds.\n\nHe plays it.\n\nOn the screen his knee has clipped the tripod and spun the phone halfway on the post, so for those eleven seconds the lens looks back at the four of them instead of out over the city.\n\nIsaiah's leg comes back over the guardrail. Bryce goes over backwards in the gravel. Yadiel lets go of the hoodie and steps up to the rail. Dani in her coat holds the little blue Bible up against her chest with both hands.\n\nAnd behind Dani, on the pull-off gravel where no one had stood: a TALL SHAPE. It stands taller than any grown man by a good deal. Its back is to the camera. One of its hands rests on the guardrail beside her. It faces down the hill the same way she does.\n\nNot one of the four saw it standing there.\n\nIsaiah watches those eleven seconds again. And again. He does not post it. He never posts it.\n\nThe tall one never turns its face.\n\nIsaiah sits with the phone in both hands and watches the shape that will not turn.\n\nINT. DANI'S KITCHEN - MONDAY MORNING\n\nRadio on the counter. Traffic on Route 22.\n\nDani's mother reaches for the blue Bible on the kitchen table, ready to zip it into the backpack's front pocket the same as Friday morning.\n\nBefore her mother can finish, Dani lifts it from her hands. She slides it into her own coat pocket on the right, where her fingers can find it.\n\nHer mother lets her. From the doorway she watches Dani head down the steps toward Emaus Avenue, one hand in that pocket, thumb resting on the zipper.\n\nFADE OUT."}
+    ]},
+{id:"tvn-the-hills-above-allentown-study", title:"After the Story: The One Question the Lights Would Not Answer", subtitle:"Douglxss Burley Johnson / d.b.j.", series:"A Thin Veiled Night", year:2026, type:"Non-fiction", status:"Draft", freeChapterCount:6, companionGroup:"tvn-01-hills", role:"after-story", blurb:"Companion study to The Hills Above Allentown.", pdfUrl:"/pdfs/tvn-01-the-hills-above-allentown-study.pdf", chapters:[
       {label:"Front Matter", text:"After the Story: The One Question the Lights Would Not Answer\n\nby Douglxss Burley Johnson / d.b.j.\n\nA companion study to The Hills Above Allentown"},
       {label:"Back Up the Mountain", text:"Pull your chair in closer, and let's go back up South Mountain one more time.\n\nYou remember the pull-off, and the steel guardrail so cold that Dani could feel it through the sleeve of her coat. Down the slope the sumac had gone red as a stop sign, and past it the whole city of Allentown was coming on one streetlight at a time.\n\nThen the lights came up out of the red bushes, and the map lady started talking out of Isaiah's phone.\n\nIsaiah Whitfield did what a smart kid ought to do with a voice like that, and he tested it. He asked how many cars were on the freight train, and the voice said ninety-one, and Bryce braced his elbows on the rail with his hands shaking and counted every car, and he got ninety-one. Isaiah asked for his grandmother's middle name, and the voice said Loretta. Every question he had, they passed, and they still wanted him over that rail.\n\nThen a twelve-year-old girl in flat black school shoes took a little blue Bible out of her backpack and held it against her coat. She asked the one question her mother had given her years before in Santiago, sitting on the edge of the bed with the fan going. \"¿Jesucristo vino en carne? Sí o no.\" Jesus Christ came in the body. Yes or no?\n\nThe lights that knew the train and knew Loretta went quiet on that one question. Even Isaiah, with one leg over the guardrail and Bryce hanging off the back of his belt, told them, \"It's a yes or a no.\"\n\nThat silence is what we are going to talk about tonight."},
       {label:"Questions to Sit With", text:"1. The lights got every one of Isaiah's questions right, and they were still trying to get him over the guardrail. Read Deuteronomy 13:1-3 and 2 Corinthians 11:14. Why can a voice be right about a lot of facts and still be lying about the one that matters most?\n\n2. Read 1 John 4:1-3. Out of every question in the world, why do you think John gave the church that one, about Jesus Christ coming in the flesh, as the test?\n\n3. Read Acts 19:13-16, then think about Yadiel stepping up to the rail in his brother's William Allen hoodie. He said the Name the way his abuela said it the day the grease caught fire. Why did the name of Jesus work for Yadiel on that mountain, when it went so badly for the sons of Sceva?"},
@@ -484,7 +505,7 @@ function shelfBooks(){
   const q = shelfQuery.trim().toLowerCase();
   if(!q) return BOOKS;
   return BOOKS.filter(b=>{
-    const hay = [b.title, b.subtitle, b.series, b.blurb, b.status, b.type, b.era, b.year, listTitle(b)].join(' ').toLowerCase();
+    const hay = [b.title, b.subtitle, b.series, b.blurb, b.status, b.type, b.era, b.year, listTitle(b), ROLE_LABEL[b.role]||'', b.role||''].join(' ').toLowerCase();
     return hay.indexOf(q) !== -1;
   });
 }
@@ -499,8 +520,20 @@ function quietAccessLabel(b){
   if(b.status==='Draft') return 'Free';
   return '';
 }
+function roleMarkHtml(b){
+  const label=b && ROLE_LABEL[b.role];
+  if(!label) return '';
+  return '<span class="role-mark">'+escapeHtml(label)+'</span>';
+}
 function seriesLine(b){
-  return b&&b.series ? '<span class="s">' + escapeHtml(b.series) + '</span>' : '';
+  const role=roleMarkHtml(b);
+  const series=b&&b.series ? escapeHtml(b.series) : '';
+  if(!role && !series) return '';
+  return '<span class="s">'+(role && series ? role+' \u00b7 '+series : (role||series))+'</span>';
+}
+function rowMeta(b, fallback){
+  const mark=roleMarkHtml(b);
+  return (mark?mark+' \u00b7 ':'')+fallback;
 }
 function bookCardHtml(b){
   const c = cardSwatch(b);
@@ -544,10 +577,10 @@ function renderShelf(){
   const books=shelfBooks();
   const empty = !!shelfQuery.trim() && !books.length;
 
-  $('list-view').innerHTML = empty ? emptyShelf() : withSections(books, b=>`<div class="list-row ${isSoon(b)?'soon':''}" data-id="${b.id}"><div><div class="t">${listTitle(b)}</div><div class="m">${b.subtitle|| (b.year+' \u00b7 '+b.type)}</div></div></div>`, (sec,collapsed)=>`<button type="button" class="list-section ${collapsed?'is-collapsed':''}" data-sec="${sec}">${sectionHead(sec)}</button>`);
+  $('list-view').innerHTML = empty ? emptyShelf() : withSections(books, b=>`<div class="list-row ${isSoon(b)?'soon':''}" data-id="${b.id}"><div><div class="t">${listTitle(b)}</div><div class="m">${rowMeta(b, b.subtitle|| (b.year+' \u00b7 '+b.type))}</div></div></div>`, (sec,collapsed)=>`<button type="button" class="list-section ${collapsed?'is-collapsed':''}" data-sec="${sec}">${sectionHead(sec)}</button>`);
   $('list-view').querySelectorAll('.list-row').forEach(el=>{ el.onclick=()=>showBook(el.dataset.id); });
   bindCollapse($('list-view'));
-  $('list-rail').innerHTML = empty ? '' : withSections(books, b=>`<div class="row ${b.id===selected?'on':''}" data-id="${b.id}"><div class="t">${listTitle(b)}</div><div class="m">${b.subtitle||b.type}</div></div>`, (sec,collapsed)=>`<button type="button" class="section ${collapsed?'is-collapsed':''}" data-sec="${sec}">${sectionHead(sec)}</button>`);
+  $('list-rail').innerHTML = empty ? '' : withSections(books, b=>`<div class="row ${b.id===selected?'on':''}" data-id="${b.id}"><div class="t">${listTitle(b)}</div><div class="m">${rowMeta(b, b.subtitle||b.type)}</div></div>`, (sec,collapsed)=>`<button type="button" class="section ${collapsed?'is-collapsed':''}" data-sec="${sec}">${sectionHead(sec)}</button>`);
   $('list-rail').querySelectorAll('.row').forEach(el=> el.onclick=()=>showBook(el.dataset.id));
   bindCollapse($('list-rail'));
   const grid=$('book-grid');
@@ -591,21 +624,34 @@ function bindAudio(a, st, srcs, autoplay){
   a.onended=()=>{ if(i<srcs.length){ autoplay=true; next(); } else if(st) st.textContent='Leo \u00b7 hired reader \u00b7 end'; };
   a.removeAttribute('src'); next();
 }
+const ROLE_ORDER = ['story','screenplay','after-story'];
+const ROLE_LABEL = {story:'Story', screenplay:'Screenplay', 'after-story':'After the Story'};
+function companionsOf(book){
+  if(!book || !book.companionGroup) return [];
+  return BOOKS.filter(x=>x && x.companionGroup===book.companionGroup).sort((a,b)=>{
+    const ia=ROLE_ORDER.indexOf(a.role), ib=ROLE_ORDER.indexOf(b.role);
+    return (ia<0?9:ia)-(ib<0?9:ib);
+  });
+}
 function renderDetail(){
   const b=BOOKS.find(x=>x.id===selected); if(!b) return;
-  const companion = b.companionId ? BOOKS.find(x=>x.id===b.companionId) : null;
-  const parent = b.parentId ? BOOKS.find(x=>x.id===b.parentId) : null;
+  const set=companionsOf(b);
+  const study=set.find(x=>x.role==='after-story' && x.id!==b.id);
+  const story=set.find(x=>x.role==='story' && x.id!==b.id);
+  const screenplay=set.find(x=>x.role==='screenplay' && x.id!==b.id);
   const free = quietAccessLabel(b);
   let actions = isSoon(b) ? `<button class="btn" type="button" disabled>Coming soon</button>` : `<button class="btn primary" type="button" id="d-read">Open</button>`;
-  if(companion) actions += `<button class="btn ghost" type="button" id="d-companion">Companion study</button>`;
-  if(parent) actions += `<button class="btn ghost" type="button" id="d-story">Read the story</button>`;
+  if(study) actions += `<button class="btn ghost" type="button" id="d-companion">Companion study</button>`;
+  if(story) actions += `<button class="btn ghost" type="button" id="d-story">Read the story</button>`;
+  if(screenplay) actions += `<button class="btn ghost" type="button" id="d-screenplay">Screenplay</button>`;
   if(b.audio) actions += `<button class="btn ghost" type="button" id="d-listen">Listen</button>`;
   const audio = b.audio ? `<div class="audio-row" id="audio-row"><div class="audio-credit">Read by ${b.reader||'Leo'}</div><audio id="qf-audio" controls preload="metadata"></audio><div class="skip"><button type="button" data-skip="-15">-15</button><button type="button" data-skip="15">+15</button></div><div class="audio-status" id="audio-status">Leo \u00b7 hired reader</div></div>` : '';
   $('detail').innerHTML = `<button class="back-shelf" type="button" id="d-back">\u2190 Shelf</button><h1>${b.title}</h1><div class="sub">${b.series?b.series+' \u00b7 '+(b.era||'')+'<br>':''}${b.subtitle}<br>${b.year} \u00b7 ${b.type} \u00b7 ${b.status}${free?' \u00b7 '+free:''}${b.reader?' \u00b7 Read by '+b.reader:''}</div><div class="blurb">${b.blurb||''}</div><div class="actions">${actions}</div>${audio}`;
   const back=$('d-back'); if(back) back.onclick=closeBook;
   const r=$('d-read'); if(r) r.onclick=()=>openReader(b);
-  const comp=$('d-companion'); if(comp && companion) comp.onclick=()=>showBook(companion.id);
-  const story=$('d-story'); if(story && parent) story.onclick=()=>showBook(parent.id);
+  const comp=$('d-companion'); if(comp && study) comp.onclick=()=>showBook(study.id);
+  const storyBtn=$('d-story'); if(storyBtn && story) storyBtn.onclick=()=>showBook(story.id);
+  const playBtn=$('d-screenplay'); if(playBtn && screenplay) playBtn.onclick=()=>showBook(screenplay.id);
   if(b.audio){ bindAudio($('qf-audio'), $('audio-status'), b.audio.slice(), false); bindSkip($('audio-row'), $('qf-audio')); }
   const lis=$('d-listen'); if(lis) lis.onclick=()=>{ location.href='/listen'; };
 }
@@ -617,19 +663,78 @@ function chapterEntries(book){
     allowed: !!(access.ok || i < (book.freeChapterCount||1))
   }));
 }
+const SLUG_RE=/^(INT|EXT|INT\/EXT|I\/E|EST)(\.| )/;
+function isTransLine(t){
+  if(/^(CUT TO:|FADE OUT\.|FADE IN:|FADE TO:|DISSOLVE TO:|SMASH CUT TO:|MATCH CUT TO:|FLASHBACK TO:|BACK TO:|TIME CUT:|JUMP CUT:|JUMP CUT TO:)$/.test(t)) return true;
+  if(/^FADE (IN|OUT)\.?$/.test(t)) return true;
+  return t===t.toUpperCase() && /TO:$/.test(t) && t.length<32;
+}
+function isCueLine(line){
+  const t=String(line||'').trim();
+  if(!t || t.length>48) return false;
+  if(SLUG_RE.test(t) || isTransLine(t)) return false;
+  if(/^\(.+\)$/.test(t)) return false;
+  const bare=t.replace(/\([^)]*\)/g,'').replace(/\s+/g,' ').trim();
+  if(!bare || bare.length>40) return false;
+  if(!/[A-Z]/.test(bare) || /[a-z]/.test(bare)) return false;
+  return true;
+}
+function classifyScreenChunk(raw){
+  const lines=String(raw||'').split('\n').map(l=>l.trim()).filter(Boolean);
+  if(!lines.length) return [];
+  if(lines.length===1){
+    const t=lines[0];
+    if(SLUG_RE.test(t)) return [{kind:'slug', text:t}];
+    if(isTransLine(t)) return [{kind:'trans', text:t}];
+    if(/^\(.+\)$/.test(t)) return [{kind:'paren', text:t}];
+    if(isCueLine(t)) return [{kind:'cue', text:t}];
+    return [{kind:'action', text:t}];
+  }
+  if(isCueLine(lines[0])){
+    const out=[{kind:'cue', text:lines[0]}];
+    for(let i=1;i<lines.length;i++){
+      const t=lines[i];
+      if(/^\(.+\)$/.test(t)) out.push({kind:'paren', text:t});
+      else if(SLUG_RE.test(t)) out.push({kind:'slug', text:t});
+      else if(isTransLine(t)) out.push({kind:'trans', text:t});
+      else out.push({kind:'dialogue', text:t});
+    }
+    return out;
+  }
+  return [{kind:'action', text:lines.join(' ')}];
+}
+function screenplayUnits(text){
+  const units=[];
+  String(text||'').replace(/\r\n/g,'\n').split(/\n\s*\n/).forEach(chunk=>{
+    classifyScreenChunk(chunk).forEach(u=>{ if(u.text && String(u.text).trim()) units.push(u); });
+  });
+  return units;
+}
+function pushListenBlock(words, paras, chapterIndex, text, kind){
+  const tokens=String(text||'').match(/\S+/g)||[];
+  if(!tokens.length) return;
+  const pi=paras.length;
+  tokens.forEach(tok=>{
+    words.push({text:tok, i:words.length, pi:pi, chapterIndex:chapterIndex});
+  });
+  paras.push({pi:pi, chapterIndex:chapterIndex, kind:kind||''});
+}
+function spClass(base, kind){
+  if(kind==='slug'||kind==='action'||kind==='cue'||kind==='dialogue'||kind==='paren'||kind==='trans') return base+' sp-'+kind;
+  return base;
+}
 function buildListen(book){
   const words=[], paras=[];
+  const screen=!!(book && book.role==='screenplay');
   chapterEntries(book).forEach(entry=>{
     if(!entry.allowed) return;
-    String(entry.ch.text||'').trim().split(/\n\n+/).filter(Boolean).forEach(block=>{
-      const tokens=block.match(/\S+/g)||[];
-      if(!tokens.length) return;
-      const pi=paras.length;
-      tokens.forEach(text=>{
-        words.push({text:text, i:words.length, pi:pi, chapterIndex:entry.i});
-      });
-      paras.push({pi:pi, chapterIndex:entry.i});
-    });
+    const raw=String(entry.ch.text||'').trim();
+    if(!raw) return;
+    if(screen){
+      screenplayUnits(raw).forEach(u=>pushListenBlock(words, paras, entry.i, u.text, u.kind));
+      return;
+    }
+    raw.split(/\n\n+/).filter(Boolean).forEach(block=>pushListenBlock(words, paras, entry.i, block, ''));
   });
   return {words:words, paras:paras};
 }
@@ -713,7 +818,7 @@ function renderScroll(){
       head='<div class="chapter-label" id="ch-'+p.chapterIndex+'" data-ch="'+p.chapterIndex+'">'+escapeHtml(label)+'</div>';
     }
     const words=(byPara[p.pi]||[]).map(w=>'<span class="w" data-i="'+w.i+'">'+escapeHtml(w.text)+'</span>').join(' ');
-    return head+'<p class="scroll-p">'+words+'</p>';
+    return head+'<p class="'+spClass('scroll-p', p.kind)+'">'+words+'</p>';
   }).join('');
 }
 function scrollToWord(index){
@@ -748,8 +853,10 @@ function chapterTitle(index){
   const ch=readerBook&&readerBook.chapters&&readerBook.chapters[index];
   return ch&&ch.label?ch.label:chapterLabel(index||0);
 }
-function pageHtml(label, text, showLabel){
-  const body=String(text||'').split(/\n\n+/).filter(Boolean).map(p=>'<p>'+escapeHtml(p)+'</p>').join('');
+function pageHtml(label, text, showLabel, kind){
+  const cls=spClass('', kind).trim();
+  const attr=cls?(' class="'+cls+'"'):'';
+  const body=String(text||'').split(/\n\n+/).filter(Boolean).map(p=>'<p'+attr+'>'+escapeHtml(p)+'</p>').join('');
   return (showLabel?'<div class="pg-label">'+escapeHtml(label)+'</div>':'')+(body||'<p>\u2014</p>');
 }
 function pageCapacity(){
@@ -774,7 +881,8 @@ function paragraphBlocks(){
       text:ws.map(w=>w.text).join(' '),
       startWord:ws[0].i,
       endWord:ws[ws.length-1].i,
-      showLabel:!seen[p.chapterIndex]
+      showLabel:!seen[p.chapterIndex],
+      kind:p.kind||''
     });
     seen[p.chapterIndex]=1;
   });
@@ -785,7 +893,7 @@ function paginate(book){
   const blocks=paragraphBlocks();
   if(!blocks.length) return emptyPage();
   const cap=pageCapacity();
-  const asPage=b=>({label:b.label, html:pageHtml(b.label, b.text, b.showLabel), startWord:b.startWord, endWord:b.endWord, chapterIndex:b.chapterIndex});
+  const asPage=b=>({label:b.label, html:pageHtml(b.label, b.text, b.showLabel, b.kind), startWord:b.startWord, endWord:b.endWord, chapterIndex:b.chapterIndex});
   if(!cap) return blocks.map(asPage);
   const probe=document.createElement('div');
   probe.className='page-body page-measure';
@@ -797,8 +905,8 @@ function paginate(book){
   const out=[];
   try{
     blocks.forEach(block=>{
-      if(fits(pageHtml(block.label, block.text, block.showLabel))){
-        units.push({text:block.text, startWord:block.startWord, endWord:block.endWord, label:block.label, chapterIndex:block.chapterIndex, showLabel:block.showLabel});
+      if(fits(pageHtml(block.label, block.text, block.showLabel, block.kind))){
+        units.push({text:block.text, startWord:block.startWord, endWord:block.endWord, label:block.label, chapterIndex:block.chapterIndex, showLabel:block.showLabel, kind:block.kind||''});
         return;
       }
       const words=block.text.split(/\s+/);
@@ -807,7 +915,7 @@ function paginate(book){
         let lo=1, hi=words.length-i, best=1;
         while(lo<=hi){
           const mid=(lo+hi)>>1;
-          if(fits(pageHtml(block.label, words.slice(i, i+mid).join(' '), show))){ best=mid; lo=mid+1; }
+          if(fits(pageHtml(block.label, words.slice(i, i+mid).join(' '), show, block.kind))){ best=mid; lo=mid+1; }
           else hi=mid-1;
         }
         units.push({
@@ -816,13 +924,14 @@ function paginate(book){
           endWord:block.startWord+i+best-1,
           label:block.label,
           chapterIndex:block.chapterIndex,
-          showLabel:show
+          showLabel:show,
+          kind:block.kind||''
         });
         show=false;
         i+=best;
       }
     });
-    const unitsHtml=group=>group.map(u=>pageHtml(u.label, u.text, !!u.showLabel)).join('');
+    const unitsHtml=group=>group.map(u=>pageHtml(u.label, u.text, !!u.showLabel, u.kind)).join('');
     let cur=[];
     const push=group=>{
       if(!group.length) return;
@@ -937,6 +1046,13 @@ function setListenTitle(b){
   if(name) name.textContent=b.title||'';
   if(by) by.textContent=b.subtitle ? ' \u2014 '+b.subtitle : '';
   setPdfLink(b);
+  const root=$('reader');
+  if(root){
+    if(b && b.role==='screenplay') root.dataset.role='screenplay';
+    else root.removeAttribute('data-role');
+    if(b && b.series==='A Thin Veiled Night') root.dataset.series='tvn';
+    else root.removeAttribute('data-series');
+  }
 }
 function renderTrack(){
   const track=$('listen-track');
@@ -953,7 +1069,7 @@ function renderTrack(){
   });
   track.innerHTML=listen.paras.map(p=>{
     const inner=(byPara[p.pi]||[]).map(w=>'<span class="w" data-i="'+w.i+'">'+escapeHtml(w.text)+'</span>').join(' ');
-    return '<p class="listen-p" data-pi="'+p.pi+'">'+inner+'</p>';
+    return '<p class="'+spClass('listen-p', p.kind)+'" data-pi="'+p.pi+'">'+inner+'</p>';
   }).join('');
 }
 function paintListen(){
@@ -1092,6 +1208,16 @@ function renderChapterSheet(){
   if(!sheet || !b) return;
   const current=listen.words[listen.index];
   let html='';
+  const set=companionsOf(b);
+  if(set.length>=2){
+    html+='<div class="comp-switch" role="group" aria-label="Companion">';
+    set.forEach(item=>{
+      const on=item.id===b.id;
+      const label=ROLE_LABEL[item.role]||item.title;
+      html+='<button type="button" data-companion="'+escapeHtml(item.id)+'"'+(on?' class="on" aria-pressed="true"':' aria-pressed="false"')+'>'+escapeHtml(label)+'</button>';
+    });
+    html+='</div><div class="sheet-kicker">Chapters</div>';
+  }
   chapterEntries(b).forEach(entry=>{
     const label=chapterTitle(entry.i);
     const on=current && current.chapterIndex===entry.i;
@@ -1155,7 +1281,8 @@ function reloadListen(keepChapter){
     saveListenProgress();
   });
 }
-function mountOpened(b){
+function mountOpened(b, opts){
+  opts=opts||{};
   clearTimeout(listen.timer);
   listen.playing=false;
   listen.finished=false;
@@ -1171,7 +1298,7 @@ function mountOpened(b){
   let idx=0;
   if(prog && typeof prog.word==='number' && isFinite(prog.word)) idx=prog.word|0;
   listen.index=clampWord(idx);
-  readMode=storedMode(prog);
+  readMode=opts.mode || storedMode(prog);
   applyTypePrefs();
   setListenTitle(b);
   renderTrack();
@@ -1183,12 +1310,12 @@ function mountOpened(b){
   root.classList.remove('is-reading');
   root.classList.add('open');
   document.body.classList.add('reader-open');
-  closeSheets();
+  if(!opts.keepSheet) closeSheets();
   const go=()=>{
     if(readerBook!==b) return;
     if(readMode==='pages'){
       pages=paginate(b);
-      if(prog && prog.mode==='pages' && typeof prog.page==='number' && typeof prog.word!=='number'){
+      if(!opts.mode && prog && prog.mode==='pages' && typeof prog.page==='number' && typeof prog.word!=='number'){
         pageIndex=Math.min(Math.max(prog.page|0, 0), Math.max(pages.length-1, 0));
       } else pageIndex=pageForWord(listen.index);
       renderPages({keepWord:true});
@@ -1197,9 +1324,29 @@ function mountOpened(b){
       syncChapterButton();
       saveListenProgress();
     } else placeListen(true);
+    if(opts.keepSheet){
+      renderChapterSheet();
+      const sheet=$('chapter-sheet');
+      const cb=$('btn-chapter');
+      if(sheet) sheet.classList.add('open');
+      if(cb) cb.setAttribute('aria-expanded','true');
+    }
   };
   if(document.fonts && document.fonts.ready) document.fonts.ready.then(()=>afterLayout(go));
   else afterLayout(go);
+}
+function switchCompanion(id){
+  const next=BOOKS.find(x=>x.id===id);
+  if(!next || isSoon(next) || (readerBook && next.id===readerBook.id)) return;
+  const mode=readMode;
+  if(mode==='autoplay') stopAutoplay();
+  else if(mode==='scroll') listen.index=wordFromScroll();
+  else if(mode==='pages') listen.index=pageWord();
+  saveListenProgress();
+  selected=next.id;
+  if(location.hash !== '#/'+next.id) history.replaceState({book:next.id}, '', '#/'+next.id);
+  render();
+  mountOpened(next, {mode:mode, keepSheet:true});
 }
 function openReader(b){
   if(isSoon(b)){ showBook(b.id); return; }
@@ -1297,6 +1444,13 @@ if($('view-seg')) $('view-seg').addEventListener('click', e=>{
 });
 if($('btn-home')) $('btn-home').onclick=()=>closeBook();
 if($('btn-play')) $('btn-play').onclick=()=>{ if(listen.playing) pauseListen(); else playListen(); };
+if($('btn-speed')) $('btn-speed').onclick=()=>{
+  const steps=SPEED_STEPS;
+  const cur=getTypePrefs().speed;
+  let i=steps.indexOf(cur);
+  if(i<0) i=steps.indexOf(1.25);
+  setSpeed(steps[(i+1)%steps.length]);
+};
 document.querySelectorAll('.mode-seg [data-mode]').forEach(btn=>{
   btn.onclick=()=>setReadMode(btn.dataset.mode);
 });
@@ -1314,14 +1468,15 @@ if($('edit-sheet')) $('edit-sheet').addEventListener('click', e=>{
   const btn=e.target.closest('button'); if(!btn) return;
   e.stopPropagation();
   if(btn.dataset.size) saveTypePrefs({size:btn.dataset.size});
-  else if(btn.dataset.speed){
-    saveTypePrefs({speed:Number(btn.dataset.speed)});
-    if(listen.playing) scheduleListen();
-  }
+  else if(btn.dataset.speed) setSpeed(Number(btn.dataset.speed));
 });
 if($('chapter-sheet')) $('chapter-sheet').addEventListener('click', e=>{
   const btn=e.target.closest('button'); if(!btn) return;
   e.stopPropagation();
+  if(btn.dataset.companion){
+    switchCompanion(btn.dataset.companion);
+    return;
+  }
   if(btn.dataset.ch!=null && btn.dataset.ch!==''){
     jumpChapter(Number(btn.dataset.ch));
     closeSheets();
@@ -1340,7 +1495,7 @@ if($('listen-progress')) $('listen-progress').addEventListener('click', e=>{
   seekListen(Math.round(Math.min(1, Math.max(0, t))*(listen.words.length-1)));
 });
 if($('reader')) $('reader').addEventListener('click', e=>{
-  if(e.target.closest && e.target.closest('#btn-edit, #btn-chapter, #btn-play, #btn-library, #btn-pdf, .listen-sheet, #listen-progress, .mode-seg, .reader-edge')) return;
+  if(e.target.closest && e.target.closest('#btn-edit, #btn-speed, #btn-chapter, #btn-play, #btn-library, #btn-pdf, .listen-sheet, #listen-progress, .mode-seg, .reader-edge')) return;
   if(sheetsOpen()){ closeSheets(); return; }
   if(readMode==='autoplay' && e.target.closest && e.target.closest('.listen-stage')){
     if(listen.playing) pauseListen(); else playListen();
