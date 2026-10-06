@@ -101,12 +101,14 @@ body.reader-open{overflow:hidden}
 .reader-root[data-size="l"]{--listen-size:23px}
 .reader-root.open{display:flex;flex-direction:column}
 .reader-root button{font-family:inherit;-webkit-tap-highlight-color:transparent}
-.reader-root button:focus-visible{outline:1px solid #000;outline-offset:3px}
+.reader-root button:focus-visible,.reader-root a:focus-visible{outline:1px solid #000;outline-offset:3px}
 .listen-top,.listen-foot{width:min(100%,calc(46ch + 64px));margin:0 auto;padding-left:32px;padding-right:32px;position:relative;z-index:4;flex-shrink:0}
 .listen-top{padding-top:calc(18px + env(safe-area-inset-top,0px));padding-bottom:14px;transition:opacity .45s ease,transform .45s ease}
 .listen-nav,.listen-controls{display:flex;align-items:center;justify-content:space-between;font-size:13px;line-height:1.4;font-weight:400;gap:10px;min-width:0}
-.listen-nav button,.listen-controls button{border:0;background:transparent;padding:6px 0;color:#8d8d8d;font-size:13px;line-height:1;font-weight:400}
-#btn-library,#btn-play{color:#111}
+.listen-nav button,.listen-controls button,.listen-nav a{border:0;background:transparent;padding:6px 0;color:#8d8d8d;font-size:13px;line-height:1;font-weight:400;text-decoration:none}
+.listen-nav-actions{display:flex;align-items:center;gap:16px;flex:0 0 auto}
+#btn-library,#btn-play,#btn-pdf{color:#111}
+#btn-pdf[hidden]{display:none}
 .mode-seg{display:flex;align-items:center;flex:0 0 auto;max-width:17.5rem;gap:2px}
 .listen-controls .mode-seg button{flex:0 0 auto;height:26px;padding:0 6px;border-radius:999px;font-size:11px;line-height:1;color:#8d8d8d;text-align:center;white-space:nowrap}
 .listen-controls .mode-seg button.on{background:#111;color:#fff}
@@ -268,7 +270,10 @@ body.reader-open{overflow:hidden}
   <header class="listen-top">
     <div class="listen-nav">
       <button type="button" id="btn-library">library</button>
-      <button type="button" id="btn-edit" aria-haspopup="true" aria-expanded="false" aria-controls="edit-sheet">edit</button>
+      <div class="listen-nav-actions">
+        <a id="btn-pdf" hidden target="_blank" rel="noopener">View PDF</a>
+        <button type="button" id="btn-edit" aria-haspopup="true" aria-expanded="false" aria-controls="edit-sheet">edit</button>
+      </div>
     </div>
     <h1 class="listen-title"><span class="listen-name" id="listen-name"></span><span class="listen-by" id="listen-by"></span></h1>
     <div class="listen-sheet" id="edit-sheet" role="dialog" aria-label="Reading settings">
