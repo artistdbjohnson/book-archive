@@ -1,7 +1,4 @@
 {
-  "rewrites": [
-    { "source": "/listen", "destination": "/listen.html" },
-    { "source": "/enter", "destination": "/enter.html" },
-    { "source": "/join", "destination": "/join.html" }
-  ]
+  "cleanUrls": true,
+  "trailingSlash": false
 }
