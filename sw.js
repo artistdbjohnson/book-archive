@@ -31,7 +31,7 @@ const PRECACHE = [
   "/pdfs/tvn-15-every-exit-reopens-study.pdf",
   "/pdfs/tvn-15-every-exit-reopens-teleplay.pdf",
   "/pdfs/tvn-15-every-exit-reopens.pdf",
-  "/pdfs/tvn-test-the-helmet-at-bake-oven-knob.pdf"
+  "/pdfs/tvn-the-helmet-at-bake-oven-knob.pdf"
 ];
 const CUT_IDS = [
   "tvn-the-3-10-shift",
