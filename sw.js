@@ -1,13 +1,12 @@
-/* Offline cache. v2 replaces any earlier book-archive cache and omits the cut Thin Veiled Night titles. */
-const CACHE = 'dglxss-archive-sw-v2';
+/* Offline cache. v3 drops cached cleanUrls redirects from v2. */
+const CACHE = 'dglxss-archive-sw-v3';
 const PRECACHE = [
   "/",
-  "/index.html",
   "/archive.js",
   "/manifest.json",
-  "/enter.html",
-  "/join.html",
-  "/listen.html",
+  "/enter",
+  "/join",
+  "/listen",
   "/pdfs/tvn-01-the-hills-above-allentown-study.pdf",
   "/pdfs/tvn-01-the-hills-above-allentown-teleplay.pdf",
   "/pdfs/tvn-01-the-hills-above-allentown.pdf",
@@ -77,24 +76,26 @@ self.addEventListener('fetch', event => {
   if(req.method !== 'GET') return;
   const url = new URL(req.url);
   if(url.origin !== self.location.origin) return;
+  const path = url.pathname;
+  if(path.endsWith('.html')) return;
   if(isCutRequest(url)){
     event.respondWith(new Response('Not found', { status: 404, statusText: 'Not Found' }));
     return;
   }
-  const path = url.pathname;
-  const cachedPath = path === '/' ? '/' : path;
-  if(PRECACHE.indexOf(cachedPath) === -1 && PRECACHE.indexOf(path) === -1) return;
+  if(PRECACHE.indexOf(path) === -1) return;
   event.respondWith((async () => {
     const cache = await caches.open(CACHE);
     try {
       const fresh = await fetch(req);
-      if(fresh && fresh.ok){
+      if(fresh && (fresh.type === 'opaqueredirect' || fresh.redirected)){
+        if(fresh.url) return Response.redirect(fresh.url, 301);
+      } else if(fresh && fresh.ok){
         cache.put(req, fresh.clone());
         return fresh;
       }
     } catch (e) {}
-    const hit = await cache.match(req) || (path === '/' ? await cache.match('/index.html') : null);
-    if(hit) return hit;
+    const hit = await cache.match(req);
+    if(hit && hit.type !== 'opaqueredirect' && !hit.redirected) return hit;
     return new Response('Offline', { status: 503, statusText: 'Offline' });
   })());
 });
