@@ -1,5 +1,5 @@
-/* Offline cache. v3 drops cached cleanUrls redirects from v2. */
-const CACHE = 'dglxss-archive-sw-v3';
+/* Offline cache. v4 adds the Helmet keeper PDF. v3 dropped cached cleanUrls redirects from v2. Activate deletes every cache except this one. */
+const CACHE = 'dglxss-archive-sw-v4';
 const PRECACHE = [
   "/",
   "/archive.js",
@@ -30,7 +30,8 @@ const PRECACHE = [
   "/pdfs/tvn-13-below-the-reading-cut.pdf",
   "/pdfs/tvn-15-every-exit-reopens-study.pdf",
   "/pdfs/tvn-15-every-exit-reopens-teleplay.pdf",
-  "/pdfs/tvn-15-every-exit-reopens.pdf"
+  "/pdfs/tvn-15-every-exit-reopens.pdf",
+  "/pdfs/tvn-the-helmet-at-bake-oven-knob.pdf"
 ];
 const CUT_IDS = [
   "tvn-the-3-10-shift",
@@ -88,7 +89,7 @@ self.addEventListener('fetch', event => {
     try {
       const fresh = await fetch(req);
       if(fresh && (fresh.type === 'opaqueredirect' || fresh.redirected)){
-        if(fresh.url) return Response.redirect(fresh.url, 301);
+        return fresh;
       } else if(fresh && fresh.ok){
         cache.put(req, fresh.clone());
         return fresh;
