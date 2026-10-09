@@ -1309,7 +1309,24 @@ function relayoutPages(){
   renderPages({keepWord:true});
 }
 function turnPage(dir){
-  if(readMode!=='pages' || !pages.length) return;
+  if(!readerBook || (readMode!=='pages' && readMode!=='autoplay')) return;
+  if(readMode==='autoplay'){
+    if(!pages.length) pages=paginate(readerBook);
+    if(!pages.length) return;
+    const next=pageForWord(listen.index)+dir;
+    if(next<0 || next>=pages.length) return;
+    pageIndex=next;
+    const pg=pages[pageIndex];
+    const body=$('page-body');
+    if(body) body.innerHTML=pg&&pg.html?pg.html:'<p>\u2014</p>';
+    if($('page-left')) $('page-left').textContent=pg?(pg.label||''):'';
+    if($('page-right')) $('page-right').textContent=(pageIndex+1)+' / '+pages.length;
+    syncChapterButton(pg?pg.chapterIndex:0);
+    if(pg && typeof pg.startWord==='number') seekListen(pg.startWord);
+    else saveListenProgress();
+    return;
+  }
+  if(!pages.length) return;
   const next=pageIndex+dir;
   if(next<0 || next>=pages.length) return;
   pageIndex=next;
@@ -1333,8 +1350,8 @@ function setReadMode(mode){
     if(!readerBook || readMode!==mode) return;
     if(mode==='autoplay'){
       paintListen();
-      setPlayLabel(false);
-      placeListen(true);
+      if(!listen.playing) setPlayLabel(false);
+      placeListen(!listen.playing);
       saveListenProgress();
     } else if(mode==='scroll'){
       scrollToWord(listen.index);
@@ -1758,7 +1775,7 @@ function mountOpened(b, opts){
       scrollToWord(listen.index);
       syncChapterButton();
       saveListenProgress();
-    } else placeListen(true);
+    } else placeListen(!listen.playing);
     if(opts.keepSheet){
       renderChapterSheet();
       const sheet=$('chapter-sheet');
@@ -1831,7 +1848,6 @@ function clampTrackY(y){
 function armStageBlock(){
   listen.blockStageToggle=true;
   clearTimeout(listen.blockTimer);
-  listen.blockTimer=setTimeout(()=>{ listen.blockStageToggle=false; }, 400);
 }
 function bindListenDrag(){
   const vp=$('listen-viewport');
@@ -1881,6 +1897,10 @@ function bindListenDrag(){
     if(moved){
       listen.userScrolled=true;
       queueScrolledWord();
+    }
+    if(listen.blockStageToggle){
+      clearTimeout(listen.blockTimer);
+      listen.blockTimer=setTimeout(()=>{ listen.blockStageToggle=false; }, 0);
     }
   };
   vp.addEventListener('pointerdown', e=>begin(e, 'pointer'));
