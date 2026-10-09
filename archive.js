@@ -79,6 +79,13 @@ function saveTypePrefs(partial){
     else if(readMode==='autoplay') placeListen(true);
   });
 }
+function syncListenHeader(){
+  const root=$('reader');
+  const top=root && root.querySelector('.listen-top');
+  if(!root || !top) return;
+  const h=top.offsetHeight;
+  if(h) root.style.setProperty('--listen-header', h+'px');
+}
 function closeSheets(){
   const edit=$('edit-sheet'); if(edit) edit.classList.remove('open');
   const ch=$('chapter-sheet'); if(ch) ch.classList.remove('open');
@@ -519,10 +526,10 @@ const BOOKS = [
 ];
 let selected = BOOKS[0].id;
 let readerBook = null;
-let readMode = 'pages';
-let pages = [];
-let pageIndex = 0;
-const listen = { words:[], paras:[], index:0, playing:false, finished:false, timer:null, drag:0, y:0, targetY:0, lineTop:null, raf:0, glideLast:0, wordStart:0, wordDur:0, progressTimer:0, userScrolled:false, blockStageToggle:false, blockTimer:0, scrollCommit:0, fontsQueued:false, prevEl:null, prevPara:null };
+var readMode = 'pages';
+var pages = [];
+var pageIndex = 0;
+const listen = { words:[], paras:[], index:0, playing:false, finished:false, timer:null, drag:0, y:0, targetY:0, lineTop:null, raf:0, glideLast:0, wordStart:0, wordDur:0, progressTimer:0, userScrolled:false, blockStageToggle:false, blockTimer:0, scrollCommit:0, fontsQueued:false, pageFillQueued:false, prevEl:null, prevPara:null };
 const isSoon = b => !b || b.status==='Coming soon' || (!(b.chapters&&b.chapters.length) && !(b.audio&&b.audio.length));
 const listTitle = b => (b.series && b.title.indexOf(b.series+': ')===0) ? b.title.slice(b.series.length+2) : b.title;
 const SERIES_META = {
@@ -575,6 +582,7 @@ function closeReader(){
   if(listen.userScrolled) commitScrolledWord();
   stopAutoplay();
   if(readerBook) saveListenProgress();
+  stopPageBox();
   const r=$('reader'); if(r) r.classList.remove('open','is-reading');
   document.body.classList.remove('reader-open');
   closeSheets();
@@ -1159,8 +1167,8 @@ function chapterTitle(index){
   const ch=readerBook&&readerBook.chapters&&readerBook.chapters[index];
   return ch&&ch.label?ch.label:chapterLabel(index||0);
 }
-function pageHtml(label, text, showLabel, kind){
-  const cls=spClass('', kind).trim();
+function pageHtml(label, text, showLabel, kind, cont){
+  const cls=[spClass('', kind).trim(), cont?'pg-cont':''].filter(Boolean).join(' ');
   const attr=cls?(' class="'+cls+'"'):'';
   const body=String(text||'').split(/\n\n+/).filter(Boolean).map(p=>'<p'+attr+'>'+escapeHtml(p)+'</p>').join('');
   return (showLabel?'<div class="pg-label">'+escapeHtml(label)+'</div>':'')+(body||'<p>\u2014</p>');
@@ -1170,7 +1178,13 @@ function pageCapacity(){
   if(!host||!reader||!reader.classList.contains('open')||reader.dataset.mode!=='pages') return null;
   const w=host.clientWidth, h=host.clientHeight;
   if(w<80||h<80) return null;
-  return {w:w, h:h};
+  const cs=getComputedStyle(host);
+  const padT=parseFloat(cs.paddingTop)||0, padB=parseFloat(cs.paddingBottom)||0;
+  let lh=parseFloat(cs.lineHeight);
+  if(!lh || !isFinite(lh)) lh=(parseFloat(cs.fontSize)||16)*1.6;
+  const content=Math.max(0, h-padT-padB);
+  const usable=Math.floor(content/lh)*lh;
+  return {w:w, h:h, lh:lh, limit:padT+padB+usable};
 }
 function emptyPage(){
   return [{label:readerBook?readerBook.title:'', html:'<p>\u2014</p>', startWord:0, endWord:0, chapterIndex:0}];
@@ -1194,12 +1208,25 @@ function paragraphBlocks(){
   });
   return blocks;
 }
+function queuePageFill(){
+  if(listen.pageFillQueued || readMode!=='pages' || !readerBook) return;
+  listen.pageFillQueued=true;
+  const step=()=>{
+    if(!readerBook || readMode!=='pages'){ listen.pageFillQueued=false; return; }
+    const fontsOk=!document.fonts || document.fonts.status==='loaded';
+    if(!pageCapacity() || !fontsOk){ requestAnimationFrame(step); return; }
+    listen.pageFillQueued=false;
+    relayoutPages();
+  };
+  requestAnimationFrame(step);
+}
 function paginate(book){
   if(!book) return emptyPage();
   const blocks=paragraphBlocks();
   if(!blocks.length) return emptyPage();
   const cap=pageCapacity();
   const asPage=b=>({label:b.label, html:pageHtml(b.label, b.text, b.showLabel, b.kind), startWord:b.startWord, endWord:b.endWord, chapterIndex:b.chapterIndex});
+  if(!cap) queuePageFill();
   if(!cap) return blocks.map(asPage);
   if(document.fonts && document.fonts.status!=='loaded'){
     if(!listen.fontsQueued){
@@ -1211,43 +1238,43 @@ function paginate(book){
     }
     return blocks.map(asPage);
   }
-  const probe=document.createElement('div');
-  probe.className='page-body page-measure';
-  probe.style.width=cap.w+'px';
-  probe.setAttribute('aria-hidden','true');
-  ($('pageview')||$('reader')).appendChild(probe);
-  const fits=html=>{ probe.innerHTML=html; return probe.offsetHeight<=cap.h+1; };
-  const units=[];
-  const out=[];
+  const probe=mountPageProbe();
+  const fits=html=>{ probe.innerHTML=html; return probe.offsetHeight<=cap.limit; };
+  let out=[];
   try{
-    blocks.forEach(block=>{
-      if(fits(pageHtml(block.label, block.text, block.showLabel, block.kind))){
-        units.push({text:block.text, startWord:block.startWord, endWord:block.endWord, label:block.label, chapterIndex:block.chapterIndex, showLabel:block.showLabel, kind:block.kind||''});
-        return;
+    const htmlOf=(label, text, show, kind, cont)=>pageHtml(label, text, show, kind, cont);
+    const linesOf=(text, kind, cont)=>{
+      if(!text) return 0;
+      probe.innerHTML=htmlOf('', text, false, kind, cont);
+      const p=probe.querySelector('p');
+      if(!p || !p.firstChild) return 0;
+      const range=document.createRange();
+      range.selectNodeContents(p);
+      const n=[...range.getClientRects()].filter(r=>r.width>0 && r.height>0).length;
+      return n || 1;
+    };
+    const maxFit=(prefix, words, label, show, kind, cont)=>{
+      let lo=1, hi=words.length, best=0;
+      while(lo<=hi){
+        const mid=(lo+hi)>>1;
+        if(fits(prefix+htmlOf(label, words.slice(0, mid).join(' '), show, kind, cont))){ best=mid; lo=mid+1; }
+        else hi=mid-1;
       }
-      const words=block.text.split(/\s+/);
-      let i=0, show=block.showLabel;
-      while(i<words.length){
-        let lo=1, hi=words.length-i, best=1;
-        while(lo<=hi){
-          const mid=(lo+hi)>>1;
-          if(fits(pageHtml(block.label, words.slice(i, i+mid).join(' '), show, block.kind))){ best=mid; lo=mid+1; }
-          else hi=mid-1;
-        }
-        units.push({
-          text:words.slice(i, i+best).join(' '),
-          startWord:block.startWord+i,
-          endWord:block.startWord+i+best-1,
-          label:block.label,
-          chapterIndex:block.chapterIndex,
-          showLabel:show,
-          kind:block.kind||''
-        });
-        show=false;
-        i+=best;
+      return best;
+    };
+    const widowOrphan=(words, best, kind, cont)=>{
+      if(best>=words.length) return words.length;
+      let k=best;
+      while(k>0){
+        const kept=linesOf(words.slice(0, k).join(' '), kind, cont);
+        const rest=linesOf(words.slice(k).join(' '), kind, true);
+        if(kept>=2 && rest>=2) return k;
+        if(rest<2) k--;
+        else return 0;
       }
-    });
-    const unitsHtml=group=>group.map(u=>pageHtml(u.label, u.text, !!u.showLabel, u.kind)).join('');
+      return 0;
+    };
+    const unitsHtml=group=>group.map(u=>htmlOf(u.label, u.text, !!u.showLabel, u.kind, !!u.cont)).join('');
     let cur=[];
     const push=group=>{
       if(!group.length) return;
@@ -1260,16 +1287,140 @@ function paginate(book){
         html:unitsHtml(group)
       });
     };
-    units.forEach(u=>{
-      if(!cur.length){ cur=[u]; return; }
-      const same=cur[0].chapterIndex===u.chapterIndex;
-      const trial=cur.concat([u]);
-      if(same && fits(unitsHtml(trial))) cur=trial;
-      else { push(cur); cur=[u]; }
+    blocks.forEach(block=>{
+      if(cur.length && cur[0].chapterIndex!==block.chapterIndex){ push(cur); cur=[]; }
+      const words=block.text.split(/\s+/).filter(Boolean);
+      if(!words.length) return;
+      let off=0, cont=false, show=!!block.showLabel, guard=0;
+      while(off<words.length && guard++<words.length+4){
+        const slice=words.slice(off);
+        const prefix=unitsHtml(cur);
+        if(fits(prefix+htmlOf(block.label, slice.join(' '), show, block.kind, cont))){
+          cur.push({text:slice.join(' '), startWord:block.startWord+off, endWord:block.startWord+off+slice.length-1, label:block.label, chapterIndex:block.chapterIndex, showLabel:show, kind:block.kind||'', cont:cont});
+          break;
+        }
+        let best=maxFit(prefix, slice, block.label, show, block.kind, cont);
+        if(best<slice.length) best=widowOrphan(slice, best, block.kind, cont);
+        if(best<=0){
+          if(cur.length){ push(cur); cur=[]; continue; }
+          best=Math.max(1, maxFit('', slice, block.label, show, block.kind, cont));
+          if(best<slice.length){
+            const adj=widowOrphan(slice, best, block.kind, cont);
+            if(adj>0) best=adj;
+          }
+        }
+        if(best>slice.length) best=slice.length;
+        if(best<1) best=1;
+        cur.push({text:slice.slice(0, best).join(' '), startWord:block.startWord+off, endWord:block.startWord+off+best-1, label:block.label, chapterIndex:block.chapterIndex, showLabel:show, kind:block.kind||'', cont:cont});
+        off+=best;
+        cont=true;
+        show=false;
+        if(off<words.length){ push(cur); cur=[]; }
+      }
     });
     push(cur);
   } finally { probe.remove(); }
+  if(out.length) out=tightenLive(out);
   return out.length?out:emptyPage();
+}
+function mountPageProbe(){
+  const host=$('page-body');
+  const cs=getComputedStyle(host);
+  const probe=document.createElement('div');
+  probe.className=((host.className||'page-body')+' page-measure').trim();
+  probe.setAttribute('aria-hidden','true');
+  probe.style.boxSizing=cs.boxSizing||'border-box';
+  probe.style.width=host.getBoundingClientRect().width+'px';
+  probe.style.paddingTop=cs.paddingTop;
+  probe.style.paddingRight=cs.paddingRight;
+  probe.style.paddingBottom=cs.paddingBottom;
+  probe.style.paddingLeft=cs.paddingLeft;
+  probe.style.font=cs.font;
+  probe.style.letterSpacing=cs.letterSpacing;
+  probe.style.wordSpacing=cs.wordSpacing;
+  probe.style.textAlign=cs.textAlign;
+  (host.parentNode||$('pageview')||$('reader')).appendChild(probe);
+  return probe;
+}
+function htmlForRange(start, end){
+  let html='', i=start|0, shown=false;
+  while(i<=end){
+    const w=listen.words[i];
+    if(!w) break;
+    let j=i;
+    while(j+1<=end && listen.words[j+1] && listen.words[j+1].pi===w.pi) j++;
+    const text=[];
+    for(let k=i;k<=j;k++) text.push(listen.words[k].text);
+    const prev=i>0?listen.words[i-1]:null;
+    const cont=!!(prev && prev.pi===w.pi);
+    const chapterStart=!prev || prev.chapterIndex!==w.chapterIndex;
+    const para=listen.paras[w.pi]||{};
+    const show=!shown && chapterStart;
+    if(show) shown=true;
+    html+=pageHtml(chapterTitle(w.chapterIndex), text.join(' '), show, para.kind||'', cont);
+    i=j+1;
+  }
+  return html;
+}
+function makePage(start, end){
+  const w=listen.words[start]||{};
+  return {
+    label:chapterTitle(w.chapterIndex||0),
+    chapterIndex:w.chapterIndex||0,
+    startWord:start,
+    endWord:end,
+    html:htmlForRange(start, end)
+  };
+}
+function pageOverBudget(html){
+  const host=$('page-body');
+  if(!host) return false;
+  host.innerHTML=html||'';
+  if(host.scrollHeight>host.clientHeight+1) return true;
+  const cs=getComputedStyle(host);
+  const padT=parseFloat(cs.paddingTop)||0, padB=parseFloat(cs.paddingBottom)||0;
+  let lh=parseFloat(cs.lineHeight);
+  if(!lh || !isFinite(lh)) lh=(parseFloat(cs.fontSize)||16)*1.6;
+  const budget=Math.floor(Math.max(0, host.clientHeight-padT-padB)/lh)*lh;
+  const top=host.getBoundingClientRect().top+padT;
+  let bot=top;
+  for(const el of host.children){
+    const r=el.getBoundingClientRect();
+    if(r.height>0) bot=Math.max(bot, r.bottom);
+  }
+  return bot-top>budget+0.5;
+}
+function tightenLive(list){
+  const host=$('page-body');
+  if(!host || !list || !list.length) return list;
+  const saved=host.innerHTML;
+  const src=list.slice();
+  const out=[];
+  let i=0, guard=0;
+  while(i<src.length && guard++<src.length*4+8){
+    const pg=src[i];
+    if(!pg || typeof pg.startWord!=='number' || typeof pg.endWord!=='number' || pg.endWord<pg.startWord){
+      out.push(pg); i++; continue;
+    }
+    if(!pageOverBudget(pg.html)){ out.push(pg); i++; continue; }
+    let lo=pg.startWord, hi=pg.endWord, best=pg.startWord-1;
+    while(lo<=hi){
+      const mid=(lo+hi)>>1;
+      if(!pageOverBudget(htmlForRange(pg.startWord, mid))){ best=mid; lo=mid+1; }
+      else hi=mid-1;
+    }
+    if(best<pg.startWord) best=pg.startWord;
+    if(best>=pg.endWord){ out.push(pg); i++; continue; }
+    out.push(makePage(pg.startWord, best));
+    const restStart=best+1, restEnd=pg.endWord;
+    const nxt=src[i+1];
+    if(nxt && nxt.chapterIndex===pg.chapterIndex && typeof nxt.endWord==='number' && nxt.startWord===restEnd+1)
+      src[i+1]=makePage(restStart, nxt.endWord);
+    else src.splice(i+1, 0, makePage(restStart, restEnd));
+    i++;
+  }
+  host.innerHTML=saved;
+  return out.length?out:list;
 }
 function pageForWord(index){
   if(!pages.length) return 0;
@@ -1300,13 +1451,49 @@ function renderPages(opts){
   syncChapterButton(pg?pg.chapterIndex:0);
   saveListenProgress();
 }
+let pageBoxObs=null;
+let pageBoxKey='';
+let pageRefit=false;
+function pageBoxKeyOf(cap){
+  return cap ? cap.w+'x'+cap.h+'@'+getTypePrefs().size : '';
+}
+function stopPageBox(){
+  if(pageBoxObs){ pageBoxObs.disconnect(); pageBoxObs=null; }
+  pageBoxKey='';
+}
+function watchPageBox(){
+  const host=$('page-body');
+  if(!host || pageBoxObs || typeof ResizeObserver!=='function') return;
+  pageBoxObs=new ResizeObserver(()=>{
+    if(readMode!=='pages' || !readerBook || pageRefit) return;
+    const key=pageBoxKeyOf(pageCapacity());
+    if(!key || key===pageBoxKey) return;
+    relayoutPages();
+  });
+  pageBoxObs.observe(host);
+}
 function relayoutPages(){
   if(!readerBook || readMode!=='pages') return;
   const word=clampWord(listen.index);
+  const before=pageBoxKeyOf(pageCapacity());
   pages=paginate(readerBook);
   pageIndex=pageForWord(word);
   listen.index=word;
   renderPages({keepWord:true});
+  const after=pageBoxKeyOf(pageCapacity());
+  pageBoxKey=after;
+  watchPageBox();
+  if(after && after!==before && !pageRefit){
+    pageRefit=true;
+    try{ relayoutPages(); }
+    finally{ pageRefit=false; }
+  } else if(!pageRefit){
+    requestAnimationFrame(()=>{
+      if(readMode!=='pages' || !readerBook || pageRefit) return;
+      const key=pageBoxKeyOf(pageCapacity());
+      if(key && key!==pageBoxKey) relayoutPages();
+    });
+  }
 }
 function turnPage(dir){
   if(!readerBook) return;
@@ -1350,6 +1537,7 @@ function setReadMode(mode){
   readMode=mode;
   updateModeChrome();
   closeSheets();
+  if(mode!=='pages') stopPageBox();
   afterLayout(()=>{
     if(!readerBook || readMode!==mode) return;
     if(mode==='autoplay'){
@@ -1361,11 +1549,7 @@ function setReadMode(mode){
       scrollToWord(listen.index);
       syncChapterButton();
       saveListenProgress();
-    } else {
-      pages=paginate(readerBook);
-      pageIndex=pageForWord(listen.index);
-      renderPages({keepWord:true});
-    }
+    } else relayoutPages();
   });
 }
 function setPdfLink(b){
@@ -1727,9 +1911,7 @@ function reloadListen(keepChapter){
   renderScroll();
   paintListen();
   if(readMode==='pages'){
-    pages=paginate(b);
-    pageIndex=pageForWord(listen.index);
-    renderPages({keepWord:true});
+    relayoutPages();
     return;
   }
   afterLayout(()=>{
@@ -1759,6 +1941,7 @@ function mountOpened(b, opts){
   listen.targetY=0;
   pages=[];
   pageIndex=0;
+  listen.pageFillQueued=false;
   readerBook=b;
   const built=buildListen(b);
   listen.words=built.words;
@@ -1778,17 +1961,14 @@ function mountOpened(b, opts){
   const root=$('reader');
   setReadingFlag(false);
   root.classList.add('open');
+  syncListenHeader();
   document.body.classList.add('reader-open');
   if(!opts.keepSheet) closeSheets();
   const go=()=>{
     if(readerBook!==b) return;
-    if(readMode==='pages'){
-      pages=paginate(b);
-      if(!opts.mode && prog && prog.mode==='pages' && typeof prog.page==='number' && typeof prog.word!=='number'){
-        pageIndex=Math.min(Math.max(prog.page|0, 0), Math.max(pages.length-1, 0));
-      } else pageIndex=pageForWord(listen.index);
-      renderPages({keepWord:true});
-    } else if(readMode==='scroll'){
+    syncListenHeader();
+    if(readMode==='pages') relayoutPages();
+    else if(readMode==='scroll'){
       scrollToWord(listen.index);
       syncChapterButton();
       saveListenProgress();
@@ -1849,6 +2029,7 @@ function toggleSheet(id, btnId){
     }
     sheet.classList.add('open');
     if(btn) btn.setAttribute('aria-expanded','true');
+    if(id==='edit-sheet') syncListenHeader();
   }
 }
 function clampTrackY(y){
@@ -2109,6 +2290,7 @@ window.addEventListener('keydown', e=>{
 let resizeTimer=0;
 function scheduleReaderLayout(){
   if(!readerBook || !$('reader') || !$('reader').classList.contains('open')) return;
+  syncListenHeader();
   clearTimeout(resizeTimer);
   resizeTimer=setTimeout(()=>{
     resizeTimer=0;

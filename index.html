@@ -162,10 +162,15 @@ body.reader-open{overflow:hidden}
 .page-body{flex:1;min-height:0;overflow:hidden;width:min(calc(100% - 64px),40ch);margin:0 auto;padding:1.15rem 0 .4rem;color:#141414;font-size:1em;line-height:1.6}
 .page-body .pg-label{font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:#8d8d8d;margin:0 0 1.15em}
 .page-body p{margin:0 0 .9em}
+.page-body p.pg-cont{margin-top:0;text-indent:0}
+.page-measure p:last-child{margin-bottom:0}
+.page-body p:last-child{margin-bottom:0}
 .page-measure{position:absolute;left:0;top:0;visibility:hidden;pointer-events:none;z-index:-1;height:auto!important;min-height:0!important;max-height:none!important;overflow:visible!important;flex:none!important}
 .reader-edge{position:absolute;top:0;bottom:0;width:22%;max-width:96px;z-index:5;border:0;background:transparent;padding:0}
 .reader-edge.left{left:0;cursor:w-resize}
 .reader-edge.right{right:0;cursor:e-resize}
+.reader-root[data-mode="pages"] .page-body{position:relative;z-index:1}
+.reader-root[data-mode="pages"] .reader-edge{z-index:6}
 .reader-root[data-mode="scroll"] .scroll-view,
 .reader-root[data-mode="pages"] .page-body{user-select:text;-webkit-user-select:text}
 .listen-track{width:min(calc(100% - 64px),40ch);margin:0 auto;padding:0 0 62vh;font-weight:400;text-align:left}
@@ -186,7 +191,8 @@ body.reader-open{overflow:hidden}
 .listen-controls{padding-top:2px}
 .listen-sheet{display:none;position:absolute;z-index:6;min-width:220px;max-width:min(320px,calc(100vw - 48px));max-height:46vh;overflow:auto;background:#fff;border:1px solid rgba(0,0,0,.16);box-shadow:0 10px 28px rgba(0,0,0,.08);padding:6px 0}
 .listen-sheet.open{display:block}
-#edit-sheet{top:calc(100% - 6px);right:32px}
+.listen-top:has(#edit-sheet.open){z-index:8}
+#edit-sheet{top:calc(100% - 6px);right:32px;max-height:calc(100dvh - var(--listen-header, 140px));overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;padding-bottom:calc(16px + env(safe-area-inset-bottom, 0px))}
 #chapter-sheet{top:auto;bottom:calc(100% - 4px);right:32px}
 .listen-sheet .type-row{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:10px 16px}
 .listen-sheet .type-label{font-size:12px;color:#444}
@@ -196,7 +202,7 @@ body.reader-open{overflow:hidden}
 .listen-sheet button.on{color:#000}
 .listen-sheet button:disabled{color:#d2d2d2}
 .listen-sheet-rule{height:1px;margin:4px 14px;background:rgba(0,0,0,.08)}
-.listen-sheet .paper-lock{color:#111;font-size:14px;min-height:44px;display:inline-flex;align-items:center}
+.listen-sheet .paper-lock{color:#111;font-size:14px;min-width:44px;min-height:44px;display:inline-flex;align-items:center;justify-content:center}
 .listen-sheet .sheet-kicker{padding:10px 16px 2px;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#8d8d8d;font-family:'JetBrains Mono',ui-monospace,monospace}
 .listen-sheet .comp-switch{display:flex;flex-wrap:wrap;align-items:center;gap:0;padding:8px 14px 2px}
 .listen-sheet .comp-switch button{display:inline;width:auto;padding:8px 0;font-size:12px}
@@ -222,11 +228,11 @@ body.reader-open{overflow:hidden}
 @media(max-width:480px){
   #btn-play{width:44px;height:44px;min-width:44px;min-height:44px;margin:-8px}
   .speed-chip{min-width:44px;min-height:44px;margin-top:-10px;margin-bottom:-10px;padding:10px 8px;display:inline-flex;align-items:center;justify-content:center}
-  .reader-edge{top:auto;bottom:0;height:max(44px,18vh);min-height:44px;min-width:44px}
+  .reader-root[data-mode="autoplay"] .reader-edge{top:auto;bottom:0;height:max(44px,18vh);min-height:44px;min-width:44px}
   .listen-foot{padding-bottom:calc(18px + env(safe-area-inset-bottom,0px))}
 }
 @media(max-width:640px){
-  #edit-sheet.listen-sheet{position:fixed;left:0;right:0;top:auto;bottom:0;max-width:none;width:auto;max-height:min(70vh,420px);border:0;border-top:1px solid rgba(0,0,0,.18);box-shadow:0 -10px 28px rgba(0,0,0,.1);padding:8px 0 calc(12px + env(safe-area-inset-bottom));z-index:30}
+  #edit-sheet.listen-sheet{position:fixed;left:0;right:0;top:auto;bottom:0;max-width:none;width:auto;max-height:calc(100dvh - var(--listen-header, 140px));overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;border:0;border-top:1px solid rgba(0,0,0,.18);box-shadow:0 -10px 28px rgba(0,0,0,.1);padding:8px 0 calc(16px + env(safe-area-inset-bottom, 0px));z-index:8}
 }
 @media(max-width:359px){
   .listen-controls .mode-seg button{font-size:10px;padding:0 3px}
