@@ -79,6 +79,13 @@ function saveTypePrefs(partial){
     else if(readMode==='autoplay') placeListen(true);
   });
 }
+function syncListenHeader(){
+  const root=$('reader');
+  const top=root && root.querySelector('.listen-top');
+  if(!root || !top) return;
+  const h=top.offsetHeight;
+  if(h) root.style.setProperty('--listen-header', h+'px');
+}
 function closeSheets(){
   const edit=$('edit-sheet'); if(edit) edit.classList.remove('open');
   const ch=$('chapter-sheet'); if(ch) ch.classList.remove('open');
@@ -1778,10 +1785,12 @@ function mountOpened(b, opts){
   const root=$('reader');
   setReadingFlag(false);
   root.classList.add('open');
+  syncListenHeader();
   document.body.classList.add('reader-open');
   if(!opts.keepSheet) closeSheets();
   const go=()=>{
     if(readerBook!==b) return;
+    syncListenHeader();
     if(readMode==='pages'){
       pages=paginate(b);
       if(!opts.mode && prog && prog.mode==='pages' && typeof prog.page==='number' && typeof prog.word!=='number'){
@@ -1849,6 +1858,7 @@ function toggleSheet(id, btnId){
     }
     sheet.classList.add('open');
     if(btn) btn.setAttribute('aria-expanded','true');
+    if(id==='edit-sheet') syncListenHeader();
   }
 }
 function clampTrackY(y){
@@ -2109,6 +2119,7 @@ window.addEventListener('keydown', e=>{
 let resizeTimer=0;
 function scheduleReaderLayout(){
   if(!readerBook || !$('reader') || !$('reader').classList.contains('open')) return;
+  syncListenHeader();
   clearTimeout(resizeTimer);
   resizeTimer=setTimeout(()=>{
     resizeTimer=0;
