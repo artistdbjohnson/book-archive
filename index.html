@@ -4,6 +4,7 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <meta name="theme-color" content="#0a0a0a"/>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%230a0a0a'/%3E%3C/svg%3E"/>
 <link rel="manifest" href="/manifest.json"/>
 <title>Archive — dglxss.</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
@@ -138,8 +139,7 @@ body.reader-open{overflow:hidden}
 .listen-art .ornament{display:block}
 .reader-root[data-mode="autoplay"].is-reading .listen-nav,
 .reader-root[data-mode="autoplay"].is-reading .listen-title{opacity:0;transform:translateY(-10px);pointer-events:none}
-.reader-root[data-mode="autoplay"].is-reading .listen-nav button,
-.reader-root[data-mode="autoplay"].is-reading .listen-nav a{pointer-events:auto}
+.reader-root[data-mode="autoplay"].is-reading #btn-edit{pointer-events:auto}
 .reader-root[data-mode="autoplay"] #pageview{display:block;pointer-events:none;background:transparent}
 .reader-root[data-mode="autoplay"] #pageview .page-body{display:none}
 .reader-root[data-mode="autoplay"] .reader-edge{pointer-events:auto}
@@ -171,7 +171,7 @@ body.reader-open{overflow:hidden}
 .listen-track{width:min(calc(100% - 64px),40ch);margin:0 auto;padding:0 0 62vh;font-weight:400;text-align:left}
 .listen-p{margin:0 0 1.15em;color:#c4c4c4;font-size:1em;line-height:1.6;font-weight:400}
 .listen-p.is-active{color:#222}
-.listen-p.is-active .w.is-now{color:#000;font-weight:700}
+.listen-p.is-active .w.is-now{color:#000;font-weight:400;text-shadow:-0.35px 0 0 currentColor,0.35px 0 0 currentColor}
 .listen-fade{position:absolute;left:0;right:0;pointer-events:none;z-index:3}
 .listen-fade-top{top:0;height:22%;background:linear-gradient(to bottom,#fff 0%,rgba(255,255,255,0) 100%)}
 .listen-fade-bot{bottom:0;height:38%;background:linear-gradient(to top,#fff 0%,rgba(255,255,255,.78) 46%,rgba(255,255,255,0) 100%)}

@@ -1096,7 +1096,7 @@ function updateModeChrome(){
   root.classList.toggle('mode-autoplay', readMode==='autoplay');
   root.classList.toggle('mode-scroll', readMode==='scroll');
   root.classList.toggle('mode-pages', readMode==='pages');
-  if(readMode!=='autoplay') root.classList.remove('is-reading');
+  if(readMode!=='autoplay') setReadingFlag(false);
   document.querySelectorAll('.mode-seg [data-mode]').forEach(b=>{
     const on=b.dataset.mode===readMode;
     b.classList.toggle('on', on);
@@ -1309,24 +1309,28 @@ function relayoutPages(){
   renderPages({keepWord:true});
 }
 function turnPage(dir){
-  if(!readerBook || (readMode!=='pages' && readMode!=='autoplay')) return;
+  if(!readerBook) return;
   if(readMode==='autoplay'){
-    if(!pages.length) pages=paginate(readerBook);
-    if(!pages.length) return;
-    const next=pageForWord(listen.index)+dir;
-    if(next<0 || next>=pages.length) return;
-    pageIndex=next;
-    const pg=pages[pageIndex];
-    const body=$('page-body');
-    if(body) body.innerHTML=pg&&pg.html?pg.html:'<p>\u2014</p>';
-    if($('page-left')) $('page-left').textContent=pg?(pg.label||''):'';
-    if($('page-right')) $('page-right').textContent=(pageIndex+1)+' / '+pages.length;
-    syncChapterButton(pg?pg.chapterIndex:0);
-    if(pg && typeof pg.startWord==='number') seekListen(pg.startWord);
+    const vp=$('listen-viewport');
+    const h=vp ? (vp.clientHeight||0) : 0;
+    if(!h || !listen.words.length) return;
+    const y=clampTrackY((listen.y||0) - dir*h);
+    listen.userScrolled=true;
+    listen.lineTop=null;
+    listen.targetY=y;
+    applyTrackY(y);
+    const idx=clampWord(wordNearestReadingLine());
+    listen.userScrolled=false;
+    listen.finished=false;
+    listen.index=idx;
+    paintListen();
+    listen.lineTop=null;
+    placeListen(true);
+    if(listen.playing) scheduleListen(0);
     else saveListenProgress();
     return;
   }
-  if(!pages.length) return;
+  if(readMode!=='pages' || !pages.length) return;
   const next=pageIndex+dir;
   if(next<0 || next>=pages.length) return;
   pageIndex=next;
@@ -1560,6 +1564,21 @@ function setPlayLabel(playing){
   btn.setAttribute('aria-pressed', playing?'true':'false');
   btn.setAttribute('aria-label', playing?'Pause':'Play');
 }
+function setReadingFlag(on){
+  const root=$('reader');
+  if(root) root.classList.toggle('is-reading', !!on);
+  ['btn-library','btn-pdf'].forEach(id=>{
+    const el=$(id);
+    if(!el) return;
+    if(on) el.setAttribute('inert','');
+    else el.removeAttribute('inert');
+  });
+  const title=document.querySelector('#reader .listen-title');
+  if(title){
+    if(on) title.setAttribute('inert','');
+    else title.removeAttribute('inert');
+  }
+}
 function stopAutoplay(){
   listen.playing=false;
   listen.drag=0;
@@ -1567,8 +1586,7 @@ function stopAutoplay(){
   listen.timer=0;
   stopProgressClock();
   stopGlide();
-  const root=$('reader');
-  if(root) root.classList.remove('is-reading');
+  setReadingFlag(false);
   setPlayLabel(false);
 }
 function wordNearestReadingLine(){
@@ -1615,8 +1633,7 @@ function playListen(){
   }
   listen.playing=true;
   listen.drag=0;
-  const root=$('reader');
-  if(root) root.classList.add('is-reading');
+  setReadingFlag(true);
   setPlayLabel(true);
   closeSheets();
   placeListen(true);
@@ -1759,7 +1776,7 @@ function mountOpened(b, opts){
   setPlayLabel(false);
   updateModeChrome();
   const root=$('reader');
-  root.classList.remove('is-reading');
+  setReadingFlag(false);
   root.classList.add('open');
   document.body.classList.add('reader-open');
   if(!opts.keepSheet) closeSheets();
@@ -1849,6 +1866,11 @@ function armStageBlock(){
   listen.blockStageToggle=true;
   clearTimeout(listen.blockTimer);
 }
+function releaseStageBlock(){
+  if(!listen.blockStageToggle) return;
+  clearTimeout(listen.blockTimer);
+  listen.blockTimer=setTimeout(()=>{ listen.blockStageToggle=false; }, 600);
+}
 function bindListenDrag(){
   const vp=$('listen-viewport');
   if(!vp || vp.dataset.bound) return;
@@ -1898,10 +1920,7 @@ function bindListenDrag(){
       listen.userScrolled=true;
       queueScrolledWord();
     }
-    if(listen.blockStageToggle){
-      clearTimeout(listen.blockTimer);
-      listen.blockTimer=setTimeout(()=>{ listen.blockStageToggle=false; }, 0);
-    }
+    releaseStageBlock();
   };
   vp.addEventListener('pointerdown', e=>begin(e, 'pointer'));
   vp.addEventListener('pointermove', move);
@@ -1909,7 +1928,10 @@ function bindListenDrag(){
   vp.addEventListener('pointercancel', end);
   vp.addEventListener('touchstart', e=>begin(e, 'touch'), {passive:true});
   vp.addEventListener('touchmove', move, {passive:false});
-  vp.addEventListener('touchend', end);
+  vp.addEventListener('touchend', e=>{
+    if((gesture || listen.blockStageToggle) && e.cancelable) e.preventDefault();
+    end(e);
+  }, {passive:false});
   vp.addEventListener('touchcancel', end);
   vp.addEventListener('wheel', e=>{
     if(readMode!=='autoplay' || !$('reader') || !$('reader').classList.contains('open')) return;
@@ -1917,7 +1939,11 @@ function bindListenDrag(){
     let dy=e.deltaY;
     if(e.deltaMode===1) dy*=16;
     else if(e.deltaMode===2) dy*=(vp.clientHeight||480);
-    if(listen.playing) pauseListen();
+    if(listen.playing){
+      pauseListen();
+      armStageBlock();
+      releaseStageBlock();
+    }
     listen.userScrolled=true;
     listen.lineTop=null;
     const y=clampTrackY((listen.y||0)-dy);
