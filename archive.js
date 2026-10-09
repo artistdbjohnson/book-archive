@@ -1238,13 +1238,9 @@ function paginate(book){
     }
     return blocks.map(asPage);
   }
-  const probe=document.createElement('div');
-  probe.className='page-body page-measure';
-  probe.style.width=cap.w+'px';
-  probe.setAttribute('aria-hidden','true');
-  ($('pageview')||$('reader')).appendChild(probe);
+  const probe=mountPageProbe();
   const fits=html=>{ probe.innerHTML=html; return probe.offsetHeight<=cap.limit; };
-  const out=[];
+  let out=[];
   try{
     const htmlOf=(label, text, show, kind, cont)=>pageHtml(label, text, show, kind, cont);
     const linesOf=(text, kind, cont)=>{
@@ -1324,7 +1320,107 @@ function paginate(book){
     });
     push(cur);
   } finally { probe.remove(); }
+  if(out.length) out=tightenLive(out);
   return out.length?out:emptyPage();
+}
+function mountPageProbe(){
+  const host=$('page-body');
+  const cs=getComputedStyle(host);
+  const probe=document.createElement('div');
+  probe.className=((host.className||'page-body')+' page-measure').trim();
+  probe.setAttribute('aria-hidden','true');
+  probe.style.boxSizing=cs.boxSizing||'border-box';
+  probe.style.width=host.getBoundingClientRect().width+'px';
+  probe.style.paddingTop=cs.paddingTop;
+  probe.style.paddingRight=cs.paddingRight;
+  probe.style.paddingBottom=cs.paddingBottom;
+  probe.style.paddingLeft=cs.paddingLeft;
+  probe.style.font=cs.font;
+  probe.style.letterSpacing=cs.letterSpacing;
+  probe.style.wordSpacing=cs.wordSpacing;
+  probe.style.textAlign=cs.textAlign;
+  (host.parentNode||$('pageview')||$('reader')).appendChild(probe);
+  return probe;
+}
+function htmlForRange(start, end){
+  let html='', i=start|0, shown=false;
+  while(i<=end){
+    const w=listen.words[i];
+    if(!w) break;
+    let j=i;
+    while(j+1<=end && listen.words[j+1] && listen.words[j+1].pi===w.pi) j++;
+    const text=[];
+    for(let k=i;k<=j;k++) text.push(listen.words[k].text);
+    const prev=i>0?listen.words[i-1]:null;
+    const cont=!!(prev && prev.pi===w.pi);
+    const chapterStart=!prev || prev.chapterIndex!==w.chapterIndex;
+    const para=listen.paras[w.pi]||{};
+    const show=!shown && chapterStart;
+    if(show) shown=true;
+    html+=pageHtml(chapterTitle(w.chapterIndex), text.join(' '), show, para.kind||'', cont);
+    i=j+1;
+  }
+  return html;
+}
+function makePage(start, end){
+  const w=listen.words[start]||{};
+  return {
+    label:chapterTitle(w.chapterIndex||0),
+    chapterIndex:w.chapterIndex||0,
+    startWord:start,
+    endWord:end,
+    html:htmlForRange(start, end)
+  };
+}
+function pageOverBudget(html){
+  const host=$('page-body');
+  if(!host) return false;
+  host.innerHTML=html||'';
+  if(host.scrollHeight>host.clientHeight+1) return true;
+  const cs=getComputedStyle(host);
+  const padT=parseFloat(cs.paddingTop)||0, padB=parseFloat(cs.paddingBottom)||0;
+  let lh=parseFloat(cs.lineHeight);
+  if(!lh || !isFinite(lh)) lh=(parseFloat(cs.fontSize)||16)*1.6;
+  const budget=Math.floor(Math.max(0, host.clientHeight-padT-padB)/lh)*lh;
+  const top=host.getBoundingClientRect().top+padT;
+  let bot=top;
+  for(const el of host.children){
+    const r=el.getBoundingClientRect();
+    if(r.height>0) bot=Math.max(bot, r.bottom);
+  }
+  return bot-top>budget+0.5;
+}
+function tightenLive(list){
+  const host=$('page-body');
+  if(!host || !list || !list.length) return list;
+  const saved=host.innerHTML;
+  const src=list.slice();
+  const out=[];
+  let i=0, guard=0;
+  while(i<src.length && guard++<src.length*4+8){
+    const pg=src[i];
+    if(!pg || typeof pg.startWord!=='number' || typeof pg.endWord!=='number' || pg.endWord<pg.startWord){
+      out.push(pg); i++; continue;
+    }
+    if(!pageOverBudget(pg.html)){ out.push(pg); i++; continue; }
+    let lo=pg.startWord, hi=pg.endWord, best=pg.startWord-1;
+    while(lo<=hi){
+      const mid=(lo+hi)>>1;
+      if(!pageOverBudget(htmlForRange(pg.startWord, mid))){ best=mid; lo=mid+1; }
+      else hi=mid-1;
+    }
+    if(best<pg.startWord) best=pg.startWord;
+    if(best>=pg.endWord){ out.push(pg); i++; continue; }
+    out.push(makePage(pg.startWord, best));
+    const restStart=best+1, restEnd=pg.endWord;
+    const nxt=src[i+1];
+    if(nxt && nxt.chapterIndex===pg.chapterIndex && typeof nxt.endWord==='number' && nxt.startWord===restEnd+1)
+      src[i+1]=makePage(restStart, nxt.endWord);
+    else src.splice(i+1, 0, makePage(restStart, restEnd));
+    i++;
+  }
+  host.innerHTML=saved;
+  return out.length?out:list;
 }
 function pageForWord(index){
   if(!pages.length) return 0;
