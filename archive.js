@@ -19,7 +19,9 @@ function speedText(n){
   return (v===0.75 ? '.75' : String(v)) + '\u00d7';
 }
 /* One-time: stored Autoplay speed 1 was the old default. Move that value to 1.25 once.
-   Later choices, including an explicit 1, stay put. .75, 1.5, and 2 are never rewritten. */
+   Later choices, including an explicit 1, stay put. .75, 1.5, and 2 are never rewritten.
+   Migration runs once at load. Speed and size then stay in memory. */
+let typePrefsCache = null;
 function migrateLegacySpeed(){
   const s=loadStore();
   if(s.speedDefaultMigrated) return s;
@@ -28,10 +30,14 @@ function migrateLegacySpeed(){
   saveStore(s);
   return s;
 }
-function getTypePrefs(){
-  const t=migrateLegacySpeed().type||{};
+function prefsFromStore(s){
+  const t=(s && s.type)||{};
   const speed = SPEEDS[Number(t.speed)] ? Number(t.speed) : 1.25;
   return { size: TYPE_SIZE_PX[t.size] ? t.size : 'm', speed: speed };
+}
+function getTypePrefs(){
+  if(!typePrefsCache) typePrefsCache=prefsFromStore(migrateLegacySpeed());
+  return typePrefsCache;
 }
 function syncSpeedChip(){
   const btn=$('btn-speed');
@@ -51,16 +57,24 @@ function applyTypePrefs(){
   syncSpeedChip();
 }
 function setSpeed(speed){
+  const frac=listen.playing ? wordElapsedFrac() : 0;
   saveTypePrefs({speed:speed});
-  if(listen.playing) scheduleListen();
+  if(listen.playing) scheduleListen(frac);
 }
 function saveTypePrefs(partial){
-  const s=migrateLegacySpeed();
-  s.type=Object.assign({}, s.type||{}, getTypePrefs(), partial);
+  const cur=getTypePrefs();
+  const s=loadStore();
+  const next={size:cur.size, speed:cur.speed};
+  if(partial && partial.size && TYPE_SIZE_PX[partial.size]) next.size=partial.size;
+  if(partial && partial.speed!=null && SPEEDS[Number(partial.speed)]) next.speed=Number(partial.speed);
+  typePrefsCache=next;
+  s.type=Object.assign({}, s.type||{}, next);
+  s.speedDefaultMigrated=true;
   saveStore(s);
   applyTypePrefs();
-  if(!readerBook) return;
+  if(!readerBook || !partial || !partial.size || next.size===cur.size) return;
   afterLayout(()=>{
+    if(!readerBook) return;
     if(readMode==='pages') relayoutPages();
     else if(readMode==='autoplay') placeListen(true);
   });
@@ -508,7 +522,7 @@ let readerBook = null;
 let readMode = 'pages';
 let pages = [];
 let pageIndex = 0;
-const listen = { words:[], paras:[], index:0, playing:false, finished:false, timer:null, drag:0, y:0, prevEl:null, prevPara:null };
+const listen = { words:[], paras:[], index:0, playing:false, finished:false, timer:null, drag:0, y:0, targetY:0, lineTop:null, raf:0, glideLast:0, wordStart:0, wordDur:0, progressTimer:0, userScrolled:false, blockStageToggle:false, blockTimer:0, scrollCommit:0, fontsQueued:false, prevEl:null, prevPara:null };
 const isSoon = b => !b || b.status==='Coming soon' || (!(b.chapters&&b.chapters.length) && !(b.audio&&b.audio.length));
 const listTitle = b => (b.series && b.title.indexOf(b.series+': ')===0) ? b.title.slice(b.series.length+2) : b.title;
 const SERIES_META = {
@@ -558,8 +572,8 @@ function bindCollapse(root){
 function closeReader(){
   if(readerBook && readMode==='scroll') listen.index=wordFromScroll();
   else if(readerBook && readMode==='pages') listen.index=pageWord();
-  clearTimeout(listen.timer);
-  listen.playing=false;
+  if(listen.userScrolled) commitScrolledWord();
+  stopAutoplay();
   if(readerBook) saveListenProgress();
   const r=$('reader'); if(r) r.classList.remove('open','is-reading');
   document.body.classList.remove('reader-open');
@@ -571,7 +585,7 @@ const CARD_SWATCHES = [
   {bg:'#e8c43a', ink:'#1c1a16'},
   {bg:'#f0a36c', ink:'#1c1a16'},
   {bg:'#e36a4a', ink:'#1c1a16'},
-  {bg:'#9a6b38', ink:'#fbf6ee'},
+  {bg:'#8a5f31', ink:'#fbf6ee'},
   {bg:'#3a6fd4', ink:'#f7f4ee'},
   {bg:'#c5d0c2', ink:'#1c1a16'},
   {bg:'#1b2d6b', ink:'#f7f4ee'},
@@ -783,7 +797,8 @@ function bookCardHtml(b){
   const free = quietAccessLabel(b);
   if(free) bits.push(free);
   const year = bits.length ? '<span class="y">' + escapeHtml(bits.join(' \u00b7 ')) + '</span>' : '';
-  return '<button type="button" class="book-card' + (isSoon(b)?' soon':'') + '" data-id="' + escapeHtml(b.id) + '" style="background:' + c.bg + ';color:' + c.ink + '"><span class="copy"><span class="t">' + quotedTitle(b) + '</span>' + seriesLine(b) + '</span>' + year + '</button>';
+  const deep = c.bg==='#8a5f31' ? ' swatch-deep' : '';
+  return '<button type="button" class="book-card' + (isSoon(b)?' soon':'') + deep + '" data-id="' + escapeHtml(b.id) + '" style="background:' + c.bg + ';color:' + c.ink + '"><span class="copy"><span class="t">' + quotedTitle(b) + '</span>' + seriesLine(b) + '</span>' + year + '</button>';
 }
 function compactMeta(b){
   const bits = [];
@@ -1041,8 +1056,22 @@ function saveListenProgress(){
     if(sc) payload.scroll=sc.scrollTop|0;
   }
   if(readMode==='pages') payload.page=pageIndex;
-  saveProgress(readerBook.id, payload);
-  rememberBook(readerBook.id);
+  const s=loadStore();
+  s.progress=s.progress||{};
+  s.progress[readerBook.id]=Object.assign({}, s.progress[readerBook.id]||{}, payload);
+  s.lastBook=readerBook.id;
+  saveStore(s);
+}
+function stopProgressClock(){
+  if(listen.progressTimer){ clearInterval(listen.progressTimer); listen.progressTimer=0; }
+}
+function startProgressClock(){
+  stopProgressClock();
+  saveListenProgress();
+  listen.progressTimer=setInterval(()=>{
+    if(!listen.playing || !readerBook){ stopProgressClock(); return; }
+    saveListenProgress();
+  }, 2000);
 }
 function syncChapterButton(chapterIndex){
   const ch=$('btn-chapter');
@@ -1067,7 +1096,7 @@ function updateModeChrome(){
   root.classList.toggle('mode-autoplay', readMode==='autoplay');
   root.classList.toggle('mode-scroll', readMode==='scroll');
   root.classList.toggle('mode-pages', readMode==='pages');
-  if(readMode!=='autoplay') root.classList.remove('is-reading');
+  if(readMode!=='autoplay') setReadingFlag(false);
   document.querySelectorAll('.mode-seg [data-mode]').forEach(b=>{
     const on=b.dataset.mode===readMode;
     b.classList.toggle('on', on);
@@ -1172,6 +1201,16 @@ function paginate(book){
   const cap=pageCapacity();
   const asPage=b=>({label:b.label, html:pageHtml(b.label, b.text, b.showLabel, b.kind), startWord:b.startWord, endWord:b.endWord, chapterIndex:b.chapterIndex});
   if(!cap) return blocks.map(asPage);
+  if(document.fonts && document.fonts.status!=='loaded'){
+    if(!listen.fontsQueued){
+      listen.fontsQueued=true;
+      document.fonts.ready.then(()=>{
+        listen.fontsQueued=false;
+        if(readerBook && readMode==='pages') relayoutPages();
+      }).catch(()=>{ listen.fontsQueued=false; });
+    }
+    return blocks.map(asPage);
+  }
   const probe=document.createElement('div');
   probe.className='page-body page-measure';
   probe.style.width=cap.w+'px';
@@ -1270,6 +1309,27 @@ function relayoutPages(){
   renderPages({keepWord:true});
 }
 function turnPage(dir){
+  if(!readerBook) return;
+  if(readMode==='autoplay'){
+    const vp=$('listen-viewport');
+    const h=vp ? (vp.clientHeight||0) : 0;
+    if(!h || !listen.words.length) return;
+    const y=clampTrackY((listen.y||0) - dir*h);
+    listen.userScrolled=true;
+    listen.lineTop=null;
+    listen.targetY=y;
+    applyTrackY(y);
+    const idx=clampWord(wordNearestReadingLine());
+    listen.userScrolled=false;
+    listen.finished=false;
+    listen.index=idx;
+    paintListen();
+    listen.lineTop=null;
+    placeListen(true);
+    if(listen.playing) scheduleListen(0);
+    else saveListenProgress();
+    return;
+  }
   if(readMode!=='pages' || !pages.length) return;
   const next=pageIndex+dir;
   if(next<0 || next>=pages.length) return;
@@ -1285,6 +1345,8 @@ function setReadMode(mode){
   else if(readMode==='pages') listen.index=pageWord();
   listen.index=clampWord(listen.index);
   listen.finished=false;
+  listen.userScrolled=false;
+  listen.lineTop=null;
   readMode=mode;
   updateModeChrome();
   closeSheets();
@@ -1292,8 +1354,8 @@ function setReadMode(mode){
     if(!readerBook || readMode!==mode) return;
     if(mode==='autoplay'){
       paintListen();
-      setPlayLabel(false);
-      placeListen(true);
+      if(!listen.playing) setPlayLabel(false);
+      placeListen(!listen.playing);
       saveListenProgress();
     } else if(mode==='scroll'){
       scrollToWord(listen.index);
@@ -1348,6 +1410,8 @@ function renderTrack(){
     const inner=(byPara[p.pi]||[]).map(w=>'<span class="w" data-i="'+w.i+'">'+escapeHtml(w.text)+'</span>').join(' ');
     return '<p class="'+spClass('listen-p', p.kind)+'" data-pi="'+p.pi+'">'+inner+'</p>';
   }).join('');
+  listen.lineTops=null;
+  listen.lineTop=null;
 }
 function paintListen(){
   const w=listen.words[listen.index];
@@ -1376,57 +1440,123 @@ function paintListen(){
   const play=$('btn-play');
   if(play) play.disabled=!listen.words.length;
 }
-function placeListen(immediate){
-  const track=$('listen-track'), vp=$('listen-viewport');
-  if(!track || !vp) return;
-  const el=track.querySelector('.w.is-now') || track.querySelector('.w');
-  if(!el) return;
-  const prev=listen.y||0;
-  const drag=listen.drag||0;
-  track.style.transition='none';
-  track.style.transform='translateY('+prev+'px)';
-  const vpRect=vp.getBoundingClientRect();
-  const elRect=el.getBoundingClientRect();
-  if(!vpRect.height) return;
-  const target=vpRect.top + vpRect.height*0.34 + drag;
-  const y=prev + (target - elRect.top);
-  if(!immediate){
-    track.getBoundingClientRect();
-    track.style.transition='transform .48s cubic-bezier(.22,.61,.36,1)';
-  }
-  track.style.transform='translateY('+y+'px)';
+function prefersReducedMotion(){
+  return !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+}
+function applyTrackY(y){
+  const track=$('listen-track');
   listen.y=y;
+  if(!track) return;
+  track.style.transition='none';
+  track.style.transform='translateY('+(Math.round(y*100)/100)+'px)';
+}
+function activeListenWord(){
+  const track=$('listen-track');
+  if(!track) return null;
+  return track.querySelector('.w.is-now') || track.querySelector('.w');
+}
+function measureLineTarget(){
+  const track=$('listen-track'), vp=$('listen-viewport');
+  const el=activeListenWord();
+  if(!track || !vp || !el) return listen.y||0;
+  const vpRect=vp.getBoundingClientRect();
+  if(!vpRect.height) return listen.y||0;
+  const elRect=el.getBoundingClientRect();
+  const anchor=vpRect.top + vpRect.height*0.34;
+  return (listen.y||0) + (anchor - elRect.top);
+}
+function stopGlide(){
+  if(listen.raf){ cancelAnimationFrame(listen.raf); listen.raf=0; }
+}
+function glideFrame(now){
+  if(!listen.playing){ listen.raf=0; return; }
+  listen.raf=requestAnimationFrame(glideFrame);
+  if(prefersReducedMotion()){
+    applyTrackY(listen.targetY||0);
+    return;
+  }
+  let dt=now-(listen.glideLast||now);
+  listen.glideLast=now;
+  if(!(dt>0)) return;
+  if(dt>50) dt=50;
+  const target=listen.targetY||0;
+  const y=listen.y||0;
+  const diff=target-y;
+  if(Math.abs(diff)<0.2){
+    if(Math.abs(diff)>0.01) applyTrackY(target);
+    return;
+  }
+  const k=1-Math.exp(-dt/160);
+  applyTrackY(y+diff*k);
+}
+function ensureGlide(){
+  if(listen.raf || !listen.playing || prefersReducedMotion()) return;
+  listen.glideLast=performance.now();
+  listen.raf=requestAnimationFrame(glideFrame);
+}
+function refreshLineTops(){
+  const track=$('listen-track');
+  if(!track){ listen.lineTops=null; return; }
+  const nodes=track.querySelectorAll('.w[data-i]');
+  const tops=[];
+  for(let i=0;i<nodes.length;i++) tops[Number(nodes[i].dataset.i)]=nodes[i].offsetTop;
+  listen.lineTops=tops;
+}
+function placeListen(immediate){
+  const el=activeListenWord();
+  if(!el) return;
+  if(immediate || !listen.lineTops) refreshLineTops();
+  const idx=Number(el.dataset.i);
+  const cached=listen.lineTops && listen.lineTops[idx];
+  const top=cached==null ? el.offsetTop : cached;
+  const changed=listen.lineTop==null || Math.abs(top-listen.lineTop)>=2;
+  if(!immediate && !changed) return;
+  listen.lineTop=top;
+  const next=measureLineTarget();
+  if(!isFinite(next)) return;
+  listen.targetY=next;
+  if(immediate || !listen.playing || prefersReducedMotion()){
+    applyTrackY(next);
+    return;
+  }
+  ensureGlide();
 }
 function riseListen(){
-  if(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  const track=$('listen-track');
-  if(!track) return;
-  const y=listen.y||0;
-  track.style.transition='none';
-  track.style.transform='translateY('+(y+28)+'px)';
-  track.getBoundingClientRect();
-  track.style.transition='transform .58s cubic-bezier(.22,.61,.36,1)';
-  track.style.transform='translateY('+y+'px)';
+  if(prefersReducedMotion()) return;
+  ensureGlide();
 }
 function wordMs(text){
   const speed=getTypePrefs().speed||1;
   const base=340 + Math.min(String(text||'').length, 14)*26;
   return Math.round(Math.min(860, Math.max(320, base)) / speed);
 }
-function scheduleListen(){
+function wordElapsedFrac(){
+  const dur=listen.wordDur||0;
+  if(dur<=0) return 0;
+  return Math.min(1, Math.max(0, (performance.now()-(listen.wordStart||0))/dur));
+}
+function scheduleListen(frac){
   clearTimeout(listen.timer);
+  listen.timer=0;
   if(!listen.playing) return;
+  if(document.hidden){ pauseListen(); return; }
   const w=listen.words[listen.index];
   if(!w){ finishListen(); return; }
+  const dur=wordMs(w.text);
+  const f=(typeof frac==='number' && isFinite(frac)) ? Math.min(1, Math.max(0, frac)) : 0;
+  listen.wordDur=dur;
+  listen.wordStart=performance.now()-f*dur;
+  const remain=Math.max(0, Math.round(dur*(1-f)));
   listen.timer=setTimeout(()=>{
+    listen.timer=0;
     if(!listen.playing) return;
+    if(document.hidden){ pauseListen(); return; }
     if(listen.index>=listen.words.length-1){ finishListen(); return; }
     listen.index+=1;
     paintListen();
     placeListen(false);
-    saveListenProgress();
-    scheduleListen();
-  }, wordMs(w.text));
+    scheduleListen(0);
+  }, remain);
 }
 function setPlayLabel(playing){
   const btn=$('btn-play');
@@ -1434,31 +1564,82 @@ function setPlayLabel(playing){
   btn.setAttribute('aria-pressed', playing?'true':'false');
   btn.setAttribute('aria-label', playing?'Pause':'Play');
 }
+function setReadingFlag(on){
+  const root=$('reader');
+  if(root) root.classList.toggle('is-reading', !!on);
+  ['btn-library','btn-pdf'].forEach(id=>{
+    const el=$(id);
+    if(!el) return;
+    if(on) el.setAttribute('inert','');
+    else el.removeAttribute('inert');
+  });
+  const title=document.querySelector('#reader .listen-title');
+  if(title){
+    if(on) title.setAttribute('inert','');
+    else title.removeAttribute('inert');
+  }
+}
 function stopAutoplay(){
   listen.playing=false;
   listen.drag=0;
   clearTimeout(listen.timer);
-  const root=$('reader');
-  if(root) root.classList.remove('is-reading');
+  listen.timer=0;
+  stopProgressClock();
+  stopGlide();
+  setReadingFlag(false);
   setPlayLabel(false);
 }
+function wordNearestReadingLine(){
+  const track=$('listen-track'), vp=$('listen-viewport');
+  if(!track || !vp || !listen.words.length) return listen.index||0;
+  const vpRect=vp.getBoundingClientRect();
+  const line=vpRect.top + vpRect.height*0.34;
+  const nodes=track.querySelectorAll('.w[data-i]');
+  let best=listen.index||0, bestDist=Infinity;
+  for(let i=0;i<nodes.length;i++){
+    const r=nodes[i].getBoundingClientRect();
+    const mid=(r.top+r.bottom)/2;
+    const d=Math.abs(mid-line);
+    if(d<bestDist){ bestDist=d; best=Number(nodes[i].dataset.i); }
+  }
+  return best;
+}
+function commitScrolledWord(){
+  clearTimeout(listen.scrollCommit);
+  listen.scrollCommit=0;
+  if(readMode!=='autoplay' || !listen.userScrolled || !listen.words.length) return;
+  listen.index=clampWord(wordNearestReadingLine());
+  paintListen();
+  listen.lineTop=null;
+}
+function queueScrolledWord(){
+  clearTimeout(listen.scrollCommit);
+  listen.scrollCommit=setTimeout(commitScrolledWord, 80);
+}
 function playListen(){
-  if(readMode!=='autoplay' || !listen.words.length) return;
+  if(readMode!=='autoplay' || !listen.words.length || document.hidden) return;
+  clearTimeout(listen.scrollCommit);
+  listen.scrollCommit=0;
   if(listen.finished){
     listen.finished=false;
     listen.index=0;
+    listen.userScrolled=false;
+    paintListen();
+  } else if(listen.userScrolled){
+    listen.index=clampWord(wordNearestReadingLine());
+    listen.userScrolled=false;
+    listen.lineTop=null;
     paintListen();
   }
   listen.playing=true;
   listen.drag=0;
-  const root=$('reader');
-  if(root) root.classList.add('is-reading');
+  setReadingFlag(true);
   setPlayLabel(true);
   closeSheets();
   placeListen(true);
   riseListen();
-  scheduleListen();
-  saveListenProgress();
+  scheduleListen(0);
+  startProgressClock();
 }
 function pauseListen(){
   stopAutoplay();
@@ -1475,8 +1656,10 @@ function seekListen(index){
   listen.index=Math.max(0, Math.min(listen.words.length-1, index|0));
   paintListen();
   const reading=$('reader') && $('reader').classList.contains('is-reading');
+  listen.userScrolled=false;
+  listen.lineTop=null;
   placeListen(!reading);
-  if(listen.playing) scheduleListen();
+  if(listen.playing) scheduleListen(0);
   saveListenProgress();
 }
 function renderChapterSheet(){
@@ -1562,10 +1745,18 @@ function mountOpened(b, opts){
   if(!b || !liveBook(b) || isDeadTvnId(b.id)){ landOnTvnShelf(); return; }
   opts=opts||{};
   clearTimeout(listen.timer);
+  listen.timer=0;
+  stopGlide();
+  stopProgressClock();
+  clearTimeout(listen.scrollCommit);
+  listen.scrollCommit=0;
   listen.playing=false;
   listen.finished=false;
+  listen.userScrolled=false;
+  listen.lineTop=null;
   listen.drag=0;
   listen.y=0;
+  listen.targetY=0;
   pages=[];
   pageIndex=0;
   readerBook=b;
@@ -1585,7 +1776,7 @@ function mountOpened(b, opts){
   setPlayLabel(false);
   updateModeChrome();
   const root=$('reader');
-  root.classList.remove('is-reading');
+  setReadingFlag(false);
   root.classList.add('open');
   document.body.classList.add('reader-open');
   if(!opts.keepSheet) closeSheets();
@@ -1601,7 +1792,7 @@ function mountOpened(b, opts){
       scrollToWord(listen.index);
       syncChapterButton();
       saveListenProgress();
-    } else placeListen(true);
+    } else placeListen(!listen.playing);
     if(opts.keepSheet){
       renderChapterSheet();
       const sheet=$('chapter-sheet');
@@ -1660,32 +1851,111 @@ function toggleSheet(id, btnId){
     if(btn) btn.setAttribute('aria-expanded','true');
   }
 }
+function clampTrackY(y){
+  const track=$('listen-track'), vp=$('listen-viewport');
+  if(!track || !vp) return y;
+  const h=vp.clientHeight||0;
+  const th=track.scrollHeight||track.offsetHeight||0;
+  const max=h*0.34;
+  const min=h*0.34 - Math.max(th, h);
+  if(y>max) return max;
+  if(y<min) return min;
+  return y;
+}
+function armStageBlock(){
+  listen.blockStageToggle=true;
+  clearTimeout(listen.blockTimer);
+}
+function releaseStageBlock(){
+  if(!listen.blockStageToggle) return;
+  clearTimeout(listen.blockTimer);
+  listen.blockTimer=setTimeout(()=>{ listen.blockStageToggle=false; }, 600);
+}
 function bindListenDrag(){
   const vp=$('listen-viewport');
   if(!vp || vp.dataset.bound) return;
   vp.dataset.bound='1';
-  let active=false, startY=0, startDrag=0;
-  vp.addEventListener('pointerdown', e=>{
-    if(!$('reader') || !$('reader').classList.contains('is-reading')) return;
-    if(e.target.closest && e.target.closest('button, .listen-sheet')) return;
-    active=true;
-    startY=e.clientY;
-    startDrag=listen.drag||0;
-    try{ vp.setPointerCapture(e.pointerId); }catch(err){}
-  });
-  vp.addEventListener('pointermove', e=>{
-    if(!active) return;
-    const next=startDrag+(e.clientY-startY);
-    listen.drag=Math.max(-160, Math.min(160, next));
-    placeListen(true);
-  });
-  const end=()=>{
-    if(!active) return;
-    active=false;
-    if(listen.playing){ listen.drag=0; placeListen(false); }
+  let gesture=null;
+  const pointOf=e=>{
+    if(e.touches && e.touches.length) return e.touches[0];
+    if(e.changedTouches && e.changedTouches.length) return e.changedTouches[0];
+    return e;
   };
+  const begin=(e, kind)=>{
+    if(readMode!=='autoplay' || !$('reader') || !$('reader').classList.contains('open')) return;
+    if(e.target && e.target.closest && e.target.closest('button, a, .listen-sheet')) return;
+    if(gesture) return;
+    const pt=pointOf(e);
+    gesture={kind:kind, id:e.pointerId, x:pt.clientX, y:pt.clientY, origin:listen.y||0, moved:false};
+    if(kind==='pointer'){ try{ vp.setPointerCapture(e.pointerId); }catch(err){} }
+    if(listen.playing){
+      pauseListen();
+      armStageBlock();
+    }
+  };
+  const move=e=>{
+    if(!gesture) return;
+    if(gesture.kind==='pointer' && e.pointerId!=null && e.pointerId!==gesture.id) return;
+    const pt=pointOf(e);
+    const dx=pt.clientX-gesture.x, dy=pt.clientY-gesture.y;
+    if(!gesture.moved && Math.hypot(dx, dy)>=10){
+      gesture.moved=true;
+      listen.userScrolled=true;
+      listen.lineTop=null;
+      if(listen.playing) pauseListen();
+      armStageBlock();
+    }
+    if(!gesture.moved) return;
+    const y=clampTrackY(gesture.origin+dy);
+    listen.targetY=y;
+    applyTrackY(y);
+    if(e.cancelable) e.preventDefault();
+  };
+  const end=e=>{
+    if(!gesture) return;
+    if(gesture.kind==='pointer' && e.pointerId!=null && e.pointerId!==gesture.id) return;
+    const moved=gesture.moved;
+    gesture=null;
+    if(moved){
+      listen.userScrolled=true;
+      queueScrolledWord();
+    }
+    releaseStageBlock();
+  };
+  vp.addEventListener('pointerdown', e=>begin(e, 'pointer'));
+  vp.addEventListener('pointermove', move);
   vp.addEventListener('pointerup', end);
   vp.addEventListener('pointercancel', end);
+  vp.addEventListener('touchstart', e=>begin(e, 'touch'), {passive:true});
+  vp.addEventListener('touchmove', move, {passive:false});
+  vp.addEventListener('touchend', e=>{
+    if((gesture || listen.blockStageToggle) && e.cancelable) e.preventDefault();
+    end(e);
+  }, {passive:false});
+  vp.addEventListener('touchcancel', end);
+  vp.addEventListener('wheel', e=>{
+    if(readMode!=='autoplay' || !$('reader') || !$('reader').classList.contains('open')) return;
+    if(e.cancelable) e.preventDefault();
+    let dy=e.deltaY;
+    if(e.deltaMode===1) dy*=16;
+    else if(e.deltaMode===2) dy*=(vp.clientHeight||480);
+    if(listen.playing){
+      pauseListen();
+      armStageBlock();
+      releaseStageBlock();
+    }
+    listen.userScrolled=true;
+    listen.lineTop=null;
+    const y=clampTrackY((listen.y||0)-dy);
+    listen.targetY=y;
+    applyTrackY(y);
+    queueScrolledWord();
+  }, {passive:false});
+}
+function onReaderBackground(){
+  if(listen.userScrolled) commitScrolledWord();
+  if(readMode==='autoplay' && listen.playing) pauseListen();
+  else if(readerBook) saveListenProgress();
 }
 function mountListenMark(){
   const mark=$('listen-mark');
@@ -1792,6 +2062,7 @@ if($('reader')) $('reader').addEventListener('click', e=>{
   if(e.target.closest && e.target.closest('#btn-edit, #btn-speed, #btn-chapter, #btn-play, #btn-library, #btn-pdf, .listen-sheet, #listen-progress, .mode-seg, .reader-edge')) return;
   if(sheetsOpen()){ closeSheets(); return; }
   if(readMode==='autoplay' && e.target.closest && e.target.closest('.listen-stage')){
+    if(listen.blockStageToggle){ listen.blockStageToggle=false; return; }
     if(listen.playing) pauseListen(); else playListen();
   }
 });
@@ -1836,14 +2107,23 @@ window.addEventListener('keydown', e=>{
   }
 });
 let resizeTimer=0;
-window.addEventListener('resize', ()=>{
+function scheduleReaderLayout(){
   if(!readerBook || !$('reader') || !$('reader').classList.contains('open')) return;
   clearTimeout(resizeTimer);
   resizeTimer=setTimeout(()=>{
+    resizeTimer=0;
+    if(!readerBook || !$('reader') || !$('reader').classList.contains('open')) return;
     if(readMode==='autoplay') placeListen(true);
     else if(readMode==='pages') relayoutPages();
-  }, 60);
+  }, 80);
+}
+window.addEventListener('resize', scheduleReaderLayout);
+window.addEventListener('orientationchange', scheduleReaderLayout);
+if(window.visualViewport) window.visualViewport.addEventListener('resize', scheduleReaderLayout);
+document.addEventListener('visibilitychange', ()=>{
+  if(document.visibilityState==='hidden') onReaderBackground();
 });
+window.addEventListener('pagehide', onReaderBackground);
 window.addEventListener('popstate', ()=>{
   const id=(location.hash||'').replace(/^#\//,'');
   if(openFallbackStory(id)) return;
