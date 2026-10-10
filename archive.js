@@ -901,7 +901,7 @@ function bindAudio(a, st, srcs, autoplay){
     const src=srcs[i++]; label();
     const play=()=>{ if(autoplay) a.play().catch(next); };
     if(src.indexOf('/api/audio')===0){
-      fetch(src,{cache:'no-store'}).then(r=>{ if(r.status===401){ location.href='/enter?next=/listen'; throw new Error('member'); } return r.json(); }).then(d=>{ if(!d||!d.url) throw new Error('no url'); a.src=d.url; play(); }).catch(err=>{ if(String(err.message)==='member') return; next(); });
+      fetch(src,{cache:'no-store'}).then(r=>{ if(r.status===401){ if(st) st.innerHTML='Listening is for members. <a href="/enter?next=/listen">Enter</a>'; throw new Error('member'); } return r.json(); }).then(d=>{ if(!d||!d.url) throw new Error('no url'); a.src=d.url; play(); }).catch(err=>{ if(String(err.message)==='member') return; next(); });
       return;
     }
     a.src=src; play();
