@@ -1,5 +1,5 @@
-/* Offline cache. v7 drops veiled TVN PDFs from precache and 404s them, and deletes v6 copies on activate. v6 refreshes the shell for veiled TVN rows and d.b.j. branding. v5 swaps in short-title TVN PDFs (same paths). v4 adds the Helmet keeper PDF. v3 dropped cached cleanUrls redirects from v2. Activate deletes every cache except this one. */
-const CACHE = 'dglxss-archive-sw-v7';
+/* Offline cache. v8 refreshes the shell for painterly veil art. v7 drops veiled TVN PDFs from precache and 404s them, and deletes v6 copies on activate. v6 refreshes the shell for veiled TVN rows and d.b.j. branding. v5 swaps in short-title TVN PDFs (same paths). v4 adds the Helmet keeper PDF. v3 dropped cached cleanUrls redirects from v2. Activate deletes every cache except this one. */
+const CACHE = 'dglxss-archive-sw-v8';
 const PRECACHE = [
   "/",
   "/archive.js",
