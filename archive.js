@@ -439,8 +439,21 @@ function cardSwatch(b){
   }
   return CARD_SWATCHES[(h>>>0) % CARD_SWATCHES.length];
 }
+function shelfRank(b){
+  const sec=sectionLabel(b);
+  if(sec.indexOf('Quantum Frontier')===0) return 0;
+  if(sec===TVN_SERIES) return 1;
+  return 2;
+}
+function orderShelf(list){
+  const first={};
+  list.forEach((b,i)=>{ const k=sectionLabel(b)||('\u0000'+i); if(!(k in first)) first[k]=i; });
+  return list.map((b,i)=>({b:b,i:i,k:sectionLabel(b)||('\u0000'+i)}))
+    .sort((x,y)=>(shelfRank(x.b)-shelfRank(y.b)) || (first[x.k]-first[y.k]) || ((isVeiled(x.b)?1:0)-(isVeiled(y.b)?1:0)) || (x.i-y.i))
+    .map(x=>x.b);
+}
 function shelfBooks(){
-  const base = BOOKS.filter(liveBook);
+  const base = orderShelf(BOOKS.filter(liveBook));
   const q = shelfQuery.trim().toLowerCase();
   if(!q) return base;
   return base.filter(b=>{
@@ -906,7 +919,7 @@ function pageHtml(label, text, showLabel, kind, cont){
   const cls=[spClass('', kind).trim(), cont?'pg-cont':''].filter(Boolean).join(' ');
   const attr=cls?(' class="'+cls+'"'):'';
   const body=String(text||'').split(/\n\n+/).filter(Boolean).map(p=>'<p'+attr+'>'+escapeHtml(p)+'</p>').join('');
-  return (showLabel?'<div class="pg-label">'+escapeHtml(label)+'</div>':'')+(body||'<p>\u2014</p>');
+  return (showLabel?'<div class="pg-label"><span>'+escapeHtml(label)+'</span></div>':'')+(body||'<p>\u2014</p>');
 }
 function pageCapacity(){
   const host=$('page-body'), reader=$('reader');
@@ -918,8 +931,7 @@ function pageCapacity(){
   let lh=parseFloat(cs.lineHeight);
   if(!lh || !isFinite(lh)) lh=(parseFloat(cs.fontSize)||16)*1.6;
   const content=Math.max(0, h-padT-padB);
-  const usable=Math.floor(content/lh)*lh;
-  return {w:w, h:h, lh:lh, limit:padT+padB+usable};
+  return {w:w, h:h, lh:lh, limit:padT+padB+content};
 }
 function emptyPage(){
   return [{label:readerBook?readerBook.title:'', html:'<p>\u2014</p>', startWord:0, endWord:0, chapterIndex:0}];
@@ -998,7 +1010,7 @@ function paginate(book){
       return best;
     };
     const widowOrphan=(words, best, kind, cont)=>{
-      if(best>=words.length) return words.length;
+      return Math.min(best, words.length);
       let k=best;
       while(k>0){
         const kept=linesOf(words.slice(0, k).join(' '), kind, cont);
@@ -1116,7 +1128,7 @@ function pageOverBudget(html){
   const padT=parseFloat(cs.paddingTop)||0, padB=parseFloat(cs.paddingBottom)||0;
   let lh=parseFloat(cs.lineHeight);
   if(!lh || !isFinite(lh)) lh=(parseFloat(cs.fontSize)||16)*1.6;
-  const budget=Math.floor(Math.max(0, host.clientHeight-padT-padB)/lh)*lh;
+  const budget=Math.max(0, host.clientHeight-padT-padB);
   const top=host.getBoundingClientRect().top+padT;
   let bot=top;
   for(const el of host.children){
