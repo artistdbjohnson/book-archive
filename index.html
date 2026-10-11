@@ -295,6 +295,14 @@ body.reader-open{overflow:hidden}
   .is-veiled.veil-ph > .veil-art{filter:blur(8px)}
   .is-veiled.veil-ph::after{background:linear-gradient(115deg,rgba(255,255,255,.3),rgba(255,255,255,0) 55%),rgba(244,238,228,.38)}
 }
+.book-grid > .grid-section{grid-column:1/-1;margin:6px 0 0;padding:14px 4px;border-radius:0}
+.book-grid > .sec-body{display:contents}
+.book-grid > .sec-body.is-collapsed{display:none}
+.veil-sec{flex-direction:column;gap:7px;padding-top:4px}
+.veil-stroke-h{display:block;height:11px;width:min(58%,260px);border-radius:999px;background:radial-gradient(ellipse at 30% 50%,rgba(138,95,49,.32),rgba(27,45,107,.2) 70%);filter:blur(2.5px)}
+.veil-stroke-h.sm{height:7px;width:min(38%,180px);opacity:.6}
+.veil-sec-h{position:relative}
+.veil-sec-h::before{content:"";position:absolute;inset:6px 4px;border-radius:10px;pointer-events:none;background:linear-gradient(115deg,rgba(255,255,255,.34),rgba(255,255,255,0) 55%),rgba(251,246,238,.22);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);border:1px solid rgba(0,0,0,.05)}
 </style>
 </head>
 <body class="is-list">
