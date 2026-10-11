@@ -60,8 +60,8 @@ body.is-detail .list-view,body.is-detail .gallery,body.is-detail .book-grid,body
 body.is-grid:not(.is-detail) .book-grid{display:grid}
 body.is-rows:not(.is-detail) .row-view{display:block}
 body.is-grid .list-view,body.is-rows .list-view,body.is-grid .gallery,body.is-rows .gallery{display:none}
-.book-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;padding:16px 16px 56px;align-items:stretch;width:100%;max-width:720px;margin:0 auto}
-.book-card{position:relative;display:flex;flex-direction:column;justify-content:space-between;aspect-ratio:3/4.05;min-width:0;border:0;border-radius:8px;padding:12px 10px 10px;text-align:left;font-family:inherit;cursor:pointer;overflow:hidden;-webkit-tap-highlight-color:transparent}
+.book-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;padding:16px 16px 56px;align-items:start;width:100%;max-width:720px;margin:0 auto}
+.book-card{position:relative;box-sizing:border-box;width:100%;max-width:100%;display:flex;flex-direction:column;justify-content:space-between;aspect-ratio:3/4.05;min-width:0;border:0;border-radius:8px;padding:12px 10px 10px;text-align:left;font-family:inherit;cursor:pointer;overflow:hidden;-webkit-tap-highlight-color:transparent}
 .book-card .copy{display:flex;flex-direction:column;min-width:0;min-height:0;flex:1 1 auto}
 .book-card .t{font-size:12px;font-weight:600;line-height:1.28;letter-spacing:-.02em;display:-webkit-box;-webkit-line-clamp:6;-webkit-box-orient:vertical;overflow:hidden}
 .book-card .s{margin-top:6px;font-size:10px;font-weight:400;line-height:1.35;letter-spacing:0;opacity:.72;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -282,6 +282,14 @@ body.reader-open{overflow:hidden}
   .is-veiled > *{filter:blur(7px)}
   .is-veiled::after{background:linear-gradient(115deg,rgba(255,255,255,.4),rgba(255,255,255,0) 55%),rgba(244,238,228,.94)}
 }
+.veil-ph{cursor:default}
+.veil-bar{display:block;height:9px;border-radius:5px;background:currentColor;opacity:.32;margin:3px 0;max-width:100%}
+.veil-bar.sm{height:6px;opacity:.2}
+.list-row.veil-ph .t,.row.veil-ph .t{display:flex;align-items:center;min-height:16px}
+.book-card.veil-ph{background:#e9e1d3;color:#1c1a16}
+.compact-row.veil-ph{align-items:center}
+.compact-row.veil-ph .copy{flex:1 1 auto}
+.compact-row.veil-ph > .veil-bar{flex:0 0 auto}
 </style>
 </head>
 <body class="is-list">
@@ -407,7 +415,14 @@ body.reader-open{overflow:hidden}
 <script>
 if('serviceWorker' in navigator){
   window.addEventListener('load', function(){
-    navigator.serviceWorker.register('/sw.js');
+    navigator.serviceWorker.register('/sw.js', {updateViaCache:'none'}).catch(function(){}).then(function(reg){ if(reg) try{ reg.update().catch(function(){}); }catch(e){} });
+  });
+  navigator.serviceWorker.ready.catch(function(){});
+  var hadController = !!navigator.serviceWorker.controller;
+  navigator.serviceWorker.addEventListener('controllerchange', function(){
+    if(!hadController){ hadController = true; return; }
+    try{ if(sessionStorage.getItem('sw-reloaded')) return; sessionStorage.setItem('sw-reloaded','1'); }catch(e){}
+    location.reload();
   });
 }
 </script>
