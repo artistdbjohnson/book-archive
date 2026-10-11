@@ -756,21 +756,44 @@ function closeBook(){
   window.scrollTo(0,0);
   if(location.hash) history.pushState({}, '', location.pathname);
 }
-function veilBars(b, n){
+const VEIL_PIGMENTS=['138,95,49','28,26,22','27,45,107','227,106,74','197,208,194','232,196,58','90,74,58','58,111,212'];
+function veilRand(b){
   const seed=String(b&&b.id||'');
-  let h=7; for(let i=0;i<seed.length;i++) h=(h*31+seed.charCodeAt(i))>>>0;
-  const w=[];
-  for(let i=0;i<n;i++){ w.push(38+((h>>(i*5))%46)); }
-  return w;
+  let h=2166136261; for(let i=0;i<seed.length;i++){ h^=seed.charCodeAt(i); h=Math.imul(h,16777619); }
+  return ()=>{ h=(h+0x6D2B79F5)>>>0; let t=h; t=Math.imul(t^t>>>15,t|1); t^=t+Math.imul(t^t>>>7,t|61); return ((t^t>>>14)>>>0)/4294967296; };
+}
+function veilArtHtml(b, kind){
+  const r=veilRand(b);
+  const pick=()=>VEIL_PIGMENTS[Math.floor(r()*VEIL_PIGMENTS.length)];
+  const blobs=[];
+  const nb=2+Math.floor(r()*2);
+  for(let i=0;i<nb;i++){
+    const x=Math.round(r()*100), y=Math.round(r()*100), sz=Math.round(38+r()*44), a=(0.16+r()*0.16).toFixed(2);
+    blobs.push('radial-gradient(ellipse '+sz+'% '+Math.round(sz*(0.7+r()*0.8))+'% at '+x+'% '+y+'%,rgba('+pick()+','+a+'),rgba('+pick()+',0) 70%)');
+  }
+  const ink=pick();
+  const card=kind==='card';
+  const n=card?3+Math.floor(r()*2):2;
+  let strokes='';
+  let top=card?14+r()*10:24+r()*10;
+  for(let i=0;i<n;i++){
+    const w=Math.round((i===n-1?22:42)+r()*(i===n-1?20:40));
+    const left=Math.round((card?8:4)+r()*(card?6:10));
+    const hgt=card?(i===0?11:7):(i===0?10:6);
+    const tilt=(r()*3-1.5).toFixed(1);
+    const a=(i===0?0.34:0.2+r()*0.1).toFixed(2);
+    strokes+='<span class="veil-stroke" style="top:'+top.toFixed(1)+'%;left:'+left+'%;width:'+w+'%;height:'+hgt+'px;transform:rotate('+tilt+'deg);background:rgba('+(r()<0.6?ink:pick())+','+a+')"></span>';
+    top+=card?(i===0?16:11)+r()*6:(i===0?30:20)+r()*8;
+  }
+  return '<span class="veil-art" aria-hidden="true" style="background:'+blobs.join(',')+',#efe7da">'+strokes+'</span>';
 }
 function veilRowHtml(b, kind){
-  const w=veilBars(b,3);
   const id=escapeHtml(b.id);
-  const bar=(pct,cls)=>'<span class="veil-bar'+(cls?' '+cls:'')+'" style="width:'+pct+'%"></span>';
-  if(kind==='card') return '<div class="book-card veil-ph" data-id="'+id+'"><span class="copy">'+bar(w[0]+14)+bar(w[1])+bar(w[2]*0.6,'sm')+'</span>'+bar(30,'sm')+'</div>';
-  if(kind==='compact') return '<div class="compact-row veil-ph" data-id="'+id+'"><span class="copy">'+bar(w[0])+bar(w[1]*0.7,'sm')+'</span>'+bar(18,'sm')+'</div>';
-  if(kind==='rail') return '<div class="row veil-ph" data-id="'+id+'"><div class="t">'+bar(w[0])+'</div><div class="m">'+bar(w[1]*0.7,'sm')+'</div></div>';
-  return '<div class="list-row veil-ph" data-id="'+id+'"><div><div class="t">'+bar(w[0])+'</div><div class="m">'+bar(w[1]*0.8,'sm')+'</div></div></div>';
+  const art=veilArtHtml(b, kind);
+  if(kind==='card') return '<div class="book-card veil-ph" data-id="'+id+'">'+art+'</div>';
+  if(kind==='compact') return '<div class="compact-row veil-ph" data-id="'+id+'">'+art+'</div>';
+  if(kind==='rail') return '<div class="row veil-ph" data-id="'+id+'">'+art+'</div>';
+  return '<div class="list-row veil-ph" data-id="'+id+'">'+art+'</div>';
 }
 function renderShelf(){
   const books=shelfBooks();

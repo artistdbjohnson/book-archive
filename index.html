@@ -282,14 +282,19 @@ body.reader-open{overflow:hidden}
   .is-veiled > *{filter:blur(7px)}
   .is-veiled::after{background:linear-gradient(115deg,rgba(255,255,255,.4),rgba(255,255,255,0) 55%),rgba(244,238,228,.94)}
 }
-.veil-ph{cursor:default}
-.veil-bar{display:block;height:9px;border-radius:5px;background:currentColor;opacity:.32;margin:3px 0;max-width:100%}
-.veil-bar.sm{height:6px;opacity:.2}
-.list-row.veil-ph .t,.row.veil-ph .t{display:flex;align-items:center;min-height:16px}
-.book-card.veil-ph{background:#e9e1d3;color:#1c1a16}
-.compact-row.veil-ph{align-items:center}
-.compact-row.veil-ph .copy{flex:1 1 auto}
-.compact-row.veil-ph > .veil-bar{flex:0 0 auto}
+.veil-ph{cursor:default;position:relative;overflow:hidden}
+.list-row.veil-ph,.compact-row.veil-ph,.row.veil-ph{min-height:68px}
+.book-card.veil-ph{background:#efe7da;padding:0}
+.veil-art{position:absolute;inset:3px 6px;border-radius:10px;overflow:hidden;display:block}
+.book-card .veil-art{inset:0;border-radius:8px}
+.veil-art::before{content:"";position:absolute;inset:0;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .35 0 0 0 0 .28 0 0 0 0 .2 0 0 0 .55 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");background-size:160px 160px;opacity:.22;mix-blend-mode:multiply}
+.veil-stroke{position:absolute;display:block;border-radius:999px;filter:blur(1.5px)}
+.is-veiled.veil-ph > .veil-art{filter:blur(3px);opacity:1}
+.is-veiled.veil-ph::after{background:linear-gradient(115deg,rgba(255,255,255,.34) 0%,rgba(255,255,255,.05) 40%,rgba(255,255,255,0) 55%,rgba(255,255,255,.12) 80%),rgba(251,246,238,.24);-webkit-backdrop-filter:blur(10px) saturate(125%);backdrop-filter:blur(10px) saturate(125%)}
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
+  .is-veiled.veil-ph > .veil-art{filter:blur(8px)}
+  .is-veiled.veil-ph::after{background:linear-gradient(115deg,rgba(255,255,255,.3),rgba(255,255,255,0) 55%),rgba(244,238,228,.38)}
+}
 </style>
 </head>
 <body class="is-list">
