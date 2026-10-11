@@ -278,6 +278,7 @@ body.reader-open{overflow:hidden}
   -webkit-backdrop-filter:blur(14px) saturate(140%);backdrop-filter:blur(14px) saturate(140%);
   border:1px solid rgba(0,0,0,.06);box-shadow:inset 0 1px 0 rgba(255,255,255,.6),inset 0 -1px 0 rgba(0,0,0,.03),0 1px 2px rgba(0,0,0,.03)}
 .book-card.is-veiled::after{inset:0;border-radius:8px}
+.book-grid > .book-card{width:100%;min-width:0;max-width:100%;justify-self:stretch}
 @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
   .is-veiled > *{filter:blur(7px)}
   .is-veiled::after{background:linear-gradient(115deg,rgba(255,255,255,.4),rgba(255,255,255,0) 55%),rgba(244,238,228,.94)}
