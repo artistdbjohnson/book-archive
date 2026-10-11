@@ -246,9 +246,11 @@ body.reader-open{overflow:hidden}
 .list-section.is-collapsed::after,.list-rail .section.is-collapsed::after{content:'+'}
 .sec-body.is-collapsed{display:none}
 @media(min-width:900px){
-  body.is-list main,body.is-detail main{display:grid;grid-template-columns:240px 1fr}
+  body.is-detail main{display:grid;grid-template-columns:240px 1fr}
   .list-rail{display:block;border-right:1px solid var(--line);overflow:auto}
-  body.is-list .list-view,body.is-detail .list-view{display:none}
+  body.is-detail .list-view{display:none}
+  body.is-list:not(.is-detail) .list-view{display:block;grid-column:1/-1}
+  body.is-list:not(.is-detail) .list-rail{display:none}
   body.is-list .detail,body.is-detail .detail{display:block}
   .back-shelf{display:none}
   .list-rail .row{padding:16px 18px;border-bottom:1px solid var(--line);cursor:pointer}
@@ -310,6 +312,22 @@ body.reader-open{overflow:hidden}
 .book-grid > .grid-section{grid-column:1/-1;margin:4px 0 2px;padding:16px 16px;border:1px solid var(--line);border-radius:10px;background:#efe7da;align-items:center;min-height:64px}
 .book-grid > .grid-section:not(.is-collapsed){background:#f6f0e6}
 .book-grid > .grid-section .m{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.folder-shelf{display:grid;grid-template-columns:1fr;gap:10px;padding:16px 16px 56px;max-width:900px;margin:0 auto}
+@media(min-width:700px){.folder-shelf{grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;padding:24px}}
+.folder-tile{position:relative;display:flex;align-items:center;gap:14px;width:100%;min-height:76px;padding:16px 18px;border:1px solid var(--line);border-radius:12px;background:#f6f0e6;text-align:left;font-family:inherit;color:inherit;cursor:pointer;overflow:hidden}
+.folder-tile .sec-copy{display:flex;flex-direction:column;min-width:0;flex:1 1 auto}
+.folder-tile .t{font-size:15px;font-weight:700;letter-spacing:-.02em}
+.folder-tile .m{font-size:11px;color:var(--muted);margin-top:4px}
+.folder-ic{flex:0 0 auto;width:30px;height:24px;border-radius:3px 6px 6px 6px;background:#d9c7a6;position:relative}
+.folder-ic::before{content:"";position:absolute;left:0;top:-5px;width:13px;height:6px;border-radius:3px 3px 0 0;background:#d9c7a6}
+.folder-n{flex:0 0 auto;font-size:12px;color:var(--muted)}
+.folder-n::after{content:"\203A";font-size:18px}
+.is-veil-folder .folder-ic{opacity:.5;filter:blur(1px)}
+.folder-back{display:block;margin:14px 16px 0;padding:10px 0;min-height:44px;border:0;background:transparent;font-family:inherit;font-size:12px;color:var(--muted);cursor:pointer}
+.folder-head{padding:6px 20px 14px;border-bottom:1px solid var(--line)}
+.folder-head .t{font-size:18px;font-weight:700;letter-spacing:-.02em;display:block}
+.folder-head .m{font-size:11px;color:var(--muted);display:block;margin-top:4px}
+.folder-head .veil-sec{display:flex}
 </style>
 </head>
 <body class="is-list">

@@ -279,6 +279,7 @@ const CARD_SWATCHES = [
   {bg:'#8d4e45', ink:'#fbf6ee'}
 ];
 let shelfQuery = '';
+let openFolder = null;
 const TVN_SERIES = 'A Thin Veiled Night';
 const CUT_IDS = {
   'tvn-the-3-10-shift':1,
@@ -579,9 +580,28 @@ function renderShelf(){
   const books=shelfBooks();
   const empty = !!shelfQuery.trim() && !books.length;
 
-  $('list-view').innerHTML = empty ? emptyShelf() : withSections(books, b=>isVeiled(b)?veilRowHtml(b,'list'):`<div class="list-row ${isSoon(b)?'soon':''}" data-id="${b.id}"><div><div class="t">${listTitle(b)}</div><div class="m">${rowMeta(b, b.subtitle|| (b.year+' \u00b7 '+b.type))}</div></div></div>`, (sec,collapsed)=>`<button type="button" class="list-section ${collapsed?'is-collapsed':''}" data-sec="${sec}">${sectionHead(sec)}</button>`);
-  $('list-view').querySelectorAll('.list-row').forEach(el=>{ el.onclick=()=>showBook(el.dataset.id); });
-  bindCollapse($('list-view'));
+  const rowOf=b=>isVeiled(b)?veilRowHtml(b,'list'):`<div class="list-row ${isSoon(b)?'soon':''}" data-id="${b.id}"><div><div class="t">${listTitle(b)}</div><div class="m">${rowMeta(b, b.subtitle|| (b.year+' \u00b7 '+b.type))}</div></div></div>`;
+  const lv=$('list-view');
+  if(empty) lv.innerHTML=emptyShelf();
+  else if(shelfQuery.trim()) lv.innerHTML=books.map(rowOf).join('');
+  else {
+    const groups=[], by={};
+    books.forEach(b=>{ const k=sectionLabel(b)||'\u2063veil-misc'; if(!by[k]){ by[k]=[]; groups.push(k); } by[k].push(b); });
+    if(openFolder && !by[openFolder]) openFolder=null;
+    if(openFolder){
+      lv.innerHTML='<button type="button" class="folder-back" id="folder-back">\u2190 All folders</button><div class="folder-head">'+sectionHead(openFolder)+'</div>'+by[openFolder].map(rowOf).join('');
+    } else {
+      lv.innerHTML='<div class="folder-shelf">'+groups.map(k=>{
+        const veil=k.indexOf('\u2063veil-')===0;
+        const n=by[k].length;
+        const inner=veil?sectionHead(k):'<span class="sec-copy"><span class="t">'+escapeHtml(k.split(' \u00b7 ')[0])+'</span><span class="m">'+escapeHtml((k.split(' \u00b7 ')[1]?k.split(' \u00b7 ')[1]+' \u00b7 ':'')+n+(n===1?' work':' works'))+'</span></span>';
+        return '<button type="button" class="folder-tile'+(veil?' veil-sec-h is-veil-folder':'')+'" data-folder="'+escapeHtml(k)+'"><span class="folder-ic" aria-hidden="true"></span>'+inner+'<span class="folder-n">'+(veil?'':n)+'</span></button>';
+      }).join('')+'</div>';
+    }
+  }
+  lv.querySelectorAll('.list-row').forEach(el=>{ el.onclick=()=>showBook(el.dataset.id); });
+  lv.querySelectorAll('.folder-tile').forEach(el=>{ el.onclick=()=>{ openFolder=el.dataset.folder; renderShelf(); window.scrollTo(0,0); }; });
+  const fb=$('folder-back'); if(fb) fb.onclick=()=>{ openFolder=null; renderShelf(); window.scrollTo(0,0); };
   $('list-rail').innerHTML = empty ? '' : withSections(books, b=>isVeiled(b)?veilRowHtml(b,'rail'):`<div class="row ${b.id===selected?'on':''}" data-id="${b.id}"><div class="t">${listTitle(b)}</div><div class="m">${rowMeta(b, b.subtitle||b.type)}</div></div>`, (sec,collapsed)=>`<button type="button" class="section ${collapsed?'is-collapsed':''}" data-sec="${sec}">${sectionHead(sec)}</button>`);
   $('list-rail').querySelectorAll('.row').forEach(el=> el.onclick=()=>showBook(el.dataset.id));
   bindCollapse($('list-rail'));
@@ -593,7 +613,7 @@ function renderShelf(){
   }
   const rows=$('row-view');
   if(rows){
-    rows.innerHTML = empty ? emptyShelf() : withSections(books, b=>isVeiled(b)?veilRowHtml(b,'compact'):compactRowHtml(b), (sec,collapsed)=>`<button type="button" class="list-section row-section ${collapsed?'is-collapsed':''}" data-sec="${sec}">${sectionHead(sec)}</button>`);
+    rows.innerHTML = empty ? emptyShelf() : books.slice().map((b,i)=>({b:b,i:i,r:isVeiled(b)?(shelfRank(b)<2?1:2):0})).sort((x,y)=>(x.r-y.r)||(x.i-y.i)).map(x=>isVeiled(x.b)?veilRowHtml(x.b,'compact'):compactRowHtml(x.b)).join('');
     rows.querySelectorAll('.compact-row').forEach(el=>{ el.onclick=()=>showBook(el.dataset.id); });
     bindCollapse(rows);
   }
