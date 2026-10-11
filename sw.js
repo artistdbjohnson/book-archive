@@ -1,5 +1,5 @@
-/* Offline cache. v6 refreshes the shell for veiled TVN rows and d.b.j. branding. v5 swaps in short-title TVN PDFs (same paths). v4 adds the Helmet keeper PDF. v3 dropped cached cleanUrls redirects from v2. Activate deletes every cache except this one. */
-const CACHE = 'dglxss-archive-sw-v6';
+/* Offline cache. v7 drops veiled TVN PDFs from precache and 404s them, and deletes v6 copies on activate. v6 refreshes the shell for veiled TVN rows and d.b.j. branding. v5 swaps in short-title TVN PDFs (same paths). v4 adds the Helmet keeper PDF. v3 dropped cached cleanUrls redirects from v2. Activate deletes every cache except this one. */
+const CACHE = 'dglxss-archive-sw-v7';
 const PRECACHE = [
   "/",
   "/archive.js",
@@ -10,27 +10,6 @@ const PRECACHE = [
   "/pdfs/tvn-01-the-hills-above-allentown-study.pdf",
   "/pdfs/tvn-01-the-hills-above-allentown-teleplay.pdf",
   "/pdfs/tvn-01-the-hills-above-allentown.pdf",
-  "/pdfs/tvn-03-the-board-at-pen-argyl-study.pdf",
-  "/pdfs/tvn-03-the-board-at-pen-argyl-teleplay.pdf",
-  "/pdfs/tvn-03-the-board-at-pen-argyl.pdf",
-  "/pdfs/tvn-04-above-little-gap-study.pdf",
-  "/pdfs/tvn-04-above-little-gap-teleplay.pdf",
-  "/pdfs/tvn-04-above-little-gap.pdf",
-  "/pdfs/tvn-08-below-the-kiln-study.pdf",
-  "/pdfs/tvn-08-below-the-kiln-teleplay.pdf",
-  "/pdfs/tvn-08-below-the-kiln.pdf",
-  "/pdfs/tvn-09-water-gap-before-dawn-study.pdf",
-  "/pdfs/tvn-09-water-gap-before-dawn-teleplay.pdf",
-  "/pdfs/tvn-09-water-gap-before-dawn.pdf",
-  "/pdfs/tvn-10-the-open-hearth-run-study.pdf",
-  "/pdfs/tvn-10-the-open-hearth-run-teleplay.pdf",
-  "/pdfs/tvn-10-the-open-hearth-run.pdf",
-  "/pdfs/tvn-13-below-the-reading-cut-study.pdf",
-  "/pdfs/tvn-13-below-the-reading-cut-teleplay.pdf",
-  "/pdfs/tvn-13-below-the-reading-cut.pdf",
-  "/pdfs/tvn-15-every-exit-reopens-study.pdf",
-  "/pdfs/tvn-15-every-exit-reopens-teleplay.pdf",
-  "/pdfs/tvn-15-every-exit-reopens.pdf",
   "/pdfs/tvn-the-helmet-at-bake-oven-knob.pdf"
 ];
 const CUT_IDS = [
@@ -56,7 +35,7 @@ const CUT_IDS = [
   "tvn-run-the-bob-wire-home-screenplay",
   "tvn-run-the-bob-wire-home-study"
 ];
-const CUT_PDF = /\/pdfs\/tvn-(?:02-the-3-10-shift|05-the-nail-box|06-the-fair-weight|07-the-planetarium-tooth|11-the-palmerton-switch|12-what-came-up-the-riser|14-run-the-bob-wire-home)(?:-teleplay|-study)?\.pdf$/;
+const CUT_PDF = /\/pdfs\/tvn-(?:02-the-3-10-shift|05-the-nail-box|06-the-fair-weight|07-the-planetarium-tooth|11-the-palmerton-switch|12-what-came-up-the-riser|14-run-the-bob-wire-home|03-the-board-at-pen-argyl|04-above-little-gap|08-below-the-kiln|09-water-gap-before-dawn|10-the-open-hearth-run|13-below-the-reading-cut|15-every-exit-reopens)(?:-teleplay|-study)?\.pdf$/;
 
 function isCutRequest(url){
   const path = decodeURIComponent(url.pathname);
