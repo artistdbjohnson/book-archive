@@ -939,10 +939,10 @@ function chapterTitle(index){
   const ch=readerBook&&readerBook.chapters&&readerBook.chapters[index];
   return ch&&ch.label?ch.label:chapterLabel(index||0);
 }
-function pageHtml(label, text, showLabel, kind, cont, wordsHtml){
+function pageHtml(label, text, showLabel, kind, cont){
   const cls=[spClass('', kind).trim(), cont?'pg-cont':''].filter(Boolean).join(' ');
   const attr=cls?(' class="'+cls+'"'):'';
-  const body=wordsHtml?('<p'+attr+'>'+wordsHtml+'</p>'):String(text||'').split(/\n\n+/).filter(Boolean).map(p=>'<p'+attr+'>'+escapeHtml(p)+'</p>').join('');
+  const body=String(text||'').split(/\n\n+/).filter(Boolean).map(p=>'<p'+attr+'>'+escapeHtml(p)+'</p>').join('');
   return (showLabel?'<div class="pg-label"><span>'+escapeHtml(label)+'</span></div>':'')+(body||'<p>\u2014</p>');
 }
 function pageCapacity(){
@@ -1120,15 +1120,15 @@ function htmlForRange(start, end){
     if(!w) break;
     let j=i;
     while(j+1<=end && listen.words[j+1] && listen.words[j+1].pi===w.pi) j++;
-    const text=[], wh=[];
-    for(let k=i;k<=j;k++){ text.push(listen.words[k].text); wh.push('<span class="w" data-i="'+k+'">'+escapeHtml(listen.words[k].text)+'</span>'); }
+    const text=[];
+    for(let k=i;k<=j;k++) text.push(listen.words[k].text);
     const prev=i>0?listen.words[i-1]:null;
     const cont=!!(prev && prev.pi===w.pi);
     const chapterStart=!prev || prev.chapterIndex!==w.chapterIndex;
     const para=listen.paras[w.pi]||{};
     const show=!shown && chapterStart;
     if(show) shown=true;
-    html+=pageHtml(chapterTitle(w.chapterIndex), text.join(' '), show, para.kind||'', cont, wh.join(' '));
+    html+=pageHtml(chapterTitle(w.chapterIndex), text.join(' '), show, para.kind||'', cont);
     i=j+1;
   }
   return html;
@@ -1216,6 +1216,7 @@ function renderPages(opts){
   const pg=pages[pageIndex];
   const body=$('page-body');
   if(body) body.innerHTML=pg&&pg.html?pg.html:'<p>\u2014</p>';
+  wrapPageWords(body, pg);
   paintMarks();
   if(!(opts&&opts.keepWord) && pg && typeof pg.startWord==='number') listen.index=clampWord(pg.startWord);
   if($('page-left')) $('page-left').textContent=pg?(pg.label||''):'';
@@ -2145,6 +2146,16 @@ function readSelection(){
 function wordsText(a, z){ const out=[]; for(let i=Math.max(0,a);i<=Math.min(listen.words.length-1,z);i++) out.push(listen.words[i].text); return out.join(' '); }
 function contextBefore(a){ let s='', i=a-1; while(i>=0 && s.length<120){ s=listen.words[i].text+(s?' '+s:''); i--; } return s.slice(-120); }
 function contextAfter(z){ let s='', i=z+1; while(i<listen.words.length && s.length<120){ s+=(s?' ':'')+listen.words[i].text; i++; } return s.slice(0,120); }
+function wrapPageWords(body, pg){
+  if(!body || !pg || typeof pg.startWord!=='number') return;
+  let i=pg.startWord;
+  body.querySelectorAll('p').forEach(p=>{
+    const toks=String(p.textContent||'').match(/\S+/g)||[];
+    if(!toks.length || i>pg.endWord+1) return;
+    if(!listen.words[i] || listen.words[i].text!==toks[0]) return;
+    p.innerHTML=toks.map(t=>'<span class="w" data-i="'+(i++)+'">'+escapeHtml(t)+'</span>').join(' ');
+  });
+}
 function paintMarks(){
   const host=readMode==='pages'?$('page-body'):$('scroll-inner');
   [$('page-body'),$('scroll-inner')].forEach(h=>{ if(h) h.querySelectorAll('.w.mk').forEach(n=>{ n.classList.remove('mk','mk-end'); n.removeAttribute('data-mk'); }); });
