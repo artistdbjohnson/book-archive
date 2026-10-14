@@ -333,10 +333,11 @@ body.reader-open{overflow:hidden}
 .brand .brand-mark{display:inline-block;width:auto;height:10.5px;aspect-ratio:629/582;margin-right:9px;vertical-align:0;color:var(--text);flex:none}
 
 #btn-marks{color:#111}
-.reader-root .w.mk{text-decoration:underline;text-decoration-color:#d0121b;text-decoration-thickness:2px;text-underline-offset:3px;background:rgba(208,18,27,.07);cursor:pointer;-webkit-text-decoration-color:#d0121b}
-.mark-pill{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:60;font:500 12px/1 'JetBrains Mono',ui-monospace,monospace;letter-spacing:.08em;text-transform:uppercase;color:#fff;background:#d0121b;border:0;border-radius:999px;padding:11px 18px;box-shadow:0 6px 18px rgba(0,0,0,.18)}
+.reader-root .w.mk{background:linear-gradient(#d0121b,#d0121b) 0 calc(100% - 1px)/100% 1.5px no-repeat,rgba(208,18,27,.06);cursor:pointer;-webkit-box-decoration-break:clone;box-decoration-break:clone}
+.reader-root .w.mk:not(.mk-end){padding-right:.3em;margin-right:-.3em}
+.mark-pill{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:89;font:500 12px/1 'JetBrains Mono',ui-monospace,monospace;letter-spacing:.08em;text-transform:uppercase;color:#fff;background:#d0121b;border:0;border-radius:999px;padding:11px 18px;box-shadow:0 6px 18px rgba(0,0,0,.18)}
 .mark-pill[hidden],.mark-sheet[hidden],.marks-panel[hidden]{display:none}
-.mark-sheet,.marks-panel{position:fixed;z-index:61;background:#fff;color:#141414;border:1px solid rgba(0,0,0,.14);box-shadow:0 14px 36px rgba(0,0,0,.16);font-family:'JetBrains Mono',ui-monospace,monospace;font-size:12px;line-height:1.45}
+.mark-sheet,.marks-panel{position:fixed;z-index:90;background:#fff;color:#141414;border:1px solid rgba(0,0,0,.14);box-shadow:0 14px 36px rgba(0,0,0,.16);font-family:'JetBrains Mono',ui-monospace,monospace;font-size:12px;line-height:1.45}
 .mark-sheet{left:50%;bottom:calc(24px + env(safe-area-inset-bottom));transform:translateX(-50%);width:min(420px,calc(100vw - 24px));padding:14px 14px 8px;border-top:2px solid #d0121b}
 .mark-quote{margin:0 0 10px;color:#555;max-height:7.5em;overflow:auto}
 .mark-sheet textarea{display:block;width:100%;box-sizing:border-box;border:0;border-bottom:1px solid rgba(0,0,0,.18);padding:6px 0;font:16px/1.4 'JetBrains Mono',ui-monospace,monospace;resize:none;outline:none;background:transparent;color:#111}
