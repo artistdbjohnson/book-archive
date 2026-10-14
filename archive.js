@@ -2231,9 +2231,14 @@ function mountMarks(){
   const reader=$('reader'); if(!reader) return;
   const pill=document.createElement('button');
   pill.type='button'; pill.id='mark-pill'; pill.className='mark-pill'; pill.hidden=true; pill.textContent='Mark';
-  const keep=e=>{ e.preventDefault(); markSel=readSelection()||markSel; };
-  pill.addEventListener('pointerdown', keep); pill.addEventListener('touchstart', keep, {passive:false}); pill.addEventListener('mousedown', keep);
-  pill.addEventListener('click', e=>{ e.stopPropagation(); newMarkFromSelection(); });
+  let pillFired=0;
+  const keep=e=>{ e.preventDefault(); e.stopPropagation(); markSel=readSelection()||markSel; };
+  const fire=e=>{ e.preventDefault(); e.stopPropagation(); if(Date.now()-pillFired<500) return; pillFired=Date.now(); newMarkFromSelection(); };
+  pill.addEventListener('pointerdown', keep); pill.addEventListener('mousedown', keep);
+  pill.addEventListener('touchstart', keep, {passive:false});
+  pill.addEventListener('touchend', fire, {passive:false});
+  pill.addEventListener('pointerup', e=>{ if(e.pointerType!=='mouse') fire(e); });
+  pill.addEventListener('click', fire);
   reader.appendChild(pill);
   const sheet=document.createElement('div');
   sheet.id='mark-sheet'; sheet.className='mark-sheet'; sheet.hidden=true;
@@ -2271,10 +2276,22 @@ function mountMarks(){
   $('marks-clear-all').onclick=()=>{ const ids=loadMarks().map(m=>m.id); if(ids.length && window.confirm('Clear all marks?')){ saveMarks([]); marksApi('DELETE', null, '?all=1'); paintMarks(); renderMarksPanel(); } };
   const btn=$('btn-marks');
   if(btn) btn.onclick=e=>{ e.stopPropagation(); closeSheets(); panel.hidden=!panel.hidden; if(!panel.hidden){ renderMarksPanel(); pullMarks().then(renderMarksPanel); } };
-  let selTimer=0;
+  let selTimer=0, lastScroll=0;
+  document.addEventListener('scroll', ()=>{ lastScroll=Date.now(); }, {capture:true, passive:true});
   document.addEventListener('selectionchange', ()=>{
     clearTimeout(selTimer);
-    selTimer=setTimeout(()=>{ const s=readSelection(); if(s) markSel=s; showMarkPill(!!s && $('mark-sheet').hidden); }, 120);
+    const s=readSelection();
+    if(s){ markSel=s; showMarkPill($('mark-sheet').hidden); return; }
+    const check=()=>{
+      if(readSelection()) return;
+      if(Date.now()-lastScroll<400){ selTimer=setTimeout(check, 300); return; }
+      markSel=null; showMarkPill(false);
+    };
+    selTimer=setTimeout(check, 320);
+  });
+  ['edge-left','edge-right'].forEach(id=>{
+    const ed=$(id); if(!ed) return;
+    ed.addEventListener('click', e=>{ if(readSelection() || markSel){ e.stopImmediatePropagation(); e.preventDefault(); } }, true);
   });
   ['scroll-inner','page-body'].forEach(id=>{
     const h=$(id); if(!h) return;
