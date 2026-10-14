@@ -2100,9 +2100,17 @@ function saveMarks(list){ localStorage.setItem(MARKS_KEY, JSON.stringify(list));
 function marksKey(){ try{ return localStorage.getItem(MARKS_SYNC)||''; }catch(e){ return ''; } }
 function liveMarks(){ return loadMarks().filter(m=>{ const b=bookById(m.storyId); return b && liveBook(b) && !isVeiled(b); }); }
 function marksApi(method, body, qs){
-  const k=marksKey(); if(!k) return Promise.resolve(null);
-  return fetch('/api/marks'+(qs||''), {method:method, headers:{'Authorization':'Bearer '+k,'Content-Type':'application/json'}, body:body?JSON.stringify(body):undefined, cache:'no-store'})
-    .then(r=>r.ok?r.json():null).catch(()=>null);
+  const k=marksKey();
+  if(!k && method!=='POST') return Promise.resolve(null);
+  const headers={'Content-Type':'application/json'};
+  if(k) headers.Authorization='Bearer '+k;
+  return fetch('/api/marks'+(qs||''), {method:method, headers:headers, body:body?JSON.stringify(body):undefined, cache:'no-store', credentials:'same-origin'})
+    .then(r=>{ if(!r.ok){ console.warn('marks sync', method, r.status); return null; } return r.json(); })
+    .catch(err=>{ console.warn('marks sync', method, err); return null; });
+}
+function pushUnsynced(){
+  const list=loadMarks().filter(m=>!m.synced);
+  for(let i=0;i<list.length;i+=40) pushMarks(list.slice(i,i+40));
 }
 function pushMarks(list){
   return marksApi('POST', {marks:list}).then(r=>{ if(!r) return; const ids=new Set(list.map(m=>m.id)); saveMarks(loadMarks().map(m=>ids.has(m.id)?Object.assign(m,{synced:true}):m)); });
@@ -2225,7 +2233,7 @@ function renderMarksPanel(){
       return head+'<div class="marks-item'+(m.resolved?' is-resolved':'')+'" data-mid="'+escapeHtml(m.id)+'"><button type="button" class="mi-go">\u201c'+escapeHtml(q)+'\u201d'+(m.note?'<span class="mi-note">'+escapeHtml(m.note)+'</span>':'')+'</button><span class="mi-acts"><button type="button" class="mi-res">'+(m.resolved?'reopen':'resolve')+'</button><button type="button" class="mi-del">delete</button></span></div>';
     }).join('');
   }
-  const st=$('marks-sync'); if(st) st.textContent=marksKey()?'synced to archive':'this device only';
+  const st=$('marks-sync'); if(st) st.textContent=loadMarks().some(m=>!m.synced)?'syncing\u2026':'synced to archive';
 }
 function mountMarks(){
   const reader=$('reader'); if(!reader) return;
@@ -2303,7 +2311,9 @@ function mountMarks(){
     });
   });
   syncMarksCount();
-  pullMarks();
+  if(marksKey()) pullMarks(); else pushUnsynced();
+  window.addEventListener('online', pushUnsynced);
+  document.addEventListener('visibilitychange', ()=>{ if(document.visibilityState==='visible') pushUnsynced(); });
 }
 mountMarks();
 bootLibrary();

@@ -3,6 +3,16 @@ import { timingSafeEqual } from 'crypto';
 import { isMember } from './_lib.js';
 
 const PATH = 'marks/marks.json';
+const OPEN_IDS = new Set(['qf-first-water','qf-perimeter-sample','tvn-the-helmet-at-bake-oven-knob','tvn-the-hills-above-allentown','tvn-the-hills-above-allentown-screenplay','tvn-the-hills-above-allentown-study']);
+const hits = new Map();
+function rateOk(req) {
+  const ip = String(req.headers['x-forwarded-for'] || '').split(',')[0].trim() || 'x';
+  const now = Date.now(), win = 60000;
+  const h = (hits.get(ip) || []).filter(t => now - t < win);
+  h.push(now); hits.set(ip, h);
+  if (hits.size > 5000) hits.clear();
+  return h.length <= 30;
+}
 
 function authed(req) {
   if (isMember(req)) return true;
@@ -45,13 +55,18 @@ async function body(req) {
 const FIELDS = ['id','storyId','storyTitle','quote','words','before','after','paragraph','chapter','startWord','endWord','note','resolved','createdAt','updatedAt'];
 function clean(m) {
   const o = {};
-  FIELDS.forEach(k => { if (m[k] !== undefined) o[k] = typeof m[k] === 'string' ? m[k].slice(0, 4000) : m[k]; });
+  FIELDS.forEach(k => { if (m[k] !== undefined) o[k] = typeof m[k] === 'string' ? m[k].slice(0, 2000) : m[k]; });
   return o;
 }
 
 export default async function handler(req, res) {
   res.setHeader('Cache-Control', 'no-store');
-  if (!authed(req)) { res.status(401).json({ error: 'auth' }); return; }
+  const ok = authed(req);
+  if (!ok && req.method !== 'POST') { res.status(401).json({ error: 'auth' }); return; }
+  if (!ok) {
+    if (Number(req.headers['content-length'] || 0) > 64000) { res.status(413).json({ error: 'size' }); return; }
+    if (!rateOk(req)) { res.status(429).json({ error: 'rate' }); return; }
+  }
   try {
     const url = new URL(req.url, 'http://localhost');
     let marks = await readAll();
@@ -65,9 +80,18 @@ export default async function handler(req, res) {
     }
     if (req.method === 'POST') {
       const b = await body(req);
-      const incoming = (Array.isArray(b.marks) ? b.marks : [b]).filter(m => m && typeof m.id === 'string' && m.storyId).map(clean);
+      let incoming = (Array.isArray(b.marks) ? b.marks : [b]).filter(m => m && typeof m.id === 'string' && m.id.length <= 64 && m.storyId).map(clean);
+      if (!ok) {
+        if (incoming.length > 50) { res.status(413).json({ error: 'too many' }); return; }
+        incoming = incoming.filter(m => OPEN_IDS.has(m.storyId));
+        if (!incoming.length) { res.status(400).json({ error: 'story' }); return; }
+      }
       const map = new Map(marks.map(m => [m.id, m]));
-      incoming.forEach(m => map.set(m.id, Object.assign({}, map.get(m.id) || {}, m)));
+      incoming.forEach(m => {
+        const prev = map.get(m.id);
+        if (!ok) m.resolved = prev ? !!prev.resolved : false;
+        map.set(m.id, Object.assign({}, prev || {}, m));
+      });
       marks = [...map.values()].slice(-2000);
       await writeAll(marks);
       res.status(200).json({ ok: true, count: marks.length });
