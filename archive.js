@@ -905,6 +905,7 @@ function renderScroll(){
     const words=(byPara[p.pi]||[]).map(w=>'<span class="w" data-i="'+w.i+'">'+escapeHtml(w.text)+'</span>').join(' ');
     return head+'<p class="'+spClass('scroll-p', p.kind)+'">'+words+'</p>';
   }).join('');
+  paintMarks();
 }
 function scrollToWord(index){
   const sc=$('scroll-view');
@@ -1215,6 +1216,8 @@ function renderPages(opts){
   const pg=pages[pageIndex];
   const body=$('page-body');
   if(body) body.innerHTML=pg&&pg.html?pg.html:'<p>\u2014</p>';
+  wrapPageWords(body, pg);
+  paintMarks();
   if(!(opts&&opts.keepWord) && pg && typeof pg.startWord==='number') listen.index=clampWord(pg.startWord);
   if($('page-left')) $('page-left').textContent=pg?(pg.label||''):'';
   if($('page-right')) $('page-right').textContent=(pageIndex+1)+' / '+pages.length;
@@ -2088,4 +2091,202 @@ bindListenDrag();
 mountListenMark();
 applyTypePrefs();
 applyLibraryViewClass(getLibraryView());
+/* reader markup: select text, Mark, red underline + note. local first, synced to /api/marks when a key is set. */
+const MARKS_KEY='dglxss-archive-marks-v1', MARKS_SYNC='dglxss-archive-marks-key';
+(function(){ const m=/^#marks-key=([^&]+)/.exec(location.hash||''); if(m){ try{ localStorage.setItem(MARKS_SYNC, decodeURIComponent(m[1])); }catch(e){} history.replaceState(null,'',location.pathname+'#/'); } })();
+let markSel=null, markEditing=null;
+function loadMarks(){ try{ const v=JSON.parse(localStorage.getItem(MARKS_KEY)||'[]'); return Array.isArray(v)?v:[]; }catch(e){ return []; } }
+function saveMarks(list){ localStorage.setItem(MARKS_KEY, JSON.stringify(list)); syncMarksCount(); }
+function marksKey(){ try{ return localStorage.getItem(MARKS_SYNC)||''; }catch(e){ return ''; } }
+function liveMarks(){ return loadMarks().filter(m=>{ const b=bookById(m.storyId); return b && liveBook(b) && !isVeiled(b); }); }
+function marksApi(method, body, qs){
+  const k=marksKey(); if(!k) return Promise.resolve(null);
+  return fetch('/api/marks'+(qs||''), {method:method, headers:{'Authorization':'Bearer '+k,'Content-Type':'application/json'}, body:body?JSON.stringify(body):undefined, cache:'no-store'})
+    .then(r=>r.ok?r.json():null).catch(()=>null);
+}
+function pushMarks(list){
+  return marksApi('POST', {marks:list}).then(r=>{ if(!r) return; const ids=new Set(list.map(m=>m.id)); saveMarks(loadMarks().map(m=>ids.has(m.id)?Object.assign(m,{synced:true}):m)); });
+}
+function pullMarks(){
+  return marksApi('GET').then(r=>{
+    if(!r || !Array.isArray(r.marks)) return;
+    const remote=new Map(r.marks.map(m=>[m.id,m]));
+    const out=[], unsynced=[];
+    loadMarks().forEach(m=>{
+      const rm=remote.get(m.id);
+      if(rm){ out.push(Object.assign({}, (rm.updatedAt||0)>(m.updatedAt||0)?rm:m, {synced:true})); remote.delete(m.id); }
+      else if(!m.synced){ out.push(m); unsynced.push(m); }
+    });
+    remote.forEach(m=>out.push(Object.assign({}, m, {synced:true})));
+    saveMarks(out);
+    if(unsynced.length) pushMarks(unsynced);
+    if(readerBook) paintMarks();
+  });
+}
+function markWordRange(node){
+  const el=node && (node.nodeType===1?node:node.parentElement);
+  const w=el && el.closest ? el.closest('.w[data-i]') : null;
+  return w ? Number(w.dataset.i) : null;
+}
+function readSelection(){
+  const sel=window.getSelection && window.getSelection();
+  if(!sel || sel.isCollapsed || !sel.rangeCount || !readerBook) return null;
+  const r=sel.getRangeAt(0);
+  const host=readMode==='pages'?$('page-body'):(readMode==='scroll'?$('scroll-inner'):null);
+  if(!host || !host.contains(r.commonAncestorContainer)) return null;
+  let a=markWordRange(r.startContainer), z=markWordRange(r.endContainer);
+  const spans=[...host.querySelectorAll('.w[data-i]')].filter(s=>r.intersectsNode(s));
+  if(spans.length){ a=Number(spans[0].dataset.i); z=Number(spans[spans.length-1].dataset.i); }
+  if(a==null||z==null) return null;
+  if(z<a){ const t=a; a=z; z=t; }
+  const quote=String(sel.toString()||'').replace(/\s+/g,' ').trim();
+  if(!quote) return null;
+  return {start:a, end:z, quote:quote};
+}
+function wordsText(a, z){ const out=[]; for(let i=Math.max(0,a);i<=Math.min(listen.words.length-1,z);i++) out.push(listen.words[i].text); return out.join(' '); }
+function contextBefore(a){ let s='', i=a-1; while(i>=0 && s.length<120){ s=listen.words[i].text+(s?' '+s:''); i--; } return s.slice(-120); }
+function contextAfter(z){ let s='', i=z+1; while(i<listen.words.length && s.length<120){ s+=(s?' ':'')+listen.words[i].text; i++; } return s.slice(0,120); }
+function wrapPageWords(body, pg){
+  if(!body || !pg || typeof pg.startWord!=='number') return;
+  let i=pg.startWord;
+  body.querySelectorAll('p').forEach(p=>{
+    const toks=String(p.textContent||'').match(/\S+/g)||[];
+    if(!toks.length || i>pg.endWord+1) return;
+    if(!listen.words[i] || listen.words[i].text!==toks[0]) return;
+    p.innerHTML=toks.map(t=>'<span class="w" data-i="'+(i++)+'">'+escapeHtml(t)+'</span>').join(' ');
+  });
+}
+function paintMarks(){
+  const host=readMode==='pages'?$('page-body'):$('scroll-inner');
+  [$('page-body'),$('scroll-inner')].forEach(h=>{ if(h) h.querySelectorAll('.w.mk').forEach(n=>{ n.classList.remove('mk','mk-end'); n.removeAttribute('data-mk'); }); });
+  if(!readerBook || !host) return;
+  loadMarks().filter(m=>m.storyId===readerBook.id && !m.resolved).forEach(m=>{
+    for(let i=m.startWord;i<=m.endWord;i++){
+      host.querySelectorAll('.w[data-i="'+i+'"]').forEach(n=>{ n.classList.add('mk'); n.dataset.mk=m.id; if(i===m.endWord) n.classList.add('mk-end'); });
+    }
+  });
+}
+function syncMarksCount(){
+  const b=$('btn-marks'); if(!b) return;
+  const n=liveMarks().filter(m=>!m.resolved).length;
+  b.textContent=n?('Marks '+n):'Marks';
+}
+function showMarkPill(on){ const p=$('mark-pill'); if(p) p.hidden=!on; }
+function openMarkEditor(m){
+  markEditing=m;
+  const s=$('mark-sheet'); if(!s) return;
+  $('mark-quote').textContent='\u201c'+(m.quote.length>220?m.quote.slice(0,220)+'\u2026':m.quote)+'\u201d';
+  $('mark-note').value=m.note||'';
+  $('mark-del').hidden=!m.createdAt;
+  s.hidden=false;
+  showMarkPill(false);
+}
+function closeMarkEditor(){ const s=$('mark-sheet'); if(s) s.hidden=true; markEditing=null; }
+function commitMark(){
+  const m=markEditing; if(!m) return;
+  m.note=String($('mark-note').value||'').trim().slice(0,600);
+  const now=Date.now();
+  if(!m.createdAt) m.createdAt=new Date(now).toISOString();
+  m.updatedAt=now; m.synced=false;
+  const list=loadMarks().filter(x=>x.id!==m.id); list.push(m); saveMarks(list);
+  closeMarkEditor();
+  try{ window.getSelection().removeAllRanges(); }catch(e){}
+  paintMarks(); pushMarks([m]); renderMarksPanel();
+}
+function deleteMarks(ids){
+  const set=new Set(ids);
+  saveMarks(loadMarks().filter(m=>!set.has(m.id)));
+  if(ids.length) marksApi('DELETE', null, '?ids='+encodeURIComponent(ids.join(',')));
+  paintMarks(); renderMarksPanel();
+}
+function newMarkFromSelection(){
+  const sel=markSel || readSelection();
+  if(!sel || !readerBook) return;
+  const w=listen.words[sel.start]||{};
+  openMarkEditor({
+    id:'m'+Date.now().toString(36)+Math.random().toString(36).slice(2,6),
+    storyId:readerBook.id, storyTitle:readerBook.title||'',
+    quote:sel.quote, words:wordsText(sel.start, sel.end),
+    before:contextBefore(sel.start), after:contextAfter(sel.end),
+    paragraph:w.pi, chapter:w.chapterIndex, startWord:sel.start, endWord:sel.end,
+    note:'', resolved:false, createdAt:''
+  });
+}
+function renderMarksPanel(){
+  const box=$('marks-list'); if(!box) return;
+  const list=liveMarks().sort((a,b)=>String(a.storyId).localeCompare(String(b.storyId))||a.startWord-b.startWord);
+  if(!list.length){ box.innerHTML='<p class="marks-empty">No marks. Select text while reading, then Mark.</p>'; }
+  else {
+    let last='';
+    box.innerHTML=list.map(m=>{
+      let head='';
+      if(m.storyId!==last){ last=m.storyId; const b=bookById(m.storyId); head='<div class="marks-story">'+escapeHtml((b&&b.title)||m.storyId)+'</div>'; }
+      const q=m.quote.length>140?m.quote.slice(0,140)+'\u2026':m.quote;
+      return head+'<div class="marks-item'+(m.resolved?' is-resolved':'')+'" data-mid="'+escapeHtml(m.id)+'"><button type="button" class="mi-go">\u201c'+escapeHtml(q)+'\u201d'+(m.note?'<span class="mi-note">'+escapeHtml(m.note)+'</span>':'')+'</button><span class="mi-acts"><button type="button" class="mi-res">'+(m.resolved?'reopen':'resolve')+'</button><button type="button" class="mi-del">delete</button></span></div>';
+    }).join('');
+  }
+  const st=$('marks-sync'); if(st) st.textContent=marksKey()?'synced to archive':'this device only';
+}
+function mountMarks(){
+  const reader=$('reader'); if(!reader) return;
+  const pill=document.createElement('button');
+  pill.type='button'; pill.id='mark-pill'; pill.className='mark-pill'; pill.hidden=true; pill.textContent='Mark';
+  const keep=e=>{ e.preventDefault(); markSel=readSelection()||markSel; };
+  pill.addEventListener('pointerdown', keep); pill.addEventListener('touchstart', keep, {passive:false}); pill.addEventListener('mousedown', keep);
+  pill.addEventListener('click', e=>{ e.stopPropagation(); newMarkFromSelection(); });
+  reader.appendChild(pill);
+  const sheet=document.createElement('div');
+  sheet.id='mark-sheet'; sheet.className='mark-sheet'; sheet.hidden=true;
+  sheet.innerHTML='<p id="mark-quote" class="mark-quote"></p><textarea id="mark-note" rows="2" maxlength="600" placeholder="note (optional)"></textarea><div class="mark-acts"><button type="button" id="mark-del">delete</button><span></span><button type="button" id="mark-cancel">cancel</button><button type="button" id="mark-save">save</button></div>';
+  reader.appendChild(sheet);
+  sheet.addEventListener('click', e=>e.stopPropagation());
+  $('mark-save').onclick=commitMark;
+  $('mark-cancel').onclick=closeMarkEditor;
+  $('mark-del').onclick=()=>{ if(markEditing) deleteMarks([markEditing.id]); closeMarkEditor(); };
+  const panel=document.createElement('div');
+  panel.id='marks-panel'; panel.className='marks-panel'; panel.hidden=true;
+  panel.innerHTML='<div class="marks-head"><span>Marks</span><span id="marks-sync" class="marks-sync"></span><button type="button" id="marks-close" aria-label="Close">close</button></div><div id="marks-list" class="marks-list"></div><div class="marks-foot"><button type="button" id="marks-copy">copy marks</button><button type="button" id="marks-clear-res">clear resolved</button><button type="button" id="marks-clear-all">clear all</button></div>';
+  reader.appendChild(panel);
+  panel.addEventListener('click', e=>{
+    e.stopPropagation();
+    const item=e.target.closest('.marks-item'); if(!item) return;
+    const m=loadMarks().find(x=>x.id===item.dataset.mid); if(!m) return;
+    if(e.target.closest('.mi-del')) deleteMarks([m.id]);
+    else if(e.target.closest('.mi-res')){ m.resolved=!m.resolved; m.updatedAt=Date.now(); m.synced=false; saveMarks(loadMarks().map(x=>x.id===m.id?m:x)); pushMarks([m]); paintMarks(); renderMarksPanel(); }
+    else if(e.target.closest('.mi-go')){
+      panel.hidden=true;
+      const b=bookById(m.storyId);
+      if(readerBook && readerBook.id===m.storyId){ listen.index=m.startWord; if(readMode==='pages'){ pageIndex=pageForWord(m.startWord); renderPages({keepWord:true}); } else if(readMode==='scroll') scrollToWord(m.startWord); }
+      else if(b && liveBook(b)){ saveProgress(b.id,{word:m.startWord}); openReader(b); }
+    }
+  });
+  $('marks-close').onclick=()=>{ panel.hidden=true; };
+  $('marks-copy').onclick=()=>{
+    const txt=JSON.stringify({marks:liveMarks().map(m=>{ const o=Object.assign({},m); delete o.synced; return o; })}, null, 2);
+    const done=()=>{ $('marks-copy').textContent='copied'; setTimeout(()=>{ $('marks-copy').textContent='copy marks'; }, 1400); };
+    if(navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(done, ()=>{ window.prompt('Copy marks', txt); });
+    else window.prompt('Copy marks', txt);
+  };
+  $('marks-clear-res').onclick=()=>{ const ids=loadMarks().filter(m=>m.resolved).map(m=>m.id); if(ids.length) deleteMarks(ids); };
+  $('marks-clear-all').onclick=()=>{ const ids=loadMarks().map(m=>m.id); if(ids.length && window.confirm('Clear all marks?')){ saveMarks([]); marksApi('DELETE', null, '?all=1'); paintMarks(); renderMarksPanel(); } };
+  const btn=$('btn-marks');
+  if(btn) btn.onclick=e=>{ e.stopPropagation(); closeSheets(); panel.hidden=!panel.hidden; if(!panel.hidden){ renderMarksPanel(); pullMarks().then(renderMarksPanel); } };
+  let selTimer=0;
+  document.addEventListener('selectionchange', ()=>{
+    clearTimeout(selTimer);
+    selTimer=setTimeout(()=>{ const s=readSelection(); if(s) markSel=s; showMarkPill(!!s && $('mark-sheet').hidden); }, 120);
+  });
+  ['scroll-inner','page-body'].forEach(id=>{
+    const h=$(id); if(!h) return;
+    h.addEventListener('click', e=>{
+      const n=e.target.closest && e.target.closest('.w.mk'); if(!n) return;
+      const s=window.getSelection(); if(s && !s.isCollapsed) return;
+      const m=loadMarks().find(x=>x.id===n.dataset.mk); if(!m) return;
+      e.stopPropagation(); openMarkEditor(m);
+    });
+  });
+  syncMarksCount();
+  pullMarks();
+}
+mountMarks();
 bootLibrary();

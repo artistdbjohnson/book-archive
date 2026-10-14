@@ -331,6 +331,32 @@ body.reader-open{overflow:hidden}
 .folder-head .m{font-size:11px;color:var(--muted);display:block;margin-top:4px}
 .folder-head .veil-sec{display:flex}
 .brand .brand-mark{display:inline-block;width:auto;height:10.5px;aspect-ratio:629/582;margin-right:9px;vertical-align:0;color:var(--text);flex:none}
+
+#btn-marks{color:#111}
+.reader-root .w.mk{background:linear-gradient(#d0121b,#d0121b) 0 calc(100% - 1px)/100% 1.5px no-repeat,rgba(208,18,27,.06);cursor:pointer;-webkit-box-decoration-break:clone;box-decoration-break:clone}
+.reader-root .w.mk:not(.mk-end){padding-right:.3em;margin-right:-.3em}
+.mark-pill{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:89;font:500 12px/1 'JetBrains Mono',ui-monospace,monospace;letter-spacing:.08em;text-transform:uppercase;color:#fff;background:#d0121b;border:0;border-radius:999px;padding:11px 18px;box-shadow:0 6px 18px rgba(0,0,0,.18)}
+.mark-pill[hidden],.mark-sheet[hidden],.marks-panel[hidden]{display:none}
+.mark-sheet,.marks-panel{position:fixed;z-index:90;background:#fff;color:#141414;border:1px solid rgba(0,0,0,.14);box-shadow:0 14px 36px rgba(0,0,0,.16);font-family:'JetBrains Mono',ui-monospace,monospace;font-size:12px;line-height:1.45}
+.mark-sheet{left:50%;bottom:calc(24px + env(safe-area-inset-bottom));transform:translateX(-50%);width:min(420px,calc(100vw - 24px));padding:14px 14px 8px;border-top:2px solid #d0121b}
+.mark-quote{margin:0 0 10px;color:#555;max-height:7.5em;overflow:auto}
+.mark-sheet textarea{display:block;width:100%;box-sizing:border-box;border:0;border-bottom:1px solid rgba(0,0,0,.18);padding:6px 0;font:16px/1.4 'JetBrains Mono',ui-monospace,monospace;resize:none;outline:none;background:transparent;color:#111}
+.mark-acts{display:flex;gap:4px;align-items:center;margin-top:6px}.mark-acts span{flex:1}
+.mark-acts button,.marks-panel button{border:0;background:transparent;font:inherit;color:#8d8d8d;padding:10px 8px;min-height:40px;cursor:pointer}
+#mark-save{color:#d0121b;font-weight:600}#mark-del{color:#8d8d8d}#mark-del[hidden]{display:none}
+.marks-panel{top:calc(var(--listen-header,64px) + 6px);right:12px;width:min(380px,calc(100vw - 24px));max-height:min(70vh,calc(100dvh - var(--listen-header,64px) - 24px));display:flex;flex-direction:column}
+.marks-head{display:flex;align-items:center;gap:10px;padding:6px 6px 6px 14px;border-bottom:1px solid rgba(0,0,0,.08);font-size:10px;letter-spacing:.14em;text-transform:uppercase}
+.marks-head .marks-sync{flex:1;color:#8d8d8d;letter-spacing:.06em;text-transform:none}
+.marks-list{overflow:auto;padding:4px 0}
+.marks-story{padding:12px 14px 4px;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#8d8d8d}
+.marks-item{display:flex;align-items:flex-start;border-left:2px solid #d0121b;margin:4px 14px;padding-left:8px}
+.marks-item.is-resolved{border-left-color:#d6d6d6;opacity:.55}
+.marks-item .mi-go{flex:1;text-align:left;color:#141414;padding:6px 0;font-family:Literata,Georgia,serif;font-size:13px}
+.mi-note{display:block;margin-top:3px;font-family:'JetBrains Mono',ui-monospace,monospace;font-size:11px;color:#d0121b}
+.mi-acts{display:flex;flex-direction:column}.mi-acts button{padding:4px 6px;min-height:28px;font-size:11px;text-align:right}
+.marks-empty{margin:0;padding:16px 14px;color:#8d8d8d}
+.marks-foot{display:flex;flex-wrap:wrap;justify-content:space-between;border-top:1px solid rgba(0,0,0,.08);padding:0 6px}
+#marks-clear-all{color:#d0121b}
 </style>
 </head>
 <body class="is-list">
@@ -375,6 +401,7 @@ body.reader-open{overflow:hidden}
       <button type="button" id="btn-library">library</button>
       <div class="listen-nav-actions">
         <a id="btn-pdf" hidden target="_blank" rel="noopener">View PDF</a>
+        <button type="button" id="btn-marks" aria-label="Marks">Marks</button>
         <button type="button" id="btn-edit" aria-haspopup="true" aria-expanded="false" aria-controls="edit-sheet" aria-label="Text size and paper">Aa</button>
       </div>
     </div>
