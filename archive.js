@@ -2104,7 +2104,7 @@ function marksApi(method, body, qs){
   if(!k && method!=='POST') return Promise.resolve(null);
   const headers={'Content-Type':'application/json'};
   if(k) headers.Authorization='Bearer '+k;
-  return fetch('/api/marks'+(qs||''), {method:method, headers:headers, body:body?JSON.stringify(body):undefined, cache:'no-store', credentials:'same-origin'})
+  return fetch('/api/marks'+(qs||''), {method:method, headers:headers, body:body?JSON.stringify(body):undefined, cache:'no-store', credentials:'same-origin', keepalive:method==='POST'})
     .then(r=>{ if(!r.ok){ console.warn('marks sync', method, r.status); return null; } return r.json(); })
     .catch(err=>{ console.warn('marks sync', method, err); return null; });
 }
