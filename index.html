@@ -332,7 +332,8 @@ body.reader-open{overflow:hidden}
 .folder-head .veil-sec{display:flex}
 .brand .brand-mark{display:inline-block;width:auto;height:10.5px;aspect-ratio:629/582;margin-right:9px;vertical-align:0;color:var(--text);flex:none}
 
-#btn-marks{color:#111}
+#btn-marks,#btn-epub{color:#111}
+#btn-epub[hidden]{display:none}
 .reader-root[data-mode="pages"] .reader-edge{width:12%;max-width:56px}
 .reader-root[data-mode="pages"] .page-body,.reader-root[data-mode="pages"] .page-body *,.reader-root .scroll-inner,.reader-root .scroll-inner *{user-select:text;-webkit-user-select:text;-webkit-touch-callout:default}
 .reader-root .w.mk{background:linear-gradient(#d0121b,#d0121b) 0 calc(100% - 1px)/100% 1.5px no-repeat,rgba(208,18,27,.06);cursor:pointer;-webkit-box-decoration-break:clone;box-decoration-break:clone}
@@ -403,6 +404,7 @@ body.reader-open{overflow:hidden}
       <button type="button" id="btn-library">library</button>
       <div class="listen-nav-actions">
         <a id="btn-pdf" hidden target="_blank" rel="noopener">View PDF</a>
+        <button type="button" id="btn-epub" hidden aria-label="Download EPUB">EPUB</button>
         <button type="button" id="btn-marks" aria-label="Marks">Marks</button>
         <button type="button" id="btn-edit" aria-haspopup="true" aria-expanded="false" aria-controls="edit-sheet" aria-label="Text size and paper">Aa</button>
       </div>
