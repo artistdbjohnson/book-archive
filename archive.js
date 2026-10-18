@@ -1342,6 +1342,7 @@ function setListenTitle(b){
   if(name) name.textContent=b.title||'';
   if(by) by.textContent=b.subtitle ? ' \u2014 '+b.subtitle : '';
   setPdfLink(b);
+  setEpubLink(b);
   const root=$('reader');
   if(root){
     if(b && b.role==='screenplay') root.dataset.role='screenplay';
@@ -2316,4 +2317,63 @@ function mountMarks(){
   document.addEventListener('visibilitychange', ()=>{ if(document.visibilityState==='visible') pushUnsynced(); });
 }
 mountMarks();
+/* EPUB3 export for open works only: stored zip, built in the browser from the reader text. */
+const EPUB_OK=new Set(['qf-first-water','qf-perimeter-sample','tvn-the-helmet-at-bake-oven-knob','tvn-the-hills-above-allentown','tvn-the-hills-above-allentown-screenplay','tvn-the-hills-above-allentown-study']);
+function epubAllowed(b){ return !!(b && EPUB_OK.has(b.id) && liveBook(b) && !isVeiled(b) && !isDeadTvnId(b.id)); }
+const CRC_T=(()=>{ const t=new Uint32Array(256); for(let n=0;n<256;n++){ let c=n; for(let k=0;k<8;k++) c=c&1?0xEDB88320^(c>>>1):c>>>1; t[n]=c>>>0; } return t; })();
+function crc32(u){ let c=0xFFFFFFFF; for(let i=0;i<u.length;i++) c=CRC_T[(c^u[i])&255]^(c>>>8); return (c^0xFFFFFFFF)>>>0; }
+function zipStore(files){
+  const enc=new TextEncoder(), parts=[], central=[]; let off=0;
+  const u16=n=>[n&255,(n>>>8)&255], u32=n=>[n&255,(n>>>8)&255,(n>>>16)&255,(n>>>24)&255];
+  files.forEach(f=>{
+    const name=enc.encode(f.name), data=typeof f.data==='string'?enc.encode(f.data):f.data, crc=crc32(data);
+    const head=[0x50,0x4b,3,4, ...u16(20),...u16(0),...u16(0),...u16(0),...u16(0x21), ...u32(crc),...u32(data.length),...u32(data.length),...u16(name.length),...u16(0)];
+    parts.push(new Uint8Array(head), name, data);
+    central.push(new Uint8Array([0x50,0x4b,1,2, ...u16(20),...u16(20),...u16(0),...u16(0),...u16(0),...u16(0x21), ...u32(crc),...u32(data.length),...u32(data.length),...u16(name.length),...u16(0),...u16(0),...u16(0),...u16(0),...u32(0),...u32(off)]), name);
+    off+=head.length+name.length+data.length;
+  });
+  const csize=central.reduce((s,a)=>s+a.length,0);
+  const end=new Uint8Array([0x50,0x4b,5,6, ...u16(0),...u16(0),...u16(files.length),...u16(files.length),...u32(csize),...u32(off),...u16(0)]);
+  return new Blob([...parts, ...central, end], {type:'application/epub+zip'});
+}
+function xesc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function xhtml(title, body){ return '<?xml version="1.0" encoding="utf-8"?>\n<!DOCTYPE html>\n<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" xml:lang="en" lang="en"><head><meta charset="utf-8"/><title>'+xesc(title)+'</title><link rel="stylesheet" type="text/css" href="style.css"/></head><body>'+body+'</body></html>'; }
+function buildEpub(b){
+  if(!epubAllowed(b)) return null;
+  const title=b.title||b.id, author='Douglxss Burley Johnson', uid='urn:dbj:archive:'+b.id;
+  const screen=b.role==='screenplay';
+  const chs=chapterEntries(b).filter(e=>e.allowed && String(e.ch.text||'').trim()).map((e,n)=>{
+    const label=e.ch.label||chapterLabel(e.i);
+    const paras=String(e.ch.text).trim().split(/\n\n+/).filter(Boolean);
+    const body='<section epub:type="chapter"><h2>'+xesc(label)+'</h2>'+paras.map((p,k)=>'<p'+(k===0?' class="first"':'')+'>'+xesc(p).replace(/\n/g,'<br/>')+'</p>').join('')+'</section>';
+    return {id:'c'+(n+1), file:'c'+(n+1)+'.xhtml', label:label, html:xhtml(label, body)};
+  });
+  if(!chs.length) return null;
+  const mod=new Date().toISOString().replace(/\.\d+Z$/,'Z');
+  const css='body{margin:0 4%;font-family:serif;line-height:1.5}h1,h2{font-weight:normal;text-align:center;margin:2em 0 1.5em}h2{font-size:1.1em;letter-spacing:.12em;text-transform:uppercase}p{margin:0;text-indent:1.4em;text-align:justify}p.first{text-indent:0}'+(screen?'p{text-indent:0;text-align:left;margin:0 0 .8em;font-family:monospace}':'')+'.cover{text-align:center;margin-top:30%}.cover h1{font-size:1.6em}.cover p{text-indent:0;text-align:center}';
+  const mark='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 900"><rect width="600" height="900" fill="#fff"/><g stroke="#000" stroke-width="34" stroke-linecap="square"><path d="M190 250l220 220M410 250L190 470"/><path d="M170 540h260M170 590h260M170 640h260M170 690h260" stroke-width="14"/></g><text x="300" y="800" text-anchor="middle" font-family="serif" font-size="30" fill="#000">'+xesc(title)+'</text></svg>';
+  const files=[
+    {name:'mimetype', data:'application/epub+zip'},
+    {name:'META-INF/container.xml', data:'<?xml version="1.0" encoding="utf-8"?>\n<container version="1.0" xmlns="urn:oasis:names:tc:opendocument:xmlns:container"><rootfiles><rootfile full-path="OEBPS/content.opf" media-type="application/oebps-package+xml"/></rootfiles></container>'},
+    {name:'OEBPS/content.opf', data:'<?xml version="1.0" encoding="utf-8"?>\n<package xmlns="http://www.idpf.org/2007/opf" version="3.0" unique-identifier="uid" xml:lang="en"><metadata xmlns:dc="http://purl.org/dc/elements/1.1/"><dc:identifier id="uid">'+xesc(uid)+'</dc:identifier><dc:title>'+xesc(title)+'</dc:title><dc:creator>'+author+'</dc:creator><dc:language>en</dc:language><meta property="dcterms:modified">'+mod+'</meta><meta name="cover" content="cover-img"/></metadata><manifest><item id="nav" href="nav.xhtml" media-type="application/xhtml+xml" properties="nav"/><item id="css" href="style.css" media-type="text/css"/><item id="cover-img" href="cover.svg" media-type="image/svg+xml" properties="cover-image"/><item id="title" href="title.xhtml" media-type="application/xhtml+xml"/>'+chs.map(c=>'<item id="'+c.id+'" href="'+c.file+'" media-type="application/xhtml+xml"/>').join('')+'</manifest><spine><itemref idref="title"/>'+chs.map(c=>'<itemref idref="'+c.id+'"/>').join('')+'</spine></package>'},
+    {name:'OEBPS/nav.xhtml', data:xhtml('Contents','<nav epub:type="toc" id="toc"><h1>Contents</h1><ol>'+chs.map(c=>'<li><a href="'+c.file+'">'+xesc(c.label)+'</a></li>').join('')+'</ol></nav>')},
+    {name:'OEBPS/style.css', data:css},
+    {name:'OEBPS/cover.svg', data:mark},
+    {name:'OEBPS/title.xhtml', data:xhtml(title,'<div class="cover"><h1>'+xesc(title)+'</h1><p>'+author+'</p></div>')}
+  ].concat(chs.map(c=>({name:'OEBPS/'+c.file, data:c.html})));
+  return zipStore(files);
+}
+function setEpubLink(b){
+  const a=$('btn-epub'); if(!a) return;
+  a.hidden=!epubAllowed(b);
+}
+if($('btn-epub')) $('btn-epub').onclick=e=>{
+  e.preventDefault(); e.stopPropagation();
+  if(!epubAllowed(readerBook)) return;
+  const blob=buildEpub(readerBook); if(!blob) return;
+  const url=URL.createObjectURL(blob), a=document.createElement('a');
+  a.href=url; a.download=String(readerBook.id).replace(/^tvn-|^qf-/,'')+'.epub';
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url), 4000);
+};
 bootLibrary();
