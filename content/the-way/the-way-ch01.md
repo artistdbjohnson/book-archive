@@ -48,7 +48,11 @@ The big man's arm took my weight when I lunged against it, and he set his feet a
 
 Off to the side of the ring, the men who were throwing had been taking off their outer cloaks so their arms would be free, and they had laid them in a pile at the feet of a young man. He was standing by those coats with his arms folded. He was a few years younger than me, in a clean cloak, and his face didn't change. He watched the whole thing the way a man watches grain being measured out, to make sure nobody cheats the scale. He never bent down for a rock, not once. His name was Saul, though I only learned that later, the same way everyone else in the city did.
 
-Someone rolled the wall stone off of Stephen. He turned onto his side, and a rock hit him between the shoulder blades, and another one hit the back of his hand when he put it down to push himself up, and I saw his fingers go wrong. He got himself up onto his knees anyway. His mouth was full of dust and blood. One of his eyes had swelled almost shut, and he lifted his face up again with the other one.
+Someone rolled the wall stone off of Stephen. He turned onto his side, and a rock hit him between the shoulder blades, and another one hit the back of his hand when he put it down to push himself up, and I saw his fingers go wrong. He got himself up onto his knees anyway. His mouth was full of dust and blood. One of his eyes had swelled almost shut. With the other one he looked across the ring, and he found me in the crowd.
+
+"Eleazar," he said.
+
+I don't know if anybody else heard it. Then he lifted his face up again.
 
 "Lord Jesus, receive my spirit."
 
@@ -84,7 +88,7 @@ My room was up an outside stair over the drying racks. There was a cot in it, a 
 
 I didn't light the lamp, even though it was full of oil and the flint was sitting right next to it. I watched the window go from gray to dark.
 
-When we were boys, Stephen and I used to climb up the ladder onto his father's roof in the evenings and argue until one of our mothers yelled at us to come down. He would say the light coming up over the Mount of Olives in the morning was enough for a man to live on, if he would only look at it. I would tell him the man who owned the house didn't take light for rent. He laughed every time, and we would split a loaf and start the whole argument over the next night.
+When we were boys, Stephen and I used to climb up the ladder onto his father's roof in the evenings and argue until my mother came out into the lane and called up, "Eleazar," and then I had to climb down. He would say the light coming up over the Mount of Olives in the morning was enough for a man to live on, if he would only look at it. I would tell him the man who owned the house didn't take light for rent. He laughed every time, and we would split a loaf and start the whole argument over the next night.
 
 My father used to say the evening prayer facing the wall, with his hands open in front of him. I knew every word of it. I sat on the cot with my hands between my knees and didn't say any of them.
 

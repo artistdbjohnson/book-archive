@@ -60,7 +60,7 @@ He came in a little before midday with a donkey carrying a bundle of cut boards,
 
 He paid it. Then he didn't move on. He stood there with his hand on the counter while the donkey shifted its feet behind him.
 
-"You're Yohanan," he said.
+"You're Eli," he said.
 
 I didn't say yes or no. I held his token out to him.
 

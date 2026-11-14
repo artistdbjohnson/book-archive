@@ -42,7 +42,7 @@ I knew him. I didn't know his name. I'd seen him at the offices, at the table ne
 
 He let the bucket down and filled it and drank, and wiped his mouth. Then he came over and sat down on the wall, not next to me, a little way along it, and looked at the woodworker and his wife, and then away from them. He didn't ask who they were.
 
-"You're Yohanan," he said. "Shimon's son. From the north arch."
+"You're Eli," he said. "Shimon's son. From the north arch."
 
 "Yes."
 
@@ -80,7 +80,7 @@ He looked at me then, for the first time since he'd sat down.
 
 "I know."
 
-"Now it's a line," he said. "Your name. Your father's name. Your room, and that the room's empty. Your arch, and the day you left it. And what you looked like." He stopped. "It's written on Saul's board's list now, with the others. One line. I saw it. I didn't write it. One of the scribes did."
+"Now it's a line," he said. "Eleazar son of Shimon. Your room, and that the room's empty. Your arch, and the day you left it. And what you looked like." He stopped. "It's written on Saul's board's list now, with the others. One line. I saw it. I didn't write it. One of the scribes did."
 
 I didn't say anything. The woodworker had opened his eyes.
 
@@ -94,7 +94,7 @@ I didn't say anything. The woodworker had opened his eyes.
 
 "No," he said. "There's a lot of lines. It's a long list now." He looked at the woodworker and his wife again, and away again, quick. "I didn't read them all. I didn't want to."
 
-I sat there with the skin on my shoulder, heavy and cold against my side where it had sweated through the leather.
+I sat there with the skin on my shoulder, heavy and cold against my side where it had sweated through the leather. I kept hearing the whole name the way he'd said it. It sounded like somebody else's.
 
 He stood up and got his bag and put it on his shoulder.
 

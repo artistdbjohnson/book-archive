@@ -54,7 +54,9 @@ The man with the stool set it down at the end of my counter, and the old man sat
 
 "Your name."
 
-I told him. The old man wrote it at the top of the clean side, and he wrote my father's name after it, without my telling him.
+I told him. The old man wrote it at the top of the clean side, and he wrote my father's name after it, without my telling him. Then he read it back under his breath, slow, one word at a time.
+
+"Eleazar son of Shimon."
 
 "How many people went out through this gate on foot this month?" the heavy man said.
 

@@ -56,7 +56,7 @@ There were eleven clay tokens in it. That was all there was in it. I hadn't coun
 
 The bald scribe wrote it down.
 
-After that the offices sent two guards to the dye works. They had my room on their board, where they'd written it down on the sixteenth day along with my name and my father's name, so they knew where to go. He wasn't there for that part. He had it from one of the guards, after.
+After that the offices sent two guards to the dye works. They had my room on their board, where they'd written it down on the sixteenth day along with my name and my father's name, Eleazar son of Shimon, so they knew where to go. He wasn't there for that part. He had it from one of the guards, after.
 
 They went in through the yard. The dyers were working, and they stopped and stood up from the vats with their arms colored to the elbows and watched them go up my stair. The door wasn't barred. I'd never barred it when I wasn't in. They went in and came out again in hardly any time at all, because there wasn't anything in there to look at, and they asked the man who owned the dye works where I was. He said he didn't know. They asked him who came to see me, and he said nobody did, which was true. He said I paid my rent at the new moon, and I'd paid it, and he didn't ask a man where he went in the evenings. They wrote down that he didn't know, and they left. The dyers went back to the vats. One of them asked the guards on their way out what I'd done, and they didn't tell him.
 
