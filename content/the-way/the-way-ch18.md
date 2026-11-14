@@ -6,17 +6,17 @@ I didn't drink. I let them have it. She tried to give it back to me twice and I 
 
 We stopped at dark in a gully below the road, out of sight of it, where a bank of earth had come down and made a flat place. There was no tower and no hut. There was nothing to keep off the cold but the bank. She gave him the last of the water, and he held it in his mouth and swallowed it slowly, a little at a time, and gave her the skin back empty, and she gave it to me.
 
-Nobody ate. There wasn't anything, and nobody said so. She sat against the bank with her knees up and his head on her lap, and pulled the end of her cloak over him, and he lay with his eyes open looking up at the sky. The cold came down off the ridge after the sun went, quick, the way it did up there, and the sweat from the day went cold on my back under the tunic.
+Nobody ate. She'd given him the last of the loaf at midday, and there wasn't anything else, and nobody said so. She sat against the bank with her knees up and his head on her lap, and pulled the end of her cloak over him, and he lay with his eyes open looking up at the sky. The cold came down off the ridge after the sun went, quick, the way it did up there, and the sweat from the day went cold on my back under the tunic.
 
 I lay down on my side with the skin under my head and my sandals on, and my mouth was dry, and my tongue was thick in it, and I lay there and listened to him breathing. It was a bad night for breathing. Every so often he'd stop, and then catch it again, and she'd say something to him low, and he'd say something back. I don't think any of us slept much. The ground was hard and full of small stones, and I kept finding them with my hip and my shoulder and moving, and finding more.
 
 The stars went round.
 
-When the gray came we got up without saying anything and climbed back up the bank to the road. My legs were stiff all the way up the backs of them. My heel had stuck to the leather again in the night, and when I stood on it, it came away, and I felt it come away and go wet.
+When the gray came we got up without saying anything and climbed back up the bank to the road. My legs were stiff all the way up the backs of them, and at the top of the bank I had to stand and wait before they'd carry me. My heel had stuck to the leather again in the night, and when I stood on it, it came away, and I felt it come away and go wet.
 
 That was the thirty-seventh day, the third day of the week.
 
-We walked for maybe an hour in the cool before the sun came up. Nobody talked. I watched the road ahead and the hills on either side of it for anything green, a line of it down a slope, or a patch of reeds, or a tree standing on its own where there shouldn't be one, and there wasn't any. There was stone, and scrub, and the road, and the hills going on gray one behind the other. Then the road came round the shoulder of a hill and dropped, and below us there was a village, a small one, a dozen houses and some pens, and in the middle of it a stone well with a low wall round it and a wooden frame over it, and a woman already at it with a jar.
+We walked for maybe an hour in the cool before the sun came up. Nobody talked. I watched the road ahead and the hills on either side of it for anything green, a streak of it down a slope, or a dark line of bushes in a cut, or a tree standing on its own where there shouldn't be one, and there wasn't any. There was stone, and scrub, and the road, and the hills going on gray one behind the other. Then the road came round the shoulder of a hill and dropped, and below us there was a village, a small one, a dozen houses and some pens, and in the middle of it a stone well with a low wall round it and a wooden frame over it, and a woman already at it with a jar.
 
 She saw it too. She didn't say anything. She took his arm.
 
@@ -24,7 +24,7 @@ It was slow getting down to it, because it was steep, and because he had to stop
 
 I gave it to her first. She held it for him, and he drank from the edge of it, and some of it ran down his beard onto the front of his tunic, and he didn't stop until she took it away from him. Then she drank. Then I drank. My stomach was empty, and the water went down into it cold and sat there. I drank until my stomach hurt, and then I let the bucket down again and filled the skin, and pulled the stopper tight, and lifted it. It was heavy. I hung it on my shoulder and felt it pull there, and I didn't mind it.
 
-There was a man at the far side of the well I hadn't noticed when we came down. He was sitting on the wall with his back to us, shaving the back of his neck with a little knife, looking down into a bowl of water on the wall beside him. He didn't turn round. When he was done he wiped the knife on his tunic and threw the water out of the bowl onto the ground and went into one of the houses.
+There was a woman on the step of the nearest house, sweeping it with a twig broom, short hard strokes, and the dust went up yellow off the step into the sun. She didn't look at us. When she was done she knocked the broom against the doorpost and went in.
 
 She wet a corner of her head cloth in the bucket and wiped his face with it, and the back of his neck, and his eyes, and he let her. Then she wet it again and held it against his side, over the tunic, where he always held it, and he shut his eyes.
 
@@ -38,7 +38,7 @@ He came down the same road we had, from the south, not long after. I saw him on 
 
 When he got to the bottom he came straight to the well, the way anybody would. He was a thin man about thirty, with a short beard and a narrow face, and his good tunic tied up at the belt for walking, and a cough he kept stopping to give. He put his bag down and went to the bucket, and then he looked up and saw me, and stopped.
 
-I knew him. I didn't know his name. I'd seen him at the offices, at the table nearest the door, the morning they wrote down my name and my father's name, and once more after that, going past my arch on some errand with a tablet under his arm. He'd never spoken to me. He knew me, though. I could see him know me, there at the well with the rope in his hand.
+I knew him. I didn't know his name. I'd seen him at the offices, at the table nearest the door, the evening they wrote down my name and my father's name, and once more after that, going past my arch on some errand with a tablet under his arm. He'd never spoken to me. He knew me, though. I could see him know me, there at the well with the rope in his hand.
 
 He let the bucket down and filled it and drank, and wiped his mouth. Then he came over and sat down on the wall, not next to me, a little way along it, and looked at the woodworker and his wife, and then away from them. He didn't ask who they were.
 
@@ -76,7 +76,7 @@ He coughed again and spat on the ground, away from us.
 
 He looked at me then, for the first time since he'd sat down.
 
-"Before," he said, "you were a count. Every sixth day the clerk took your box and counted it and brought the number up to us, and somebody wrote the number down, and it was right, and that was all you were to anybody up there. A number on the sixth day. Nobody had to say your name. Most of them didn't know it."
+"Before," he said, "you were a count. Every sixth day the clerk counted your box at your counter and brought the number up to us, and somebody wrote the number down, and it was right, and that was all you were to anybody up there. A number on the sixth day. Nobody had to say your name. Most of them didn't know it."
 
 "I know."
 
@@ -84,7 +84,7 @@ He looked at me then, for the first time since he'd sat down.
 
 I didn't say anything. The woodworker had opened his eyes.
 
-"A count doesn't go anywhere," the man said. "It's on a tablet in a room. A line, somebody reads it out. Somebody says, have we got anything on this one." He coughed. "That's all. I thought you'd want to know it was a line now."
+"A count's only a number," the man said. "Nobody asks about a number. A line, somebody reads it out. Somebody says, have we got anything on this one." He coughed. "That's all. I thought you'd want to know it was a line now."
 
 "Who reads it out?"
 
@@ -102,7 +102,7 @@ He stood up and got his bag and put it on his shoulder.
 
 "Will anybody ask you?"
 
-"I don't know," he said. "Nobody's ever asked me anything." He coughed. "I'm a man who sits by the door."
+"I don't know," he said. "Nobody's ever asked me anything." He coughed. "I sit by the door."
 
 He looked at the woodworker one more time. He looked at his face, and the gray round his mouth, and the way he held his side, and I could see him start to say something about it, and not.
 
@@ -136,4 +136,4 @@ When he was ready she helped him up off the wall, and I took the small bundle fr
 
 She was asking me.
 
-"North," I said. "There's a spring past the next village. On the left, under the road."
+"North," I said.
