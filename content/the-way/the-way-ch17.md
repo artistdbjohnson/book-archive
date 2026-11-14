@@ -30,7 +30,7 @@ He looked at the woodworker then, and his face changed. He reached over and took
 
 He told it low, crouched there with his arms round his knees, and the others listened, and I listened.
 
-He said he'd come out of the city three days before. He said Saul had been to the high priest. He said Saul had asked him for letters, and the high priest had given them to him, letters to the synagogues in Damascus, saying that if Saul found any of Stephen's people there, men or women, he could bring them back to Jerusalem bound. He said everybody in the lower market was talking about it. He said Saul was getting a party together to go.
+He said he'd come out of the city three days before, and they'd laid up through the Sabbath and come on again when it was out. He said Saul had been to the high priest. He said Saul had asked him for letters, and the high priest had given them to him, letters to the synagogues in Damascus, saying that if Saul found any of Stephen's people there, men or women, he could bring them back to Jerusalem bound. He said everybody in the lower market was talking about it. He said Saul was getting a party together to go.
 
 "Damascus," the girl's father said. "That's a long way."
 
@@ -44,7 +44,7 @@ Nobody said anything to that.
 
 "I don't know," he said. "That's what people are saying."
 
-I don't know if it was true either. Nobody I met ever saw one of those other letters. But on that road, that week, it didn't matter whether it was true. Everybody had heard it, and everybody walked like it was true.
+I don't know if it was true either. Nobody I met ever saw one of those other letters. But on that road, that week, it didn't matter whether it was true. Everybody had heard it.
 
 The door boy said that was why they'd been walking at night. They'd come up out of the city in the dark and gone round the first town by the fields, and they'd slept the day in a dry streambed under some rocks, and come on again at dusk. He said there were others doing it. He said there were little lots of people all along the road, going north at night and lying up in the day, and he'd passed some and been passed by some, and nobody asked anybody's name.
 
@@ -74,11 +74,11 @@ I thought about it. I'd never had to say it out loud.
 
 "They're looking now."
 
-"They're looking for what's different," I said. "The watch stands at a gate all day. After the first hour everything that comes through looks the same, and they stop seeing it. What they see is what doesn't look like everything else."
+"They're looking for what's different," I said. "The watch stands at a gate all day. After the first hour everything that comes through looks the same, and they stop seeing it. They only see what isn't like the rest."
 
 "Like what?"
 
-"Like a family with all its bedding on its backs," I said. "Like people who come through at first light, when the arch is empty, and there's nobody else to look at. Like people who look back. Like people who hurry. Like people who come round the outside of the wall in the dark and get caught in the fields by somebody's watchman, and have to say what they were doing there."
+"Like a family with all its bedding on its backs," I said. "Or people who come through at first light, when the arch is empty, and there's nobody else to look at. Or people who come round the outside of the wall in the dark and get caught in the fields by somebody's watchman, and have to say what they were doing there."
 
 The door boy didn't say anything.
 
@@ -136,7 +136,7 @@ The man with the basket stopped at the counter. The collector looked at the bask
 
 The man paid. The collector dropped it in his box and made his mark and gave him a token without looking at him again, and turned back to the timber man, who was still shouting. The watch was watching the timber man. Nobody stopped any of us.
 
-On the far side of the arch there was a street going up into the town, and outside a house on the corner two women were sitting on the ground facing each other with a hand mill between them, turning it together, the stone going round and round, and the flour coming out round the edge of it onto a cloth. They were arguing about somebody's son. Neither of them looked up.
+On the far side of the arch there was a street going up into the town, and outside a house on the corner two men were squatting over a pebble game scratched in the dust, arguing about a move, one of them with his hand still on a pebble. Neither of them looked up.
 
 We went up the street past them, and through the town, and out the far gate, which was just as busy, and nobody asked any of us anything.
 
@@ -144,7 +144,7 @@ Out on the road on the other side, the man with the basket stopped and took the 
 
 He didn't say anything. He nodded once, and then he and his wife and the girl went on up the road faster than we could go, and before long I lost them among all the others.
 
-The woodworker was walking with his hand on his side. He'd been holding his breath all the way through the arch, and now he let it out. His face had gone gray round the mouth. She made him sit down on a stone at the side of the road, and I gave her the skin, and she held it for him while he drank. Then she gave it back to me. It was lighter than I wanted it to be. There was a spring at the last town, people said, and none they knew of before the next one. We sat there until his breathing came back even, and then we got up.
+The woodworker was walking with his hand on his side. He'd been holding his breath all the way through the arch, and now he let it out. His face had gone gray round the mouth. She made him sit down on a stone at the side of the road, and I gave her the skin, and she held it for him while he drank. Then she gave it back to me. It was lighter than I wanted it to be. We hadn't stopped for water in the town. I didn't know if there was a spring before the next one. We sat there until his breathing came back even, and then we got up.
 
 "You watched people come through a lot of times," he said.
 
