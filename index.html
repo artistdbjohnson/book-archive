@@ -46,6 +46,13 @@ main{flex:1}
 .list-row .t{font-size:15px;font-weight:700;letter-spacing:-.02em}
 .list-row .m{font-size:11px;color:var(--muted);margin-top:4px;font-weight:400}
 .list-row.soon{opacity:.78}
+#list-view .list-row{align-items:center;transition:background .15s ease}
+#list-view .list-row:active{background:var(--press)}
+#list-view .list-row:focus-visible{outline:1px solid var(--muted);outline-offset:-1px}
+#list-view .list-row .copy{min-width:0;flex:1 1 auto}
+#list-view .list-row .m.st{margin-top:2px;opacity:.85}
+#list-view .list-row .row-go{flex:0 0 auto;color:var(--muted);font-size:18px;line-height:1}
+#list-view .list-row .row-go::after{content:"\203A"}
 .list-section{padding:18px 20px;font-size:15px;font-weight:700;letter-spacing:-.02em;text-transform:none;color:var(--text);border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;width:100%;background:transparent;border-left:0;border-right:0;border-top:0;text-align:left;cursor:pointer}
 .list-section .sec-copy,.list-rail .section .sec-copy{display:flex;flex-direction:column;align-items:flex-start;min-width:0;flex:1 1 auto;padding-right:14px}
 .list-section .t,.list-rail .section .t{font-size:15px;font-weight:700;letter-spacing:-.02em;color:var(--text)}
@@ -333,6 +340,8 @@ body.reader-open{overflow:hidden}
 .folder-head .t{font-size:18px;font-weight:700;letter-spacing:-.02em;display:block}
 .folder-head .m{font-size:11px;color:var(--muted);display:block;margin-top:4px}
 .folder-head .veil-sec{display:flex}
+.folder-head{cursor:default;user-select:none}
+.folder-kicker{display:block;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
 .brand .brand-mark{display:inline-block;width:auto;height:10.5px;aspect-ratio:629/582;margin-right:9px;vertical-align:0;color:var(--text);flex:none}
 
 #btn-marks,#btn-epub{color:var(--r-strong)}
