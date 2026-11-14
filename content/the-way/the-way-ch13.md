@@ -4,7 +4,9 @@ The two of them sat by the wall under the tree until the last of the light was g
 
 I took a drink out of the skin. The water was warm and tasted of the skin. I put the stopper back in and held it on my knees. I hadn't eaten anything since the morning, and I hadn't thought about it until then, and now I couldn't stop thinking about it. Up by the tree I could see her moving, getting something out of the small bundle, and I thought it was bread, and I watched her break it and give him the bigger part.
 
-It got cold the way it did out there after a hot day, all at once, with the heat going up off the stones. Somewhere off on the hill behind the village there were sheep with bells on, moving, and a man calling them in a high voice.
+It got cold the way it did out there after a hot day, all at once, with the heat going up off the stones. Somewhere off on the hill behind the village there were sheep with bells on, moving, and a man calling them in a high voice. After a little the bells stopped, and the man stopped calling.
+
+The stone I was sitting on had been warm when I sat down on it, and now it wasn't. The cold came up out of it into me, and I moved over to the edge of it and then back again, and it was the same everywhere. My stomach was making noises. I'd been hungry before, on fast days, and when I was a boy and there wasn't much, but I'd always known where the next bread was. I didn't know that now. I had coppers in my belt and no idea who out here would sell me anything after dark.
 
 Behind me the city was up on its hill with the wall around it, and there were lamps in it, hundreds of them, small, in the upper city and down through the lower market and along the top of the wall where the watch was. I could pick out the dark gap of my own gate, because there weren't any lamps in it. I couldn't pick out the dye works. It was down in the lower part somewhere, behind the market, in among all the other roofs.
 
@@ -20,7 +22,7 @@ The clerk stood and looked at all that. He asked the night watch where I was. Th
 
 Then he picked up the key and opened the box.
 
-He counted it right there at the counter, with the two guards standing behind him and the night watch looking on. He counted it the way he always counted it, out into his hand in tens and down in piles on the counter, so that when he was done there was a row of little piles all along the wood with the key lying at the end of them, and then he took the tablet and ran his finger down the marks since his last count, the way he always did, and he counted the marks.
+He counted it right there at the counter, with the two guards standing behind him and the night watch looking on. He counted it the way he always counted it, out into his hand in tens and down in piles on the counter, so that when he was done there was a row of little piles all along the wood with the key lying at the end of them. Then he took the tablet and ran his finger down the marks since his last count, the way he always did, and he counted the marks.
 
 It came out right. It came out right to the copper.
 
@@ -30,7 +32,7 @@ The clerk stood there a little after he'd finished, with his hand flat on the co
 
 I don't know who took the tolls at my gate that day. Maybe nobody did. It was the eve of the Sabbath, and the loads that came in would have come in early to get done before sundown. The man from the offices didn't know. I didn't ask him.
 
-Back at the offices the clerk gave in the count, and he told them where I'd gone. Saul's board was waiting for me there. The man said there were three of them that morning at the long table, the heavy man with the rings and the bald scribe and a third man the man from the offices didn't know. The clerk told them what he'd found, the key and the tablet and the count, and the heavy man had the scribe write it down.
+Back at the offices the clerk gave in the count, and he told them where I'd gone. Saul's board was waiting for me there. The man said there were three of them that morning at the long table, the heavy man with the rings and the bald scribe and a third man he didn't know. The clerk told them what he'd found, the key and the tablet and the count, and the heavy man had the scribe write it down.
 
 Then the heavy man asked the clerk a question. He asked him if I had ever been short.
 
@@ -40,13 +42,13 @@ Then the heavy man asked the clerk a question. He asked him if I had ever been s
 
 "Not this morning either."
 
-The scribe wrote that down too. The man from the offices said nobody at the table said anything about it after that. They went on to the next thing, which was where I'd gone.
+The scribe wrote that down too. Nobody at the table said anything about it after that. They went on to the next thing, which was where I'd gone.
 
 Then the offices sent the runner.
 
-It was a boy from the offices, maybe twelve, in a clean tunic that was too long for him. They sent him down to the gate to look at it with his own eyes and come back and tell them. He ran all the way, the man said. That boy always ran. He went down out of the upper city and through the market and out the long street to my gate, with his tunic held up in one hand so he wouldn't fall on it, and the people on the street got out of his way, because everybody in that city knew what a boy running from the offices meant.
+It was a boy from the offices, maybe twelve. They sent him down to the gate to look at it with his own eyes and come back and tell them. He ran all the way, the man said. That boy always ran. I'd seen him do it, the day he came out to my counter for me, out of breath before he could say what he'd been sent for.
 
-He came in under the arch from the city side, out of breath, and the auxiliaries were back on the post by then, the day watch. My counter was there with nobody behind it. The box was shut and locked. The tablet was lying on the wood, face up. And the stool was standing behind the counter where it always stood, empty, with my pouch on it, tied.
+He came in under the arch from the city side, out of breath, and the day watch had come on by then, out at the end of the arch. My counter was there with nobody behind it. The box was shut and locked. The tablet was lying on the wood, face up. And the stool was standing behind the counter where it always stood, empty, with my pouch on it, tied.
 
 The boy picked up the pouch. He didn't open it. He stood there holding it, and one of the auxiliaries told him he'd better take it up to whoever had sent him. So he took it. He carried it up to the offices in both hands, and he gave it to the clerk, who was still there, and the clerk untied it and tipped it out on the long table in front of the board.
 
@@ -54,23 +56,21 @@ There were eleven clay tokens in it. That was all there was in it. I hadn't coun
 
 The bald scribe wrote it down.
 
-After that the offices sent two guards to the dye works. They had my room on their board, where they'd written it down on the sixteenth day along with my name and my father's name, so they knew where to go. The man from the offices wasn't there for that part. He had it from one of the guards, after.
+After that the offices sent two guards to the dye works. They had my room on their board, where they'd written it down on the sixteenth day along with my name and my father's name, so they knew where to go. He wasn't there for that part. He had it from one of the guards, after.
 
-They went in through the yard. The dyers were working, and they stopped and stood up from the vats with their arms colored to the elbows and watched them go up my stair. The door wasn't barred. I'd never barred it when I wasn't in. They went in and came out again in hardly any time at all, because there wasn't anything in there to look at, and they asked the man who owned the dye works where I was. He said he didn't know. They asked him who came to see me, and he said nobody did, which was true. He said I paid my rent at the new moon, and I'd paid it, and he didn't ask a man where he went in the evenings. They wrote down that he didn't know, and they left. The dyers went back to the vats. One of them asked the guards on their way out what I'd done, the man said, and they didn't tell him.
+They went in through the yard. The dyers were working, and they stopped and stood up from the vats with their arms colored to the elbows and watched them go up my stair. The door wasn't barred. I'd never barred it when I wasn't in. They went in and came out again in hardly any time at all, because there wasn't anything in there to look at, and they asked the man who owned the dye works where I was. He said he didn't know. They asked him who came to see me, and he said nobody did, which was true. He said I paid my rent at the new moon, and I'd paid it, and he didn't ask a man where he went in the evenings. They wrote down that he didn't know, and they left. The dyers went back to the vats. One of them asked the guards on their way out what I'd done, and they didn't tell him.
 
-Down on the road that night I couldn't have known any of it. The man and the woman under the tree had got up. I heard them before I saw them, his breath going in short on one side and her saying something low to him. Then they went on up the road toward the village, slow, and I got up off my stone and went on after them, back the same distance I'd been all evening.
+Down on the road that night, none of it had happened yet. The man and the woman under the tree had got up. I heard them before I saw them, his breath going in short on one side and her saying something low to him. Then they went on up the road toward the village, slow. I stood up, and my legs had gone stiff from the cold stone, and I had to stand there a little before I could walk on them. Then I went on after them, back the same distance I'd been all evening.
 
-Outside the village somebody had spread their washing out on the bushes along the road to dry and left it there into the night. There were five or six tunics and a long cloth laid out over the thorns, pale in the dark all the way along the side of the road, and nobody about. I went past them. I didn't touch them.
+Outside the village somebody had spread their washing out on the bushes along the road to dry and left it there into the night. There were five or six tunics and a long cloth laid out over the thorns, pale in the dark all the way along the side of the road, and nobody about. I went past them.
 
-The rest of it, the man from the offices had from the guard too, and from what got said at the dye works afterward, because a thing like that got said.
+The rest of it the man had from the dye works man himself, who came up to the offices after the Sabbath to tell them the room was empty and let again, because they had it on their board.
 
-That afternoon the dye works man sent one of the women from the vats up to my room to clear it. It was the eve of the Sabbath, and he wanted it empty before sundown so he could rent it again after. She was a big woman with her hands stained dark to the wrist, the man said, the way all of them were, from the vats.
+That afternoon the dye works man sent one of the women from the vats up to my room to clear it. It was the eve of the Sabbath, and he wanted it empty before sundown so he could rent it again after. She was a big woman with her hands stained dark to the wrist, the way all of them were, from the vats.
 
-She went up the stair and in. The shutter was open the way I'd left it, and the sun was coming in on the floor. There was the cot with my blanket on it, folded. There was the basin on its stand under the window, with water still in the bottom of it from the day before, gone warm. She tipped the water out of the window into the yard. She dried the basin with the corner of her apron, and she carried it down and gave it to the dye works man, and he put it in his storeroom with the others.
+She went up the stair and in. I knew what she'd have found, because I'd left it. The cot with my blanket folded on it. The basin on its stand under the window, dry, with a gray ring of dust in the bottom of it where the water had gone down. Half a loaf of barley bread on the shelf, broken across, with a cloth over it.
 
-And on the shelf there was half a loaf of bread, barley, broken across, with a cloth over it.
-
-The man from the offices said she stood and looked at it. Then she wrapped it up in its cloth and put it inside her own clothes, and she took my blanket off the cot and my other tunic down off the peg behind the door, which was all there was of mine to take, and she went down. I don't know if she ate the bread. The man didn't know either. He said she had children, and he said it was a good loaf, from the baker by the rope maker's, and that bread like that didn't get thrown out in the lower market.
+She wiped the basin out with the corner of her apron and brought it down and gave it to the dye works man, and he put it in his storeroom with the others. She came down with the bread wrapped up in its cloth, and my blanket, and my other tunic off the peg behind the door, which was all there was of mine to take. I don't know if she ate the bread. The man didn't know either. He said she had children, and that a good barley loaf didn't get thrown out in the lower market.
 
 She left the lamp where it was on the shelf.
 
