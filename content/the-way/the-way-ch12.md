@@ -4,9 +4,9 @@ On the thirty-second day I woke up before it was light, the way I always did, an
 
 I'd bought a loaf off the baker by the rope maker's the night before. I broke it in two on the shelf by the basin. I ate one half standing at the window, looking down at the dye works men taking the covers off the vats in the gray, and I left the other half on the shelf for when I came home. Then I put my sandals on and went down the stair.
 
-I went the way I always went, through the lower market, where the stall men were still putting their awnings up and a boy was throwing water down on the stones in front of the cloth seller's to keep the dust off. At the woodworker's the shutter was down and the door was shut, and there wasn't any light inside. I didn't stop. A woman two doors up was shaking out a blanket over the street, and she said good morning to me, and I said it back.
+I went the way I always went, through the lower market, where the stall men were still putting their awnings up and a boy was throwing water down on the stones in front of the cloth seller's to keep the dust off. At the woodworker's there was a lamp lit, and the door with the leather on its hinge was open a hand's width. There were bundles tied up on the floor inside, and on the bench was the chair with three legs in it and the fourth lying next to it. I didn't stop. A woman two doors up was shaking out a blanket over the street, and she said good morning to me, and I said it back.
 
-At the gate the guards were already out at the road end of the arch with their spears, the scarred one and the tall one, and they didn't look round when I came in under the arch. I unlocked the box and set out my tokens and put the tablet in its groove. Up in the roof seam the wasp was going in and out of its crack with bits of gray in its mouth.
+At the gate the guards were already out at the road end of the arch with their spears, the scarred one and the tall one, and they didn't look round when I came in under the arch. I unlocked the box and set out my tokens and put the tablet in its groove. Up in the roof seam the wasp's crack was plastered shut with gray, and the wasp was walking on the outside of it.
 
 The man with the stool came out to the shade a little after the second hour, with the man with the ink on his finger. The brown-cloak man didn't come. The two of them stood where they always stood, and the man with the stool wrote, and the man with the ink watched the road.
 
@@ -16,7 +16,7 @@ It was a busy morning. Everybody who'd been held at the end of the arch the day 
 
 "I've got a big family."
 
-"They're sealed. They've got a merchant's mark on them."
+"Six jars is a merchant's load."
 
 "They're still for my table."
 
@@ -24,7 +24,7 @@ It was a busy morning. Everybody who'd been held at the end of the arch the day 
 
 He paid. He didn't like it. He took his token and went out under the arch, and the guards stopped him at the end of it and made him tell them all over again who he was and where he was going, and I watched him point back at me twice while he was telling them.
 
-A little before midday a woman came through on foot from the road with a string of green glass beads round her neck, and as she came up to my counter the string broke. The beads went everywhere. They went across the stones and under my counter and out toward the guards, and three or four people stopped to help her, and I got down on my knees and picked up the ones that had gone under the box. She stood there holding them all in her two cupped hands and counted them with her lips moving. Then she said they were all there. She tied them up in a corner of her shawl and went on into the city.
+A little before midday a woman came through on foot from the road with a string of green glass beads round her neck, and as she came up to my counter the string broke. The beads went everywhere. They went across the stones and under my counter and out toward the guards, and three or four people stopped to help her, and I got down on my knees and picked up the ones that had gone under my counter. She didn't count them. She tied them up in a corner of her shawl and went on into the city.
 
 The clerk came out a little after midday.
 
@@ -34,7 +34,7 @@ It wasn't his day. The count was the day after. He came without his board, and h
 
 "I know."
 
-"I'm to count it here like always. Then you're to walk up to the offices with me, and they're sending two of their guards down to walk with us." He looked down at the counter. "Saul's board wants you there when they open it."
+"I'm to count it here like always. Then you're to walk up to the offices with me, and they're sending two of their guards down to walk with us." He looked down at the counter. "Saul's board wants you in front of them after."
 
 "What for?"
 
@@ -54,7 +54,7 @@ The man with the stool came over from the shade then. He stood at the end of the
 
 He wrote that down. He waited to see if I'd say anything else, and I didn't, and he went back.
 
-I took the next copper. It was a man with a load of charcoal, and he was black to the elbows with it and he told me the price of charcoal had gone up and the toll should come down to match. I told him it didn't work that way. He paid me one copper at a time out of a rag, and every one of them left a black mark on my palm.
+I took the next copper. It was a man I'd never seen before with a load of charcoal, and he was black to the elbows with it and he told me the price of charcoal had gone up and the toll should come down to match. I told him it didn't work that way. He paid me one copper at a time out of a rag, and every one of them left a black mark on my palm.
 
 All through the afternoon I took the coppers and made the marks and handed out the tokens. A man came through with a load of roof tiles, still pale from the kiln, and he set one on my counter for a second to show me they weren't cracked, and then he packed it away again. Two young men came in from the north with nothing and said they'd come to see the Temple, and the guards kept them out at the end of the arch past the time it took to tell them where it was. A man with a load of straw for the stables up by the fortress paid me and told me it was going to rain. It didn't.
 
@@ -68,9 +68,9 @@ Then I didn't put the key in my pouch.
 
 I set it down on the counter, on the wood, right in the middle.
 
-I took the tablet out of its groove. I looked at it. It was the week's marks since the clerk's last count, and every one of them was right, and nobody would ever have to wonder about a single one. I laid it down on the counter next to the key, face up.
+I took the tablet out of its groove. I looked at it. It was the week's marks since the clerk's last count, and every one of them was right. I laid it down on the counter next to the key, face up.
 
-I untied the pouch from my belt. There were the day's tokens in it, the clay ones, still warm from being on me all day. I didn't take them out. I tied the strings shut and set the pouch down on the stool behind the counter, where I'd sat every day for four years.
+I untied the pouch from my belt. I swept the leftover tokens off the counter into the pouch, the way I did every night. I didn't take them out again. I tied the strings shut and set the pouch down on the stool behind the counter, where I'd sat every day for four years.
 
 My own coppers were in my belt, where I always kept them. There were nine of them. I didn't count them out. I knew it was nine.
 
@@ -104,7 +104,7 @@ I turned round. He'd come out of the shade, a step or two, with his small board.
 
 He wrote it down. I watched him write it. Then I turned back round and went on.
 
-The road was still warm from the day. The open ground was off to my right, and I didn't look at it. There were people still coming in toward the gate, late, hurrying to get under the arch before the big doors shut, and none of them looked at me twice. A man on foot going out alone at dusk with a water skin was nothing to look at. A family passed me going the same way I was, a man and his wife and his mother, with their bedding rolled and tied on their backs and a little boy riding up on the man's shoulders, half asleep. They went by me fast, the way people walked when they wanted to be somewhere else by dark, and the wife looked back at me once over the bedding and then didn't look again.
+The road was still warm from the day. The open ground was off to my left, and I didn't look at it. There were people still coming in toward the gate, late, hurrying to get under the arch before the big doors shut, and none of them looked at me twice. A man on foot going out alone at dusk with a water skin was nothing to look at. A family passed me going the same way I was, a man and his wife and his mother, with their bedding rolled and tied on their backs and a little boy riding up on the man's shoulders, half asleep. They went by me fast, the way people walked when they wanted to be somewhere else by dark, and the wife looked back at me once over the bedding and then didn't look again.
 
 I walked. I didn't hurry. I went down the slope where the road left the wall, and past the place where the path came round from the east side of the city, from the Sheep Gate, and joined the road.
 
@@ -126,7 +126,7 @@ The fields on both sides were all stones and terraces, with the barley cut and g
 
 They didn't look back. They were working too hard at it to look back. The road went up a little and then down, and they went down out of sight over the top of it, and I came up over the top a little after and there they were again, small, still going, him with his hand to his side.
 
-My hands were empty. I had the strap of the water skin over my shoulder and my coppers in my belt and nothing at all in my hands, and I walked with them down at my sides.
+I had the strap of the water skin over my shoulder and my coppers in my belt, and I walked with my hands down at my sides.
 
 A man came the other way with a torch, going in late toward the city, and he said, "They'll have the doors shut," and I said I knew. He went on, and his torch got small behind me.
 

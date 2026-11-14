@@ -46,7 +46,7 @@ I saw them coming down the street from the city, and I knew who they were before
 
 The man with the ink on his finger came out of the shade to meet them. He didn't say anything to me. He said something to the heavy man, and the heavy man nodded, and the man with the ink went back to the shade and stood there. He didn't come any closer the whole time they were there. He kept his right hand tucked into the front of his belt with the sleeve pulled down over it.
 
-The younger man set the stool down at the end of my counter, and the old man sat down on it and laid his big board across his knees. He opened it. One side had writing on it already, small and close, and the other side was clean.
+The man with the stool set it down at the end of my counter, and the old man sat down on it and laid his big board across his knees. He opened it. One side had writing on it already, small and close, and the other side was clean.
 
 "You're the collector at this gate," the heavy man said.
 
