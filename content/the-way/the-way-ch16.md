@@ -2,11 +2,11 @@
 
 We went down the woman's ladder before it was light on the first day of the week, the thirty-fifth day, and she was up already, sitting in her doorway, and she watched us go and didn't say anything. He thanked her. She nodded at him.
 
-The road went north out of that village along the side of a long valley. It was cooler early, and he went better than he had, with the day's rest in him, and for the first hour he only stopped twice. She had the big bundle on her back and the small one in her hand, the way she'd had them since the Sheep Gate, and I had the skin. I'd put the strip of cloth back in under my strap, against the heel, and it held.
+The road went north out of that village along the side of a long valley. It was cooler early, and he went better than he had, with the day's rest in him, and for the first hour he only stopped twice. She had the big bundle on her back and the small one in her hand, the way she'd had them since the city, and I had the skin. I'd put the strip of cloth back in under my strap, against the heel, and it held.
 
 We didn't talk much. When we did, it was the road.
 
-The valley was all fields on both sides, cut and empty, with stone walls round them and little stone huts in the corners for the watchmen at harvest, all empty now. A man was out early along one of the field walls, cutting the thorn brush back off it with a hook and stacking it in a pile, and he stopped and leaned on the hook and watched us go by. There was dew on the scrub at the side of the road, and our feet got wet from it, and then the sun came over the hill and it was gone.
+The valley was all fields on both sides, cut and empty, with stone walls round them and little stone huts in the corners for the watchmen at harvest, all empty now. A man was out early along one of the field walls, cutting the thorn brush back off it with a hook and stacking it in a pile, and he stopped and leaned on the hook and watched us go by. There was dew on the scrub at the side of the road, and our feet got wet from it. Then the sun came over the hill and it was gone.
 
 About the second hour the valley opened out, and there was a town on a hill ahead of us, a real town, with a wall round the top of the hill and the houses packed in behind it and spilling down outside it on the slope below. The road went up to it and in through a gate in the wall and out the other side, I suppose, because there wasn't any other way round that I could see.
 
@@ -18,7 +18,7 @@ About the second hour the valley opened out, and there was a town on a hill ahea
 
 She looked at me. Then she looked back at the town.
 
-It took us most of the morning to get up to it, because the road went back and forth across the slope to make the climb easier for animals, and every turn of it was in the sun. The houses outside the wall were poor ones, mud and stones, with goats tied in the doorways and children sitting in the dust. Up on one of the roofs a woman was plastering a crack in her parapet with mud. She had a bowl of it beside her and she was slapping it on with her flat hand and smoothing it down and slapping on more, and she didn't look down at any of us going by.
+It took us most of the morning to get up to it, because the road went back and forth across the slope to make the climb easier for animals, and every turn of it was in the sun. The houses outside the wall were poor ones, mud and stones, with goats tied in the doorways and children sitting in the dust. In one doorway an old woman sat spinning, the spindle dropping and turning and climbing back up her thread, and she didn't look up at any of us going by.
 
 Then we came round the last turn and the gate was in front of us.
 
@@ -36,9 +36,9 @@ There were two town watchmen on the gate, with staves and no spears, sitting on 
 
 "Where to?"
 
-"North," she said. "His brother."
+"North," she said. "His brother's people."
 
-He looked at the woodworker, at the way he stood, and at his face. He looked at me. He looked at my belt, and at my hands, and he didn't seem to see anything in them to ask about.
+He looked at the woodworker, at the way he stood, and at his face. He looked at me. He looked at my belt, and he didn't seem to see anything there to ask about.
 
 "There's a lot of you," he said. "Coming up from there."
 
@@ -76,13 +76,13 @@ So that left eight.
 
 I carried the loaves back down the street, one in each hand. They were still a little warm on the bottom. When I got back to the step, he was sitting with his eyes shut and his back against the wall of the house, and she was watching the gate.
 
-I gave her both loaves. She looked at them and then at me.
+I gave her one of the loaves and kept the other. She looked at it and then at me.
 
 "One's yours," I said. "The two of you."
 
-She broke one of them in two and gave him half and kept half. She put the other loaf in the small bundle, wrapped in the cloth, for later.
+She put it in the small bundle, wrapped in the cloth, for later.
 
-I went and stood by the well. I didn't want to watch them eat. I had a drink out of the skin, and I filled it from the well, and I stood there with my back to them and looked at the gate.
+I went and stood by the well with my loaf in my hand. I had a drink out of the skin, and I filled it from the well, hauling the bucket up hand over hand on a wet rope that had worn a deep groove into the stone lip of the well, and I stood there with my back to them and looked at the gate.
 
 From inside, I could see the counter side on, the man on his stool, the box, the chain round the post. A load came through, oil jars on a donkey, and he did it all over again. He looked, said the price, took the copper, dropped it in, closed the box, made the mark, gave the token. He was quick at it. He'd done it a lot of times.
 
@@ -90,9 +90,9 @@ The next one was a man with two baskets of cheese, and the collector knew him. T
 
 Then, a little after, the road outside went empty, and he got up off his stool and stretched, and said something to the watchmen on the bench, and one of them laughed. He went off round the side of the arch, through a little door in the wall there, and didn't come back.
 
-The stool was standing there behind the counter with nobody on it.
+Nobody was on the stool now.
 
-I don't know how long I stood by the well looking at it. My feet hurt. The heel had opened again under the cloth on the climb. My back hurt from the wall and the ground and the roof, three nights, and my legs hurt from the hills. The stool was in the shade of the arch. It was a plain wooden stool, three legs, the seat worn smooth and a little hollow in the middle where men had sat on it for years.
+I don't know how long I stood by the well looking at it. My feet hurt. The heel had opened again under the cloth on the climb, and the cloth had slipped down and balled up under my foot, and every step on it had been like walking on a pebble. My back hurt from the wall and the ground and the roof, three nights, and my legs hurt from the hills. The stool was in the shade of the arch. It was a plain wooden stool, the seat worn smooth and a little hollow in the middle where men had sat on it for years.
 
 I went over to it. I walked back across the open place and in under the edge of the arch to the end of the counter, and I stood next to the stool, and I put my hand on the counter. The plank was rough and warm. There was a knot in it, near the edge, that somebody had rubbed smooth.
 
@@ -108,7 +108,7 @@ She had seen all of it. I could tell by her face. She didn't say anything about 
 
 After a little the man came back out of the little door, wiping his mouth, and sat down on his stool, and the next load came in.
 
-We sat there until the worst of the heat was over. People came and went at the well. A man filled his jar and stood drinking out of the dipper and looking at us, and then went away. Two girls came down the street with water jars on their hips and stopped at the well and talked about somebody's wedding until their mother shouted down the street for them. The stalls started to close up for the middle of the day, the awnings coming down one after another, and the street went empty. I ate my loaf there on the step, the whole thing, slowly, and drank out of the skin. It was good bread. It was dry and a little burned on the bottom and I ate every crumb of it, and then I sat with my hands on my knees.
+We sat there until the worst of the heat was over. People came and went at the well. A man filled his jar and stood drinking out of the dipper and looking at us, and then went away. Two girls came down the street with water jars on their hips and stopped at the well and talked about somebody's wedding until their mother shouted down the street for them. The stalls started to close up for the middle of the day, the awnings coming down one after another, and the street went empty. I ate my loaf there on the step, the whole thing, slowly, with the crumbs going down my front, and drank out of the skin. It was good bread. It was dry and a little burned on the bottom and I ate every crumb of it, and then I sat with my hands on my knees.
 
 When the sun had gone round off the street, he said, "All right," and she helped him up, the two tries it always took now, and she put the bundle on her back.
 
