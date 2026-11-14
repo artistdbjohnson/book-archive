@@ -4,7 +4,7 @@ I found the well by the smell of it, wet stone, before I found it any other way.
 
 The village was only one street, really, with the houses built close on both sides of it and little lanes going off between them, and all of it dark except for a lamp here and there behind a door. It was hot in there. Out on the road the cold had come down, but in between the houses the heat of the day was still in the walls, and when I put my hand on one going by it was warm as bread. The air didn't move. It smelled of cooking fires gone down to coals and of people living close together.
 
-Partway along there was a bed frame stood up on end against the front of a house, with the cords strung across only half of it and a ball of new cord sitting on the doorstep beside it. I went round it.
+Partway along there was a plow leaned up against the front of a house, with the iron tip of it tied up in a rag. I went round it.
 
 The street opened out a little after that into a place where three lanes came together, and the well was in the middle of it, with a low wall of stones round the top and a wooden frame over it. There was a leather bucket on a rope tied off to the frame. Nobody was there.
 
@@ -38,11 +38,11 @@ Nobody said anything for a little. Then the man with the sons, without moving hi
 
 "Tonight. At dusk."
 
-"So did we," he said. "Well. This morning. You walked fast."
+"So did we," he said. "Well. This morning. We stopped in every village with the pots."
 
 I didn't say anything to that. He didn't ask me anything else. He didn't ask me why I'd come out, or what I'd done in there, or what I did for a living, and nobody else along that wall asked me either. I sat there and waited for somebody to, and nobody did.
 
-After a little I understood that they weren't going to. I don't know if they'd all come out for the same reason. Some of them, I think, had. The woman with the baby had. I could tell by the way the man with her sat with his back against the wall and his face to the street, and didn't lie down. But nobody said it, and nobody asked it.
+I don't know if they'd all come out for the same reason. Some of them, I think, had. The woman with the baby had. I could tell by the way the man with her sat with his back against the wall and his face to the street, and didn't lie down. But nobody said it, and nobody asked it.
 
 The old man turned over toward me.
 
@@ -68,7 +68,7 @@ I lay down. There wasn't anything to lie on except the ground, which was beaten 
 
 I hadn't taken my sandals off.
 
-I thought about it. I lay there and thought about untying them and setting them by my head the way I'd always set them by the door, and I didn't do it. I don't know why. Maybe it was only that there wasn't any door to set them by. I left them on. I'd never slept in my sandals before.
+I thought about it. I lay there and thought about untying them and setting them by my head the way I'd always set them by the cot, and I didn't do it. I left them on. I'd never slept in my sandals before.
 
 The straps were tight across the tops of my feet, where they'd swelled from the walking. I could feel each one of them.
 
@@ -76,11 +76,11 @@ It was a strange way to be hot and cold at once. All down my back the wall was g
 
 There wasn't any sound in that village at all except the people breathing along the wall, and the baby once, and the woman shushing it, and every so often the man with the pots turning over. I could hear the well, a drip somewhere down in it, very far down, and then a long space, and then another drip.
 
-I'd lived my whole life in the city, and I'd never been anywhere at night with that little noise. In the city there was always something. Somebody walking. A door. The watch calling up on the wall. Carts coming in late. And at my gate, all day, every day, the cracked stone in the roadway at the mouth of the arch, and every wheel that came over it knocking on it twice, once going on and once coming off, so that I used to count the loads by it without looking up.
+I'd lived my whole life in the city, and I'd never been anywhere at night with that little noise. In the city there was always something. Somebody walking. A door. The watch calling up on the wall. Carts coming in late. And at my gate, all day, every day, the cracked stone in the roadway under the arch, and every wheel that came over it knocking on it twice, once going on and once coming off, so that I used to count the carts by it without looking up.
 
 I lay there by the wall and I kept hearing it.
 
-There wasn't any cart. There wasn't any stone. I knew there wasn't. I was a long way up the road in the dark in a village whose name I didn't know, lying on the ground with strangers, and that stone was back at the mouth of my arch with nobody counting anything over it. But every time I started to go to sleep, I'd hear a wheel go over it, the two knocks, and I'd come awake again and lie there listening, and there wasn't anything to listen to.
+There wasn't any cart. There wasn't any stone. I knew there wasn't. I was a long way up the road in the dark in a village whose name I didn't know, lying on the ground with strangers, and that stone was back under my arch with nobody counting anything over it. But every time I started to go to sleep, I'd hear a wheel go over it, the two knocks, and I'd come awake again and lie there listening, and there wasn't anything to listen to.
 
 It happened three or four times. Then it stopped happening.
 
@@ -98,7 +98,7 @@ I got up. I went over to the well and let the bucket down and washed my face and
 
 When I came back to the wall, I gave the old man his folded cloth. He took it and looked at it and put it back in his bag. He didn't say anything about it.
 
-The man with the pots was already going, with the net on his back and one of the boys carrying their water jar, out of the open place and down the far lane toward the north end of the village, with the two boys behind him. He nodded to me as he went by, and that was his goodbye. The woman with the baby and her man were rolling up their cloak. The baby was awake and looking at everything, and the woman was talking to it low while she worked, telling it they were going for a walk, that was all, a nice long walk. The old man stayed sitting where he was.
+The man with the pots was already going, with the net on his back and one of the boys carrying their water jar, out of the open place and down the far lane toward the north end of the village, with the other boy behind him. He nodded to me as he went by, and that was his goodbye. The woman with the baby and her man were rolling up their cloak. The baby was awake and looking at everything, and the woman was talking to it low while she worked, telling it they were going to see the hills, that was all. The old man stayed sitting where he was.
 
 "Which way are you going?" I said to him.
 
@@ -106,8 +106,6 @@ The man with the pots was already going, with the net on his back and one of the
 
 I didn't know what to say to that. I said goodbye to him, and he said goodbye.
 
-I went out of the open place the way the man with the pots had gone, down the far lane, past the end houses and out onto the road on the other side of the village, where it went on north between the fields in the first gray light. There were people on it already, a few, small, going the same way I was.
+I went out of the open place the way the man with the pots had gone, down the far lane, past the end houses and out onto the road on the other side of the village, where it went on north between the fields in the first gray light. The raw place on my heel hurt with the first steps and then it went on hurting, and I walked a little on the side of that foot to keep the strap off it. The full skin swung against my hip at every step, and the strap of it was already cutting into my shoulder. There were people on it already, a few, small, going the same way I was.
 
-I looked for two of them that walked slow, with one of them stopping. I didn't see them yet.
-
-I went on.
+I looked for two of them that walked slow, with one of them stopping. I didn't see them.

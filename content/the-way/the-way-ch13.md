@@ -68,9 +68,9 @@ The rest of it the man had from the dye works man himself, who came up to the of
 
 That afternoon the dye works man sent one of the women from the vats up to my room to clear it. It was the eve of the Sabbath, and he wanted it empty before sundown so he could rent it again after. She was a big woman with her hands stained dark to the wrist, the way all of them were, from the vats.
 
-She went up the stair and in. I knew what she'd have found, because I'd left it. The cot with my blanket folded on it. The basin on its stand under the window, dry, with a gray ring of dust in the bottom of it where the water had gone down. Half a loaf of barley bread on the shelf, broken across, with a cloth over it.
+She went up the stair and in. I knew what was up there.
 
-She wiped the basin out with the corner of her apron and brought it down and gave it to the dye works man, and he put it in his storeroom with the others. She came down with the bread wrapped up in its cloth, and my blanket, and my other tunic off the peg behind the door, which was all there was of mine to take. I don't know if she ate the bread. The man didn't know either. He said she had children, and that a good barley loaf didn't get thrown out in the lower market.
+She brought the basin down and gave it to the dye works man, and he put it in his storeroom with the others. She came down with half a loaf of barley bread wrapped up in a cloth, and my blanket, and my other tunic off the peg behind the door, which was all there was of mine to take. I don't know if she ate the bread. The man didn't know either. He said she had children, and that a good barley loaf didn't get thrown out in the lower market.
 
 She left the lamp where it was on the shelf.
 
@@ -81,6 +81,8 @@ I didn't know any of that then. On the road that night I only knew what was in f
 The two of them went on into the village, and I stopped out at the edge of it where the first walls began, by a wall with an old olive tree leaning over it. A dog came out from between two of the houses and barked at me from a good way off, and when I didn't move it went back in. There were more dogs somewhere farther in, and lamps in a few houses still, and somebody's door shut. The two of them went in between the houses and I lost them.
 
 I stood there. The village smelled of cooking fires that had gone down to coals, and of goats, and of the dust that the day had left on everything. I didn't know if they had somewhere to go in there, people they knew, or if they'd walk straight through and go on in the dark. I didn't go after them to find out. I'd come as far behind them as I could without being with them.
+
+The road in front of the village was rutted deep from the carts in the rains, and the ruts had dried hard with sharp edges, and in the dark I kept putting my foot down into one or turning it on the edge of one. Twice I nearly went over.
 
 My feet were sore. I'd been on them all day at the counter and then all evening on the road, and the road had stones in it. I sat down with my back against the wall and took my sandals off and rubbed my feet, one and then the other, and then I put the sandals back on and tied them.
 
