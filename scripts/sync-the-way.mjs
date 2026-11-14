@@ -82,9 +82,8 @@ function readChapters(){
 
 function entry(chapters){
   const n = chapters.length;
-  const list = [{ label: 'Front Matter', text: BOOK.title + '\n\nby Douglxss Burley Johnson / d.b.j.' }].concat(chapters);
-  const head = `{id:${JSON.stringify(BOOK.id)}, title:${JSON.stringify(BOOK.title)}, subtitle:${JSON.stringify(BOOK.subtitle)}, series:${JSON.stringify(BOOK.series)}, year:${BOOK.year}, type:${JSON.stringify(BOOK.type)}, status:${JSON.stringify('In progress \u00b7 ' + n + ' of ' + BOOK.plannedChapters + ' chapters')}, freeChapterCount:${list.length}, blurb:${JSON.stringify(BOOK.blurb)}, chapters:[`;
-  const rows = list.map(c => `      {label:${JSON.stringify(c.label)}, text:${JSON.stringify(c.text)}}`).join(',\n');
+  const head = `{id:${JSON.stringify(BOOK.id)}, title:${JSON.stringify(BOOK.title)}, subtitle:${JSON.stringify(BOOK.subtitle)}, series:${JSON.stringify(BOOK.series)}, year:${BOOK.year}, type:${JSON.stringify(BOOK.type)}, status:${JSON.stringify('In progress \u00b7 ' + n + ' of ' + BOOK.plannedChapters + ' chapters')}, freeChapterCount:${n}, blurb:${JSON.stringify(BOOK.blurb)}, chapters:[`;
+  const rows = chapters.map(c => `      {label:${JSON.stringify(c.label)}, text:${JSON.stringify(c.text)}}`).join(',\n');
   return `  ${BEGIN}\n  ${head}\n${rows}\n    ]},\n  ${END}`;
 }
 

@@ -2,9 +2,10 @@
 
 The Way is one book entry (`id: "the-way"`, series `The Way`) inside `BOOKS` in
 `archive.js`, built the same way as the Quantum Frontier prequels: inline
-chapters, a `Front Matter` chapter, `freeChapterCount` equal to every chapter so
-the whole published text is readable, no cover (typographic card like the TVN
-shorts), byline `Douglxss Burley Johnson / d.b.j.`.
+chapters starting at Chapter One (no front-matter page in the web reader),
+`freeChapterCount` equal to every published chapter so the whole published text
+is readable, no cover (typographic card like the TVN shorts), byline
+`Douglxss Burley Johnson / d.b.j.`.
 
 That entry is generated. The published prose lives in
 `content/the-way/the-way-ch01.md`, `the-way-ch02.md`, ... (one file per
