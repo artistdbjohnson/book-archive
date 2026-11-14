@@ -130,7 +130,7 @@ At the end, the heavy man asked me where I slept. I told him. He asked me if I h
 
 The old man wrote that down, all of it. I watched his stylus go, and it took him longer than it had taken me to say it.
 
-Then the heavy man nodded, and the old man closed the board. The younger man picked up the stool. They went back up the street the way they had come, with the four guards behind them and people stepping out of their way again, and the man with the ink came out of the shade and went with them. He walked at the back. He was holding his right wrist in his left hand.
+Then the heavy man nodded, and the old man closed the board. The man with the stool picked it up. They went back up the street the way they had come, with the four guards behind them and people stepping out of their way again, and the man with the ink came out of the shade and went with them. He walked at the back. He was holding his right wrist in his left hand.
 
 The man with the straw came up to my counter. He set his copper down in front of me and didn't look at me.
 

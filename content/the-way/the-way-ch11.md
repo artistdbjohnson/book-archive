@@ -10,17 +10,17 @@ On the twenty-ninth day the board was at my gate again. It wasn't all of them. I
 
 The guards stayed out at the end of the arch. The scarred guard didn't look at me all day.
 
-I took the coppers. The clerk wouldn't be out for the count for four more days, so I just kept my marks. A man brought in wool, and another man brought in a load of tent cloth rolled up tight on a donkey, and two women brought in lentils between them on a pole and argued with each other about whose turn it was to pay. Around midday an old man came through on foot with nothing, and the guards kept him out there past the time it took to load and unload a donkey, asking him things, and he kept saying he was going to see his daughter, and they kept asking him which daughter. When they let him come on, he stopped at my counter even though he didn't owe anything and said, "Is it like this at every gate now?" I said I didn't know. He went on in, slow, looking back at the guards twice before he got to the end of the arch.
+I took the coppers. The clerk wouldn't be out for the count for four more days, so I just kept my marks. A man brought in wool, and another man brought in a load of tent cloth rolled up tight on a donkey, and two women brought in lentils between them on a pole and argued with each other about whose turn it was to pay. Around midday an old man came through on foot with nothing, and the guards kept him out there past the time it took to load and unload a donkey. He kept saying he was going to see his daughter, and they kept asking him which daughter. When they let him come on, he stopped at my counter even though he didn't owe anything and said, "Is it like this at every gate now?" I said I didn't know. He went on in, slow, looking back at the guards twice before he got to the end of the arch.
 
 When the light started to go, I locked up and put the leftover tokens in my pouch and the key in after them, and I walked home, but I didn't walk home the way I always went.
 
-I went the long way, round the far side of the lower market, and then I didn't go down the hide sellers' street. I went up the other way instead, through the streets behind the cloth market, where I didn't have any business being and hadn't walked since I was a boy. I walked slow. I wasn't looking for a door. I didn't know what door I'd be looking for. I was listening.
+I started the long way, round the far side of the lower market, but I didn't turn down the hide sellers' street. I went up the other way instead, through the streets behind the cloth market, where I didn't have any business being and hadn't walked since I was a boy. I walked slow. I wasn't looking for a door. I didn't know what door I'd be looking for. I was listening.
 
-It was the hour when everybody was eating, and the streets back there were narrow and close, so I could hear into every house I went by. I heard a man and his wife arguing about her mother. I heard children being told to sit down. I heard a pot go over and somebody laugh at it. On one step an old man was sitting on an upturned basket shelling beans into his lap in the last of the light, and he dropped the empty pods down into the gutter one at a time, and he didn't look up at me when I went past. In one courtyard I heard somebody singing a song about a girl from the hill country, badly, and somebody else telling him to stop.
+It was the hour when everybody was eating, and the streets back there were narrow and close, so I could hear into every house I went by. I heard a man and his wife arguing about her mother. I heard children being told to sit down. Somewhere a woman was calling a boy's name over and over out of a window, and nobody was answering her. I heard a pot go over and somebody laugh at it. Farther up, an old man was sitting on a basket on his step shelling beans into his lap in the last of the light, and he dropped the empty pods down into the gutter one at a time, and he didn't look up at me when I went past. In one courtyard I heard somebody singing a song about a girl from the hill country, badly, and somebody else telling him to stop.
 
 I walked those streets until it was full dark. I went down one and up the next one. I didn't hear anything, and I started to think I'd been a fool, and that they were somewhere on the other side of the city, or nowhere at all. When the lamps started going out behind the shutters, I went home and lay down in my room and listened to the dye works men putting the covers on the vats.
 
-On the thirtieth day the board wasn't there. The shade was empty all morning, and I kept looking over at it anyway. A man came in with a string of pack mules carrying bitumen in baskets from down by the salt sea, and the whole arch stank of it for an hour after he'd gone. The guards turned back a man who said he was a cousin of somebody in the high priest's house and couldn't say who. He shouted at them about it out on the road until they stopped answering him, and then he went off toward the next gate along the wall to try his luck there. A girl came through with her grandmother and asked me if the tokens were silver. I told her they were lead. She looked at the one I gave her grandmother like she still didn't believe me.
+On the thirtieth day the board wasn't there. The shade was empty all morning, and I kept looking over at it anyway. A man going out with a string of pack mules carrying bitumen in baskets, up from the salt sea and on his way to the coast, stopped to pay, and the whole arch stank of it for an hour after he'd gone. The guards turned back a man who said he was a cousin of somebody in the high priest's house and couldn't say who. He shouted at them about it out on the road until they stopped answering him, and then he went off toward the next gate along the wall to try his luck there. A girl came through with her grandmother and asked me if the tokens were silver. I told her they were clay. She looked at the one I gave her grandmother like she still didn't believe me. After them a potter came in with a load of new cooking pots packed in straw, and he made me watch while he counted them, because he'd been charged for twelve at another gate once when he only had ten. I counted along with him. He had eleven.
 
 The man with the ink on his finger came by in the afternoon, by himself, without his tablet. He stood in the shade and watched the road until the sun came round onto him, and then he left. He didn't come to my counter.
 
@@ -50,7 +50,7 @@ Then he came over to me, stepping between people's feet, and bent down close.
 
 "The board was at your gate yesterday."
 
-"Not today."
+"Not today. One of them came by alone, without his tablet."
 
 He looked at me a little longer. "If they start following you home," he said, "don't come here. Don't come to any of it."
 
@@ -64,7 +64,7 @@ There was a place on the mat by the wall near the door, where somebody had moved
 
 I sat with my knees up like everybody else. The man next to me moved his feet over a little to make room, and he didn't look at me, and that was all.
 
-They had already broken the bread before I came in. It had gone all the way round, and there wasn't any left. The cup was going round now, hand to hand along the far wall. I watched it go along. It came round the corner of the room and along to the man next to me, and he drank, and he held it out to me. I took it in both hands. I held it for a second, and then I handed it on to the woman on my other side, and I didn't drink from it. She took it from me and drank. Nobody said anything about it.
+They had already broken the bread before I came in. It had gone all the way round, and there wasn't any left. The cup was going round now, hand to hand along the far wall. I watched it go along. It came round the corner of the room and along to the man next to me, and he drank. He held it out to me, and I took it and handed it straight on to the woman on my other side without drinking. She drank. Nobody said anything about it.
 
 When the cup had gone all the way round, the younger man stood up at the back.
 
@@ -72,7 +72,7 @@ He said some things about Stephen first. He didn't say much. Then he said some o
 
 I waited until he was done. Then I reached into my belt and took out the scrap of papyrus.
 
-I'd been carrying it in there with my own coppers for eight days. I hadn't shown it to anybody. Twice I'd taken it out in my room at night and thought about holding it to my lamp, and twice I'd put it back in my belt, because they weren't my names to burn. I got up on my knees and held it out toward the back of the room, and the man next to me took it and passed it on, and it went hand to hand along the wall to the younger man.
+I'd been carrying it in there with my own coppers for eight days. I hadn't shown it to anybody. Twice I'd taken it out in my room at night and thought about burning it, and twice I'd put it back in my belt, because they weren't my names to burn. I got up on my knees and held it out toward the back of the room, and the man next to me took it and passed it on, and it went hand to hand along the wall to the younger man.
 
 He unfolded it and looked at it, and then he looked at me.
 
@@ -94,12 +94,8 @@ They sang a psalm. I sat there while they sang it. Then they started going out i
 
 The woodworker stopped by me on his way out. He couldn't bend down very well, with his ribs, so he stood there over me, and his wife stood behind him.
 
-"You sat down," he said.
-
-"I did."
-
 "The chair's almost done," he said. "Two more days." He breathed. "Then we're going north. My brother's got people up there." He didn't say where, and I didn't ask him. I didn't want to have it in my head. Then his wife touched his arm, and they went out.
 
 When it was my turn, the old woman looked down the stair and nodded at me. She didn't say anything to me, and I didn't say anything to her. I went down the stair and out of that lane and back through the streets behind the cloth market, and home past the dye works, where the covers were on the vats and nobody was about. I lay down in my clothes on top of my blanket with my sandals off by the door, and I didn't sleep until the dye works men came back to take the covers off.
 
-The next morning the board was in the shade again, the three of them, and the man with the ink was writing on his tablet. The guards were out at the end of the arch. I set out my tokens and took the first copper of the day, a man with a load of tent poles, and made his mark.
+The next morning the board was in the shade again, the three of them, and the man with the ink was writing on his tablet.

@@ -20,17 +20,17 @@ I understood a little of it. I had picked up enough of their talk in four years 
 
 I don't think anybody told them to stay away from me. The board had stood at my counter the day before and looked over at the post, and the guards had seen it, and they had moved themselves out of the way of whatever came next. I didn't like it, and I couldn't blame them.
 
-The clerk came for the count at the usual hour. It was the eve of the Sabbath, so people were in a hurry all morning, and the road was busier than it had been all week. He counted the coppers out onto the counter and ran his finger down my marks. The man with the ink on his finger and the big man in the brown cloak were in the shade, and this time there was a third one with them, the younger man who had carried the old scribe's stool. He had a small board of his own. He came over and stood at the end of my counter while the clerk counted, and he watched every copper go from one side of the counter to the other, and when the clerk wrote the number down on his board, the younger man wrote it down on his.
+The clerk came for the count at the usual hour. It was the eve of the Sabbath, so people were in a hurry all morning, and the road was busier than it had been all week. He counted the coppers out onto the counter and ran his finger down my marks. The man with the ink on his finger and the big man in the brown cloak were in the shade, and this time there was a third one with them, the man who had carried the old scribe's stool. He had a small board of his own. He came over and stood at the end of my counter while the clerk counted, and he watched every copper go from one side of the counter to the other, and when the clerk wrote the number down on his board, the man with the stool wrote it down on his.
 
 "It's right," the clerk said, to nobody in particular.
 
-The younger man wrote that down too.
+The man with the stool wrote that down too.
 
 "It's small," the clerk said, to me this time. "It's the smallest week you've had."
 
 "I know."
 
-He closed his board. He didn't say anything else, and he didn't look at the younger man once, the whole time. Then he went back up into the city with his board under his arm, and the younger man went back to the shade.
+He closed his board. He didn't say anything else, and he didn't look at the man with the stool once, the whole time. Then he went back up into the city with his board under his arm, and the man with the stool went back to the shade.
 
 A little after midday a man came up from the city side going out, with a donkey cart loaded with empty oil jars, maybe twenty of them, packed in straw and roped down. They were empty jars going out to sell to the presses up north, so they owed a toll. He knew it, and he had his copper out before he got to me. He was a thin man with a cough, and he made a joke about how twenty empty jars were the lightest load he'd ever paid a toll on. I took it and made the mark and gave him his token, and he went on out toward the road.
 
@@ -52,7 +52,7 @@ I went back to my counter.
 
 They kept that man there until they'd looked in every jar twice. When they finally let him go, he loaded them all back up himself, by himself, counting them out loud as he went, and roped them down again, and he didn't look at me or at them. The loads that had been piled up behind him came through all at once, a man with a load of pitch and two women with greens and a string of donkeys carrying wool, all of them pushing to get to my counter before the next one. I took their coppers as fast as I could and made the marks and handed out the tokens, and they all looked at me like it was my fault they'd been kept, and maybe it was.
 
-That afternoon the brown-cloak man stood in the shade and watched it all, and the younger man wrote on his small board. The man with the ink on his finger stood with them. He didn't come over. He didn't look like a man who was in any hurry about anything.
+That afternoon the brown-cloak man stood in the shade and watched it all, and the man with the stool wrote on his small board. The man with the ink on his finger stood with them. He didn't come over. He didn't look like a man who was in any hurry about anything.
 
 When the light started to go, I put the leftover tokens in my pouch and the key in after them and locked the box. The whole city was lighting its Sabbath lamps by then. I walked home through the lower market, and it smelled like everybody's bread at once.
 
@@ -84,11 +84,11 @@ The tall guard looked at me. The woman looked at me. I lifted my hand and waved 
 
 The woman came through. She went past my counter half running, with the little girl's head bouncing on her shoulder, and she didn't stop to thank me, and I didn't want her to. She went on up the street and around the corner and was gone.
 
-When I looked over at the shade, the younger man with the small board was writing. The brown-cloak man was looking right at me. The man with the ink on his finger was looking at me too, and he didn't write anything. He didn't have to. The younger man was writing it for him.
+When I looked over at the shade, the man with the stool was writing. The brown-cloak man was looking right at me. The man with the ink on his finger was looking at me too, and he didn't write anything. He didn't have to. The man with the stool was writing it for him.
 
 The rest of that day nobody said a word to me that they didn't have to. Late in the afternoon the woman came back out through the arch on her way home. The little girl was asleep on her shoulder now, and her face wasn't as red. The guards stopped the woman and asked her where she was going, and she told them, and they let her go. She didn't look over at me, and I didn't look at her long. The guards stopped everybody. The people they stopped came on to me and paid if they owed, and went on through if they didn't, and some of them looked at me hard, and some of them made a point of not looking at me at all.
 
-At the end of the day, with the light going, the younger man came out of the shade and stood at the end of my counter again.
+At the end of the day, with the light going, the man with the stool came out of the shade and stood at the end of my counter again.
 
 "Open the box," he said. "I want to see it."
 
